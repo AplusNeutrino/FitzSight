@@ -1,177 +1,105 @@
-# FitzSight Architecture
+# FitzSight Architecture — v0.6
 
-Version: v0.5.0
-
-## North-star boundary
+## Core principle
 
 ```text
-LLM / Planner = decide what approved investigation to run
-SQL / Python   = calculate
-Evidence       = prove what ran
-Verifier       = decide whether claims may be shown
-UI             = render verified results
+LLM / planner decides only the approved analytical workflow.
+SQL / Python calculates.
+Evidence Registry records.
+Verifier decides what may be presented.
 ```
 
-No layer above the deterministic tools is allowed to invent business numbers.
-
-## Runtime architecture
+## Runtime
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                        User / UI                            │
-│              CLI or Streamlit demo shell                   │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Supported Intent Gate                    │
-│  CRM/FTD investigation | Net-deposit anomaly investigation │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Constrained Planner                       │
-│ deterministic fallback | structured JSON | OpenAI optional │
-│        approved intent + approved actions only             │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│              MultiIntentInvestigationEngine                 │
-│                                                             │
-│  ┌──────────────────────┐  ┌──────────────────────────────┐ │
-│  │ CRM/FTD Engine       │  │ Net Deposit Engine           │ │
-│  │ conversion/control   │  │ deposits/withdrawals         │ │
-│  │ stats/contribution   │  │ concentration/control       │ │
-│  │ anomaly/events       │  │ events/guardrail            │ │
-│  └──────────────────────┘  └──────────────────────────────┘ │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Deterministic Tools                      │
-│ Schema | Read-only SQL | Statistics | Contribution | KPI   │
-│ Anomaly | local decomposition                              │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Evidence Registry                       │
-│ Evidence ID | inputs | status | digest | compact result    │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   EvidenceClaimVerifier                     │
-│ references | digest | status | *_gt boundary | causality   │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-                        PASS │ FAIL
-                     ┌───────┴────────┐
-                     ▼                ▼
-              Verified answer    Fail closed
+User question
+    ↓
+Local intent classifier
+    ├── CRM / FTD
+    ├── Net Deposit
+    └── Customer Intelligence
+    ↓
+Constrained planner
+    ├── deterministic fallback
+    ├── JSON adapter
+    └── optional OpenAI Responses provider
+    ↓
+Intent-specific deterministic executor
+    ↓
+Read-only analytical tools
+    ↓
+Evidence Registry
+    ↓
+EvidenceClaimVerifier
+    ↓
+Verified answer / fail closed
 ```
+
+## Approved deterministic executors
+
+### CRM / FTD
+
+- schema inspection;
+- affected/control SQL;
+- statistical tests;
+- contribution decomposition;
+- anomaly detection;
+- event check.
+
+### Net Deposit
+
+- period money-flow measurement;
+- deposit/withdrawal driver decomposition;
+- customer concentration;
+- regional controls;
+- event check.
+
+### Customer Intelligence
+
+- schema inspection;
+- observable customer-feature aggregation;
+- transparent behavioral-value segmentation;
+- segment deposit/withdrawal/trading profiles;
+- decision-use guardrail.
 
 ## Data layer
 
-Current reproducible source:
+Preferred: DuckDB.
 
-```text
-Synthetic CSV bundle
-├── customers
-├── salespeople
-├── sales_activity
-├── deposits
-├── withdrawals
-├── trades
-└── business_events
-```
+Fallback: SQLite for restricted/offline development.
 
-Preferred analytical backend:
+Synthetic CSV files are the reproducible source for the competition benchmark.
 
-```text
-DuckDB
-```
+## SQL boundary
 
-Restricted/offline fallback:
+Normal Agent queries are passed through `ReadOnlySQLTool`:
 
-```text
-SQLite
-```
+- SELECT/WITH only;
+- no multiple statements;
+- no DDL/DML/admin keywords;
+- no external file/network scan functions;
+- bounded output;
+- every call registered as evidence.
 
-The SQL Tool never receives direct model-generated SQL.
+The v0.6 row limit is 25,000 so the complete 20,000-customer synthetic benchmark can be profiled without truncation.
 
-## Intent 1: CRM routing / FTD
+## Evidence boundary
 
-Deterministic path:
+Every evidence record contains:
 
-```text
-schema
-→ affected cohort SQL
-→ control SQL
-→ two-proportion test
-→ response-time test
-→ team contribution decomposition
-→ robust daily anomaly scan
-→ business event check
-→ evidence-linked claims
-```
+- Evidence ID;
+- tool name;
+- parameters;
+- result payload;
+- result digest;
+- execution status.
 
-## Intent 2: net deposits
+The final renderer does not recompute analytical metrics. It renders only previously verified claim text.
 
-Deterministic path:
+## Evaluation-only data
 
-```text
-schema
-→ baseline/current deposit SQL
-→ baseline/current withdrawal SQL
-→ net-deposit identity decomposition
-→ top-customer withdrawal concentration
-→ regional per-customer control
-→ business event check
-→ evidence-linked claims
-```
-
-The identity enforced by the engine is:
-
-```text
-net_change = deposit_change - withdrawal_change
-```
-
-## Optional model provider
-
-The OpenAI provider is above the local scope gate.
-
-```text
-question
-→ local supported-intent classifier
-→ provider Structured Output
-→ local plan validator
-→ deterministic executor
-```
-
-It is impossible for the provider contract to authorize an unknown intent, direct SQL, arbitrary tool parameters, or a high-impact financial action.
+Synthetic generator fields ending in `_gt` are benchmark-only. Normal Agent SQL is prohibited from using them, and the verifier scans read-only SQL evidence for leakage.
 
 ## UI boundary
 
-`streamlit_app.py` only:
-
-- submits a question;
-- selects approved runtime options;
-- renders verified findings;
-- shows metrics/evidence.
-
-It does not recompute financial metrics.
-
-## Expansion rule
-
-Future functionality should generally be added in this order:
-
-1. deterministic data/tool capability;
-2. tests and evidence;
-3. benchmark scenario;
-4. approved Agent intent/action contract;
-5. optional model planning;
-6. UI.
-
-This prevents the interface or LLM layer from outrunning the analytical evidence layer.
+Streamlit is a presentation layer. KPI cards, charts, trace, and evidence cards are constructed from verified result objects. The UI must not become an independent analytics path.

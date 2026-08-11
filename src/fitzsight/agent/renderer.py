@@ -37,7 +37,10 @@ def render_verified_answer(
 
     root_status = result.diagnosis.get("root_cause_status")
     driver_type = result.diagnosis.get("driver_type")
-    if root_status == "supported_candidate" and driver_type == "observed_withdrawal_concentration":
+    analysis_type = result.diagnosis.get("analysis_type")
+    if analysis_type == "customer_intelligence_segmentation":
+        headline = "A verified customer-value segmentation profile was generated."
+    elif root_status == "supported_candidate" and driver_type == "observed_withdrawal_concentration":
         headline = "A supported financial-operations driver was identified."
     elif root_status == "supported_candidate":
         headline = "A supported root-cause candidate was identified."

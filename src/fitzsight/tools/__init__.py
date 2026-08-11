@@ -4,12 +4,14 @@ from .comparison import PeriodComparisonTool
 from .contribution import ContributionAnalysisTool
 from .kpi import KPITool
 from .schema import SchemaInspectorTool
+from .segmentation import CustomerSegmentationTool
 from .sql import ReadOnlySQLTool, SQLSafetyError, validate_read_only_sql
 from .statistics import StatisticalTestTool
 
 __all__ = [
     "AnomalyDetectionTool",
     "ContributionAnalysisTool",
+    "CustomerSegmentationTool",
     "KPITool",
     "PeriodComparisonTool",
     "ReadOnlySQLTool",

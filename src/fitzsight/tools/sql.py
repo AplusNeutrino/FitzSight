@@ -73,7 +73,15 @@ class ReadOnlySQLTool:
         self.registry = registry
         self.max_rows = max_rows
 
-    def run(self, sql: str) -> ToolResult:
+    def run(
+        self,
+        sql: str,
+        *,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
         safe_sql = validate_read_only_sql(sql)
         wrapped = (
             "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
@@ -103,9 +111,26 @@ class ReadOnlySQLTool:
             "truncated": truncated,
             "backend": self.store.backend,
         }
+        evidence_payload = payload
+        if compact_evidence:
+            evidence_payload = {
+                "columns": columns,
+                "row_count": len(records),
+                "truncated": truncated,
+                "backend": self.store.backend,
+                "rows_preview": records[:evidence_preview_rows],
+                "preview_row_count": min(len(records), evidence_preview_rows),
+                "full_result_digest": EvidenceRegistry.digest(payload),
+                "evidence_mode": "compact_preview",
+            }
         record = self.registry.register(
             "read_only_sql",
-            {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows},
-            payload,
+            {
+                "sql": safe_sql,
+                "backend": self.store.backend,
+                "max_rows": self.max_rows,
+                "compact_evidence": compact_evidence,
+            },
+            evidence_payload,
         )
         return ToolResult(record.evidence_id, "read_only_sql", payload)

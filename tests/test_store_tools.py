@@ -40,3 +40,22 @@ def test_duckdb_backend_loads_and_queries(tmp_path):
         store.load_csv_directory()
         result = ReadOnlySQLTool(store, registry).run("SELECT COUNT(*) AS n FROM customers")
         assert int(result.data["rows"][0]["n"]) == 1000
+
+
+def test_read_only_sql_compact_evidence_keeps_full_tool_result(tmp_path):
+    data_dir = _data(tmp_path)
+    registry = EvidenceRegistry()
+    with AnalyticsStore(data_dir, backend="sqlite") as store:
+        store.load_csv_directory()
+        result = ReadOnlySQLTool(store, registry, max_rows=2000).run(
+            "SELECT customer_id, region FROM customers ORDER BY customer_id",
+            compact_evidence=True,
+            evidence_preview_rows=5,
+        )
+        assert result.data["row_count"] == 1000
+        assert len(result.data["rows"]) == 1000
+        evidence = registry.get(result.evidence_id).result
+        assert evidence["row_count"] == 1000
+        assert len(evidence["rows_preview"]) == 5
+        assert evidence["evidence_mode"] == "compact_preview"
+        assert evidence["full_result_digest"]

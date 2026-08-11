@@ -62,3 +62,24 @@ The normal Agent does not receive a special per-withdrawal ground-truth flag. It
 
 The `business_events` table contains a synthetic `HIGH_VALUE_WITHDRAWAL_CLUSTER` event to support event-log correlation, but the Agent must still avoid inferring why individual customers withdrew.
 
+
+## v0.6 customer-intelligence benchmark
+
+The third benchmark does **not** inject a new hidden event. It evaluates whether FitzSight can derive a transparent behavioral-value segmentation from the existing observable synthetic operations data.
+
+Normal Agent inputs:
+
+```text
+customers
++ completed deposits
++ completed withdrawals
++ trades
+```
+
+Evaluation-only field:
+
+```text
+customers.customer_segment_gt
+```
+
+The Agent is prohibited from querying that field. `CustomerSegmentationTool` derives `High Value / Growth / Core / Low Activity` using observable deposit/trading behavior only; the resulting segments are descriptive analytics, not high-impact customer decisions.

@@ -1,5 +1,5 @@
 {
-  "catalog_version": "0.5",
+  "catalog_version": "0.6",
   "scenarios": [
     {
       "id": "crm_routing_ftd_20260715",
@@ -22,6 +22,20 @@
         "net_deposit_change_sign": "negative",
         "withdrawal_change_sign": "positive",
         "minimum_top_11_withdrawal_share": 0.5
+      }
+    },
+    {
+      "id": "europe_customer_value_segmentation",
+      "intent": "customer_intelligence_segmentation",
+      "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+      "expected": {
+        "verification_passed": true,
+        "root_cause_status": "descriptive_profile",
+        "segmentation_method": "behavioral_value_score_v1",
+        "minimum_coverage": 0.99,
+        "minimum_segment_count": 4,
+        "expected_top_deposit_segment": "High Value",
+        "high_value_avg_deposits_exceeds_low_activity": true
       }
     }
   ]

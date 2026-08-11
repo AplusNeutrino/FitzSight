@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 
 CRM_INTENT = "crm_routing_ftd_investigation"
 NET_DEPOSIT_INTENT = "net_deposit_anomaly_investigation"
+CUSTOMER_INTELLIGENCE_INTENT = "customer_intelligence_segmentation"
 
 CRM_ACTIONS = (
     "inspect_schema",
@@ -27,9 +26,19 @@ NET_DEPOSIT_ACTIONS = (
     "evidence_boundary",
 )
 
+CUSTOMER_INTELLIGENCE_ACTIONS = (
+    "inspect_customer_schema",
+    "build_customer_behavior_features",
+    "segment_customer_value",
+    "profile_segment_deposits",
+    "compare_withdrawal_pressure",
+    "evidence_boundary",
+)
+
 INTENT_ACTIONS = {
     CRM_INTENT: CRM_ACTIONS,
     NET_DEPOSIT_INTENT: NET_DEPOSIT_ACTIONS,
+    CUSTOMER_INTELLIGENCE_INTENT: CUSTOMER_INTELLIGENCE_ACTIONS,
 }
 
 ACTION_PURPOSES = {
@@ -43,8 +52,13 @@ ACTION_PURPOSES = {
     "decompose_deposit_withdrawal_drivers": "Decompose the net-deposit change into deposit-side and withdrawal-side pressure.",
     "identify_customer_concentration": "Measure whether the current withdrawal shock is concentrated in a small number of customers.",
     "compare_regional_control": "Compare Europe's weekly net-deposit movement with other regions as a control.",
+    "inspect_customer_schema": "Confirm customer, deposit, withdrawal and trading fields needed for descriptive segmentation.",
+    "build_customer_behavior_features": "Aggregate observable customer deposit, withdrawal and trading behavior without using hidden benchmark labels.",
+    "segment_customer_value": "Apply the approved transparent behavioral-value segmentation policy.",
+    "profile_segment_deposits": "Profile customer counts, deposits, net deposits and trading activity across derived value segments.",
+    "compare_withdrawal_pressure": "Describe segment-level withdrawal pressure without inferring motives or compliance risk.",
     "event_check": "Inspect nearby operational events for context without converting association into unsupported causality.",
-    "evidence_boundary": "Separate directly supported findings from hypotheses or causal overclaims.",
+    "evidence_boundary": "Separate directly supported findings from hypotheses, causal overclaims or prohibited decision use.",
 }
 
 
@@ -53,10 +67,10 @@ class UnsupportedIntentCatalogError(ValueError):
 
 
 def classify_supported_intent(question: str) -> str:
-    """Classify only the two explicitly approved v0.5 intents.
+    """Classify only explicitly approved FitzSight v0.6 intents.
 
-    This is intentionally conservative. The model is not used to expand scope.
-    Unsupported questions must be refused before any external model call.
+    This local classifier is a security/scope boundary. A model cannot expand
+    FitzSight into arbitrary financial actions or invent a new workflow.
     """
 
     q = " ".join(question.lower().split())
@@ -106,8 +120,42 @@ def classify_supported_intent(question: str) -> str:
     if net_deposit:
         return NET_DEPOSIT_INTENT
 
+    customer_intelligence = (
+        europe
+        and any(
+            token in q
+            for token in (
+                "customer segment",
+                "customer segments",
+                "segmentation",
+                "segment customers",
+                "customer intelligence",
+                "high value customers",
+                "high-value customers",
+                "客户分群",
+                "客户细分",
+                "高价值客户",
+            )
+        )
+        and any(
+            token in q
+            for token in (
+                "value",
+                "deposit",
+                "deposits",
+                "contribute",
+                "contribution",
+                "价值",
+                "入金",
+                "贡献",
+            )
+        )
+    )
+    if customer_intelligence:
+        return CUSTOMER_INTELLIGENCE_INTENT
+
     raise UnsupportedIntentCatalogError(
-        "Question is outside the approved FitzSight v0.5 intent catalog."
+        "Question is outside the approved FitzSight v0.6 intent catalog."
     )
 
 

@@ -1,0 +1,29 @@
+{
+  "intent": "customer_intelligence_segmentation",
+  "steps": [
+    {
+      "action": "inspect_customer_schema",
+      "purpose": "Confirm the customer and behavioral transaction fields needed for descriptive segmentation."
+    },
+    {
+      "action": "build_customer_behavior_features",
+      "purpose": "Aggregate observable deposit, withdrawal, and trading behavior without using hidden benchmark labels."
+    },
+    {
+      "action": "segment_customer_value",
+      "purpose": "Apply the approved transparent behavioral-value segmentation policy."
+    },
+    {
+      "action": "profile_segment_deposits",
+      "purpose": "Compare customer counts, deposits, net deposits, and trading activity across the derived segments."
+    },
+    {
+      "action": "compare_withdrawal_pressure",
+      "purpose": "Describe segment-level withdrawal pressure without inferring motives or compliance risk."
+    },
+    {
+      "action": "evidence_boundary",
+      "purpose": "Keep the result descriptive and outside credit, AML, suitability, eligibility, or adverse-action use."
+    }
+  ]
+}

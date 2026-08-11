@@ -1,69 +1,59 @@
-# FitzSight v0.5 Multi-Intent Contract
+# FitzSight v0.6 Multi-Intent Contract
 
-## Intent catalog
+FitzSight expands by **approved business intents**, not unrestricted tool autonomy.
+
+## Approved intents
 
 ### `crm_routing_ftd_investigation`
 
-Primary question:
+Question family: European FTD/conversion deterioration around the synthetic 2026-07-15 CRM routing change.
 
-```text
-Why did European FTD conversion deteriorate after July 15?
-```
+Required actions:
 
-Approved actions:
-
-1. inspect schema
-2. query affected cohort
-3. query control cohort
-4. statistical validation
-5. contribution decomposition
-6. anomaly scan
-7. event check
-8. evidence boundary
+1. `inspect_schema`
+2. `query_affected_cohort`
+3. `query_control_cohort`
+4. `statistical_validation`
+5. `contribution_decomposition`
+6. `anomaly_scan`
+7. `event_check`
+8. `evidence_boundary`
 
 ### `net_deposit_anomaly_investigation`
 
-Primary question:
+Question family: European weekly net-deposit deterioration around the synthetic 2026-08-03 period.
 
-```text
-Why did European net deposits fall in the week starting August 3?
-```
+Required actions:
 
-Approved actions:
+1. `inspect_schema`
+2. `measure_period_net_deposits`
+3. `decompose_deposit_withdrawal_drivers`
+4. `identify_customer_concentration`
+5. `compare_regional_control`
+6. `event_check`
+7. `evidence_boundary`
 
-1. inspect schema
-2. measure period net deposits
-3. decompose deposit/withdrawal drivers
-4. identify customer concentration
-5. compare regional control
-6. event check
-7. evidence boundary
+### `customer_intelligence_segmentation`
 
-## Critical policy
+Question family: European customer behavioral-value segmentation and deposit contribution.
 
-The planner does not choose arbitrary tools.
+Required actions:
 
-The local classifier first decides whether the user question falls into a published supported intent. A model may then produce a structured plan only inside that intent's exact action policy.
+1. `inspect_customer_schema`
+2. `build_customer_behavior_features`
+3. `segment_customer_value`
+4. `profile_segment_deposits`
+5. `compare_withdrawal_pressure`
+6. `evidence_boundary`
 
-The executor independently routes the question to a deterministic engine. Planner and executor intents must match or the Agent fails.
+## Policy
 
-## Second benchmark interpretation
+A planner/model may not:
 
-The net-deposit benchmark is designed to test **driver attribution**, not customer-motive inference.
+- invent a fourth intent;
+- omit or reorder required actions;
+- emit SQL;
+- provide arbitrary tool arguments;
+- request a trade, transfer, account freeze, customer contact, credit decision, AML conclusion, suitability decision, or investment recommendation.
 
-Supported:
-
-- withdrawals increased;
-- deposits increased/decreased;
-- net deposits changed;
-- a small group of customer withdrawals dominates the current withdrawal volume;
-- Europe moved more negatively than a regional control statistic;
-- a matching operational event exists.
-
-Not supported without additional evidence:
-
-- why a specific customer withdrew;
-- fraud/AML conclusions;
-- customer creditworthiness;
-- investment intent;
-- legal or compliance conclusions.
+The local classifier runs before any external model invocation. The local plan validator remains authoritative after model output.

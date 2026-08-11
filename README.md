@@ -2,20 +2,20 @@
 
 **Evidence-grounded Financial Operations Intelligence Agent**
 
-FitzSight is a GOAI 2026 · Boundless Agents · AI+金融 project focused on one question:
+FitzSight is a GOAI 2026 · Boundless Agents · AI+金融 project focused on a specific operational problem:
 
-> **Why did this financial-operations metric change?**
+> **Turn a financial-operations question into a reproducible investigation with traceable evidence.**
 
-Instead of letting an LLM invent an explanation, FitzSight separates reasoning from calculation:
+Instead of asking an LLM to invent an explanation, FitzSight separates planning from calculation:
 
 ```text
 Business question
         ↓
+Local approved-intent gate
+        ↓
 Constrained planner
         ↓
-Approved intent + approved action sequence
-        ↓
-Deterministic SQL / Python analysis
+Deterministic SQL / Python tools
         ↓
 Evidence Registry
         ↓
@@ -24,19 +24,17 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.5.0
+## Current release: v0.6.0
 
-v0.5 turns the v0.4 single-intent Agent MVP into a **multi-intent financial-operations Agent** and adds an optional live OpenAI Responses planner plus a minimal Streamlit demo shell.
+v0.6 adds the third supported workflow—deterministic Customer Intelligence / behavioral segmentation—and expands the benchmark/evaluation layer while preserving the same evidence-first architecture.
 
-### Supported intent 1 — CRM / FTD investigation
-
-Question:
+### Supported workflow 1 — CRM / FTD investigation
 
 ```text
 Why did European FTD conversion deteriorate after July 15?
 ```
 
-The synthetic benchmark contains a CRM routing change affecting European Team A/B. FitzSight investigates:
+FitzSight checks:
 
 - affected vs control conversion;
 - response-time movement;
@@ -46,59 +44,78 @@ The synthetic benchmark contains a CRM routing change affecting European Team A/
 - nearby operational events;
 - causal-language boundaries.
 
-### Supported intent 2 — Net-deposit investigation
+Fixed-seed benchmark:
 
-Question:
+```text
+affected FTD change:      -7.53 pp
+control FTD change:       -1.21 pp
+response median change:  +29.15 min
+verification:             PASS
+```
+
+### Supported workflow 2 — Net-deposit investigation
 
 ```text
 Why did European net deposits fall in the week starting August 3?
 ```
 
-The v0.5 synthetic benchmark contains a concentrated European high-value withdrawal shock. FitzSight investigates:
+FitzSight measures:
 
-- baseline vs current deposits;
-- baseline vs current withdrawals;
+- baseline/current deposits;
+- baseline/current withdrawals;
 - exact net-deposit driver decomposition;
-- customer withdrawal concentration;
-- Europe vs other-region control movement;
+- top-customer withdrawal concentration;
+- regional control movement;
 - nearby operational events;
-- explicit boundary between an observed financial driver and an unsupported claim about customer motives.
+- boundary between observed drivers and unsupported customer-motive claims.
 
-Default-seed v0.5 benchmark result:
+Fixed-seed benchmark:
 
 ```text
-CRM benchmark:
-  affected FTD change:      -7.53 pp
-  control FTD change:       -1.21 pp
-  response median change:  +29.15 min
-  verification:             PASS
-
-Net-deposit benchmark:
-  net-deposit change:      -$223,901.70
-  deposit change:          +$24,365.52
-  withdrawal change:       +$248,267.22
-  top-11 withdrawal share:  92.2%
-  verification:             PASS
+net-deposit change:      -$223,901.70
+deposit change:          +$24,365.52
+withdrawal change:       +$248,267.22
+top-11 withdrawal share:  92.2%
+verification:             PASS
 ```
 
-These are **synthetic benchmark results**, not real-company performance data.
+### Supported workflow 3 — Customer Intelligence
+
+```text
+How are European customer segments distributed by behavioral value,
+and which segment contributes most to deposits?
+```
+
+FitzSight builds observable customer behavior features and applies the transparent `behavioral_value_score_v1` policy. It never uses the hidden synthetic `customer_segment_gt` field during normal Agent execution.
+
+Fixed-seed benchmark:
+
+```text
+European customers:          6,770
+coverage:                     100%
+value groups:                 4
+High Value customers:          278 (4.1%)
+High Value deposit share:     55.8%
+High Value withdrawal share:  61.0%
+verification:                 5 / 5 PASS
+```
+
+Customer segments are descriptive operational analytics only. They are not credit, AML, suitability, eligibility, or adverse-action decisions.
 
 ---
 
-## Why FitzSight is not "chat with CSV"
+## Why FitzSight is not “chat with CSV”
 
-A chat interface is not the core product.
+A chat interface is not the core product. FitzSight requires:
 
-FitzSight requires:
-
-1. a recognized business intent;
-2. an approved investigation plan;
-3. actual tool execution;
-4. evidence IDs for factual claims;
+1. a locally recognized approved business intent;
+2. an approved high-level investigation plan;
+3. deterministic tool execution;
+4. Evidence IDs for supported factual claims;
 5. verification of evidence integrity and causal wording;
 6. fail-closed output if verification fails.
 
-The LLM, when enabled, is a planner—not a calculator and not an unrestricted SQL agent.
+The model, when enabled, is a constrained planner—not a calculator and not an unrestricted SQL agent.
 
 ---
 
@@ -122,22 +139,30 @@ Run the reliable no-API Agent fallback:
 
 ```bash
 python scripts/agent_investigate.py \
-  --backend sqlite \
+  --backend duckdb \
   --question "Why did European FTD conversion deteriorate after July 15?"
 ```
 
-Second intent:
+Net-deposit workflow:
 
 ```bash
 python scripts/agent_investigate.py \
-  --backend sqlite \
+  --backend duckdb \
   --question "Why did European net deposits fall in the week starting August 3?"
 ```
 
-Run the two-scenario benchmark catalog:
+Customer Intelligence workflow:
 
 ```bash
-python scripts/run_benchmark.py --backend sqlite
+python scripts/agent_investigate.py \
+  --backend duckdb \
+  --question "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?"
+```
+
+Run the three-scenario benchmark catalog:
+
+```bash
+python scripts/run_benchmark.py --backend duckdb
 ```
 
 Run tests:
@@ -148,29 +173,27 @@ pytest -q
 
 ---
 
-## DuckDB
+## Runtime validation status
 
-DuckDB is the preferred competition backend.
+### DuckDB — validated
 
-```bash
-pip install -e ".[dev]"
-python scripts/agent_investigate.py --backend duckdb
-```
+A deployment environment has successfully executed both:
 
-A SQLite fallback remains available for restricted/offline environments.
+- the default constrained planner; and
+- the JSON-file structured planner
 
----
+using DuckDB and `data/generated`, with final status `verified`.
 
-## Optional OpenAI Responses planner
+### OpenAI Responses planner — implemented, live runtime still pending
 
-The core project does **not** require an external model.
+The optional provider adapter uses strict structured planner output while preserving the local scope gate and plan validator.
 
-To enable the optional OpenAI planner:
+Install:
 
 ```bash
 pip install -e ".[openai]"
 export OPENAI_API_KEY="..."
-export FITZSIGHT_MODEL="<your enabled model>"
+export FITZSIGHT_MODEL="<model available to your account>"
 ```
 
 Then:
@@ -182,20 +205,9 @@ python scripts/agent_investigate.py \
   --question "Why did European net deposits fall in the week starting August 3?"
 ```
 
-The provider:
+A real provider call is not treated as validated until actual deployment output exists.
 
-- uses the Responses API;
-- requests strict JSON-schema output;
-- sets `store=False`;
-- is locally scope-gated before API invocation;
-- cannot emit SQL or arbitrary tool arguments;
-- remains subject to local plan validation.
-
-No API key is ever committed to the repository.
-
----
-
-## Streamlit demo
+### Streamlit UI — implemented, runtime smoke test still pending
 
 Install:
 
@@ -203,7 +215,7 @@ Install:
 pip install -e ".[ui]"
 ```
 
-or with both UI and model provider:
+or:
 
 ```bash
 pip install -e ".[demo]"
@@ -215,25 +227,84 @@ Run:
 streamlit run streamlit_app.py
 ```
 
-The initial UI exposes:
+v0.6 UI code contains:
 
-- the two supported demo questions;
-- planner/backend selection;
-- verification status;
+- three preset workflows;
+- backend/planner selector;
+- verified business KPI cards;
+- intent-specific charts;
 - verified findings;
-- investigation plan;
-- metrics;
-- evidence/audit trace.
+- explicit investigation-plan trace;
+- evidence cards with ID/tool/status/digest;
+- raw verified metrics.
 
-The UI is a demo shell, not yet the final competition interface.
+The UI reads verified Agent outputs and does not recalculate business metrics.
+
+---
+
+## Customer Intelligence method
+
+`CustomerSegmentationTool` uses observable features only:
+
+- completed deposit value;
+- trading volume;
+- trading frequency;
+- withdrawal behavior for descriptive profiling.
+
+Active customers receive a transparent score:
+
+```text
+value_score =
+    0.55 × deposit-value percentile
+  + 0.30 × trade-volume percentile
+  + 0.15 × trade-count percentile
+```
+
+Segments:
+
+```text
+High Value   score >= 0.75
+Growth       0.50 <= score < 0.75
+Core         score < 0.50 among active customers
+Low Activity no completed deposit / withdrawal / trade activity
+```
+
+See `docs/CUSTOMER_INTELLIGENCE.md`.
+
+---
+
+## Benchmark and evaluation
+
+v0.6 contains three deterministic benchmark workflows.
+
+Current SQLite build result:
+
+```text
+scenario count:               3
+passed:                       3
+failed:                       0
+scenario pass rate:           100%
+root-cause scenario accuracy: 100%
+mean evidence coverage:       100%
+verifier violations:          0
+```
+
+The benchmark runner also records end-to-end deterministic latency. Latency values are environment-specific and are not production guarantees.
+
+Evaluation artifacts:
+
+- `evaluation/benchmark_catalog.json`
+- `scripts/run_benchmark.py`
+- `docs/V0.6_BENCHMARK_RESULTS.json`
+- `docs/V0.6_VALIDATION.md`
 
 ---
 
 ## Planner safety policy
 
-Model/planner output is treated as untrusted input.
+Planner/model output is untrusted input.
 
-The planner may only return one of the published intents and that intent's exact action sequence.
+The planner may only return one published intent and that intent's exact approved action sequence.
 
 It may not:
 
@@ -244,10 +315,11 @@ It may not:
 - transfer funds;
 - freeze accounts;
 - contact customers;
-- create compliance conclusions;
+- create automated compliance conclusions;
+- create credit/suitability decisions;
 - make investment recommendations.
 
-Unsupported questions fail before external model invocation.
+Unsupported questions fail before an external model invocation.
 
 ---
 
@@ -256,11 +328,11 @@ Unsupported questions fail before external model invocation.
 The read-only SQL tool:
 
 - accepts only `SELECT` / `WITH`;
-- rejects multi-statement SQL;
+- rejects multiple statements;
 - rejects write/DDL/admin keywords;
 - rejects external file/network scan functions;
-- applies a bounded row limit;
-- writes successful and failed calls to the Evidence Registry.
+- enforces a bounded row output;
+- records successful and failed calls in the Evidence Registry.
 
 ---
 
@@ -273,7 +345,7 @@ For every supported claim, `EvidenceClaimVerifier` checks:
 - tool execution status is successful;
 - supported claims have evidence;
 - evaluation-only `*_gt` fields were not queried;
-- guarded claims include causal-language boundaries;
+- guarded claims include a policy boundary;
 - wording does not exceed the evidence status.
 
 If verification fails:
@@ -284,7 +356,7 @@ answer = withheld
 
 ---
 
-## Synthetic-data policy
+## Synthetic-data and compliance policy
 
 All benchmark data is synthetic.
 
@@ -296,7 +368,9 @@ Never add:
 - internal sales reports;
 - real API secrets.
 
-The `_gt` fields used by the benchmark generator are evaluation-only and must never be queried by the normal Agent workflow.
+The `_gt` fields used by the synthetic generator are evaluation-only and must never be queried by the normal Agent workflow.
+
+FitzSight is analytical decision support. It does not provide investment advice or automated high-impact financial/compliance decisions.
 
 ---
 
@@ -307,100 +381,67 @@ FitzSight/
 ├── README.md
 ├── MASTER_PLAN.md
 ├── IMPLEMENTATION_STATUS.md
+├── LICENSE
+├── THIRD_PARTY_NOTICES.md
 ├── streamlit_app.py
 ├── evaluation/
 │   └── benchmark_catalog.json
 ├── examples/
 │   ├── valid_agent_plan.json
-│   └── valid_net_deposit_plan.json
+│   ├── valid_net_deposit_plan.json
+│   └── valid_customer_intelligence_plan.json
 ├── scripts/
 │   ├── generate_data.py
 │   ├── agent_investigate.py
 │   └── run_benchmark.py
 ├── src/fitzsight/
 │   ├── agent/
-│   │   ├── catalog.py
-│   │   ├── planner.py
-│   │   ├── orchestrator.py
-│   │   └── verifier.py
-│   ├── providers/
-│   │   └── openai_planner.py
-│   ├── investigation/
-│   │   ├── engine.py
-│   │   ├── net_deposit.py
-│   │   └── router.py
-│   ├── tools/
+│   ├── data/
 │   ├── evidence/
-│   └── data/
-└── tests/
+│   ├── investigation/
+│   ├── providers/
+│   └── tools/
+├── tests/
+└── docs/
 ```
 
----
+Key new v0.6 files:
 
-## Current limitations
-
-v0.5 remains intentionally constrained:
-
-- only two approved business intents exist;
-- all data is synthetic;
-- the OpenAI provider code is integration-tested with a fake Responses client in the build environment, but a live API call requires user credentials;
-- Streamlit code is syntax-validated in the build environment, but runtime validation requires the optional package;
-- DuckDB runtime validation requires an environment with the dependency installed;
-- customer segmentation is not yet integrated into the Agent;
-- the benchmark catalog contains two scenarios, not the planned five;
-- evidence traceability proves what the tools returned, not that an external real-world data source is intrinsically correct;
-- observed drivers are not automatically causal explanations.
+- `src/fitzsight/tools/segmentation.py`
+- `src/fitzsight/investigation/customer_intelligence.py`
+- `docs/CUSTOMER_INTELLIGENCE.md`
+- `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`
+- `docs/PITCH_DECK_CONTENT.md`
+- `docs/V0.6_VALIDATION.md`
 
 ---
 
-## Safety boundary
+## Validation snapshot
 
-FitzSight is analytical decision support.
-
-It is **not**:
-
-- an investment adviser;
-- an automated trading system;
-- an AML enforcement engine;
-- a credit-decision system;
-- an automated compliance decision-maker.
-
-High-impact actions remain outside the MVP.
-
----
-
-## Documentation
-
-- `MASTER_PLAN.md` — competition/product master plan
-- `IMPLEMENTATION_STATUS.md` — current implementation snapshot
-- `docs/ARCHITECTURE.md` — system architecture
-- `docs/AGENT_LAYER.md` — constrained Agent policy
-- `docs/MULTI_INTENT.md` — v0.5 intent catalog
-- `docs/MODEL_PROVIDER.md` — optional OpenAI provider boundary
-- `docs/V0.5_VALIDATION.md` — v0.5 validation evidence
-- `evaluation/benchmark_catalog.json` — current benchmark catalog
-- `PROJECT_PROGRESS.md` — pointer to the external progress truth source
-
----
-
-## Progress source of truth
-
-Project status is maintained in:
+Build sandbox:
 
 ```text
-AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md
+46 passed, 1 skipped
+compileall PASS
+3 / 3 benchmark scenarios PASS
 ```
 
-The public tracker is:
-
-```text
-https://neutriverse.uk/projfitzgerald/
-```
-
-When implementation and tracker disagree, verified code/tests/commit evidence must be used to correct the tracker.
+The single build skip is the DuckDB-specific test because the sandbox lacks DuckDB; separate deployment evidence has already validated the DuckDB runtime path.
 
 ---
 
 ## License
 
-Final open-source license selection remains pending competition/dependency review.
+MIT. See `LICENSE`.
+
+Third-party dependencies remain subject to their own licenses; see `THIRD_PARTY_NOTICES.md`.
+
+## Progress source of truth
+
+Project status is maintained separately in:
+
+```text
+AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md
+```
+
+The published tracker reads that file. Repository implementation evidence and tests determine whether tracker tasks may be marked `done`.

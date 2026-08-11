@@ -14,7 +14,7 @@ class InvestigationExecutor(Protocol):
 
 
 class FitzSightAgent:
-    """Constrained v0.5 multi-intent Agent orchestration layer.
+    """Constrained v0.6 multi-intent Agent orchestration layer.
 
     The planner may be deterministic, a structured JSON adapter, or the optional
     OpenAI Responses provider. Execution remains inside deterministic audited
@@ -68,7 +68,7 @@ class FitzSightAgent:
 
         return AgentRunResult(
             product="FitzSight",
-            mode="agent_v0.5_multi_intent",
+            mode="agent_v0.6_multi_intent",
             question=question,
             planner_mode=plan.planner_mode,
             plan=plan,

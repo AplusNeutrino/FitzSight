@@ -42,7 +42,7 @@ def test_constrained_agent_runs_question_to_verified_answer(tmp_path):
         result = agent.run(QUESTION)
         payload = result.to_dict()
         assert payload["product"] == "FitzSight"
-        assert payload["mode"] == "agent_v0.5_multi_intent"
+        assert payload["mode"] == "agent_v0.6_multi_intent"
         assert payload["verification"]["passed"] is True
         assert payload["final_answer"]["status"] == "verified"
         assert payload["investigation"]["diagnosis"]["root_cause_status"] == "supported_candidate"

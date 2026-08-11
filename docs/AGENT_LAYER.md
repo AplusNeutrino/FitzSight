@@ -1,124 +1,58 @@
 # FitzSight Agent Layer
 
-Version: v0.5.0
+Version: v0.6.0
 
-## Purpose
-
-The Agent layer converts a supported natural-language financial-operations question into an approved deterministic investigation.
-
-It is deliberately **not** an unrestricted autonomous agent.
-
-## Trust model
-
-Planner output is untrusted.
-
-The local application controls:
-
-- which intents exist;
-- which action names exist;
-- the exact action order for each intent;
-- which deterministic executor handles the question;
-- whether final claims pass evidence verification.
-
-## Planner modes
-
-### Deterministic fallback
-
-`ConstrainedRulePlanner`
-
-- default;
-- no API/network required;
-- competition-safe fallback;
-- produces the same approved plan contract.
-
-### Structured JSON adapter
-
-`StructuredJSONPlanner`
-
-- provider neutral;
-- accepts JSON text from an external completion function;
-- validates exact keys, intent, step list, order and purposes.
-
-### OpenAI Responses planner
-
-`OpenAIResponsesPlanner`
-
-- optional dependency;
-- strict JSON-schema output;
-- `store=False`;
-- local scope classifier runs before provider invocation;
-- local `validate_plan` runs after provider output.
-
-## Supported v0.5 intents
-
-### CRM/FTD
-
-`crm_routing_ftd_investigation`
-
-Eight approved actions.
-
-### Net deposits
-
-`net_deposit_anomaly_investigation`
-
-Seven approved actions.
-
-See `docs/MULTI_INTENT.md`.
-
-## Prohibited planner capabilities
-
-The planner may not authorize or construct:
-
-- SQL;
-- table names as dynamic tool targets;
-- arbitrary filters or free-form tool arguments;
-- trades;
-- fund transfers;
-- account freezes;
-- customer outreach;
-- investment advice;
-- legal/compliance decisions.
-
-## Executor independence
-
-The executor re-classifies the question through the same local intent catalog.
-
-If:
+## Contract
 
 ```text
-planner intent != executor intent
+question
+→ local intent classification
+→ constrained AgentPlan
+→ deterministic executor
+→ Evidence Registry
+→ EvidenceClaimVerifier
+→ verified answer / withheld answer
 ```
 
-the run fails.
+Planner/model output is always untrusted.
 
-The planner cannot trick the executor into running another workflow.
+## Planners
 
-## Verification
+### `ConstrainedRulePlanner`
 
-Every `InvestigationResult` goes through `EvidenceClaimVerifier`.
+Reliable no-network fallback. It classifies one of the approved intents and creates the exact allowed action sequence.
 
-A supported claim must have valid evidence IDs.
+### `StructuredJSONPlanner`
 
-The verifier checks:
+Provider-neutral adapter for pre-generated/model JSON. It parses only `intent` and `steps`, then applies the same local plan validator.
 
-- evidence existence;
-- evidence result digest;
-- successful tool status;
-- ground-truth-field SQL boundary;
-- causal-language guardrail;
-- non-empty evidence graph.
+### `OpenAIResponsesPlanner`
 
-If verification fails, `render_verified_answer` returns a withheld result.
+Optional provider integration. The local classifier fixes the approved intent before API invocation; structured output is still validated locally afterwards.
 
-## Multi-intent growth policy
+## Approved intents
 
-Adding an intent requires all of:
+- `crm_routing_ftd_investigation`
+- `net_deposit_anomaly_investigation`
+- `customer_intelligence_segmentation`
 
-1. a deterministic executor;
-2. data/tool evidence;
-3. test coverage;
-4. a benchmark or reproducible scenario;
-5. an approved action contract;
-6. verifier-compatible claims.
+See `docs/MULTI_INTENT.md` for exact action sequences.
 
-Do not add an intent by prompt engineering alone.
+## Verifier
+
+`EvidenceClaimVerifier` checks:
+
+- claim status policy;
+- Evidence ID existence;
+- evidence digest integrity;
+- tool success status;
+- guardrail presence when required;
+- causal overclaim wording;
+- evaluation-only `*_gt` leakage;
+- non-empty claim-to-evidence graph.
+
+If any verification condition fails, the final renderer fails closed.
+
+## Customer Intelligence boundary
+
+The new segmentation workflow is descriptive. The Agent may discuss observed value and withdrawal concentration but cannot turn the segments into credit, AML, suitability, eligibility, customer-contact, restriction, or adverse-action decisions.

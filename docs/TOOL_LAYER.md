@@ -77,3 +77,16 @@ This layer is intentionally read-only and local. It is not an enterprise sandbox
 - query timeouts / resource quotas;
 - audit storage outside the Agent process;
 - PII classification and access control.
+
+## v0.6 compact SQL evidence mode
+
+Customer segmentation needs the full synthetic European customer feature matrix for computation, but shipping thousands of raw rows inside every Agent audit payload would make the demo unnecessarily large.
+
+`ReadOnlySQLTool.run()` therefore supports an explicit `compact_evidence=True` mode:
+
+- the caller receives the full bounded query result for deterministic computation;
+- the Evidence Registry stores query metadata, row count, a bounded row preview, backend, and a digest of the full result;
+- the Evidence ID/digest/status chain remains verifier-compatible;
+- the normal SQL safety policy remains unchanged.
+
+The v0.6 customer-intelligence feature query uses this mode. The fixed-seed Agent sample drops from multi-megabyte raw-row evidence to a compact audit payload while preserving the executed query and full-result digest.

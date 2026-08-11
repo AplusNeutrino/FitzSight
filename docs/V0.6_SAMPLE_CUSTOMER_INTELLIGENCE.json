@@ -1,0 +1,2014 @@
+{
+  "product": "FitzSight",
+  "mode": "agent_v0.6_multi_intent",
+  "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+  "planner_mode": "structured_llm_adapter",
+  "plan": {
+    "plan_version": "0.6",
+    "intent": "customer_intelligence_segmentation",
+    "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+    "planner_mode": "structured_llm_adapter",
+    "steps": [
+      {
+        "step_id": "AP1",
+        "action": "inspect_customer_schema",
+        "purpose": "Confirm the customer and behavioral transaction fields needed for descriptive segmentation."
+      },
+      {
+        "step_id": "AP2",
+        "action": "build_customer_behavior_features",
+        "purpose": "Aggregate observable deposit, withdrawal, and trading behavior without using hidden benchmark labels."
+      },
+      {
+        "step_id": "AP3",
+        "action": "segment_customer_value",
+        "purpose": "Apply the approved transparent behavioral-value segmentation policy."
+      },
+      {
+        "step_id": "AP4",
+        "action": "profile_segment_deposits",
+        "purpose": "Compare customer counts, deposits, net deposits, and trading activity across the derived segments."
+      },
+      {
+        "step_id": "AP5",
+        "action": "compare_withdrawal_pressure",
+        "purpose": "Describe segment-level withdrawal pressure without inferring motives or compliance risk."
+      },
+      {
+        "step_id": "AP6",
+        "action": "evidence_boundary",
+        "purpose": "Keep the result descriptive and outside credit, AML, suitability, eligibility, or adverse-action use."
+      }
+    ]
+  },
+  "plan_evidence_id": "E0001",
+  "investigation": {
+    "product": "FitzSight",
+    "mode": "deterministic_customer_intelligence_v0.6",
+    "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+    "plan": {
+      "intent": "customer_intelligence_segmentation",
+      "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+      "steps": [
+        {
+          "step_id": "S1",
+          "action": "inspect_customer_schema",
+          "purpose": "Confirm customer and behavioral transaction fields exist without using benchmark-only labels."
+        },
+        {
+          "step_id": "S2",
+          "action": "build_customer_behavior_features",
+          "purpose": "Aggregate observable deposits, withdrawals and trading activity per European customer."
+        },
+        {
+          "step_id": "S3",
+          "action": "segment_customer_value",
+          "purpose": "Apply a transparent deterministic behavioral-value scoring policy."
+        },
+        {
+          "step_id": "S4",
+          "action": "profile_segment_deposits",
+          "purpose": "Compare customer counts, deposits, net deposits and trading behavior across the derived segments."
+        },
+        {
+          "step_id": "S5",
+          "action": "compare_withdrawal_pressure",
+          "purpose": "Describe segment-level withdrawal pressure without inferring customer motives."
+        },
+        {
+          "step_id": "S6",
+          "action": "evidence_boundary",
+          "purpose": "Keep segmentation descriptive and outside credit, AML, suitability or adverse-action use."
+        }
+      ]
+    },
+    "claims": [
+      {
+        "claim_id": "S-C1",
+        "text": "FitzSight segmented 6,770 European customers into 4 transparent behavioral-value groups with 100% coverage.",
+        "status": "supported",
+        "confidence": "high",
+        "evidence_ids": [
+          "E0002",
+          "E0003",
+          "E0004",
+          "E0005",
+          "E0007"
+        ]
+      },
+      {
+        "claim_id": "S-C2",
+        "text": "High Value is the largest deposit-value segment, accounting for 55.8% of completed European deposits in the synthetic dataset.",
+        "status": "supported",
+        "confidence": "high",
+        "evidence_ids": [
+          "E0007"
+        ]
+      },
+      {
+        "claim_id": "S-C3",
+        "text": "High Value customers average $9,791.21 in completed deposits, versus $0.00 for Low Activity customers.",
+        "status": "supported",
+        "confidence": "high",
+        "evidence_ids": [
+          "E0007"
+        ]
+      },
+      {
+        "claim_id": "S-C4",
+        "text": "High Value accounts for the largest segment share of completed withdrawals (61.0%); this is descriptive withdrawal pressure, not evidence of customer motive or suspicious behavior.",
+        "status": "supported_with_guardrail",
+        "confidence": "medium",
+        "evidence_ids": [
+          "E0007"
+        ]
+      },
+      {
+        "claim_id": "S-C5",
+        "text": "The segmentation is a descriptive operational analytics layer and must not be used as an automated credit, AML, suitability, eligibility or adverse-action decision.",
+        "status": "supported_with_guardrail",
+        "confidence": "high",
+        "evidence_ids": [
+          "E0007"
+        ]
+      }
+    ],
+    "metrics": {
+      "segmentation": {
+        "method": "behavioral_value_score_v1",
+        "region": "Europe",
+        "customer_count": 6770,
+        "active_customer_count": 1425,
+        "coverage": 1.0,
+        "segment_count": 4,
+        "segment_order": [
+          "High Value",
+          "Growth",
+          "Core",
+          "Low Activity"
+        ],
+        "score_formula": {
+          "deposit_percentile_weight": 0.55,
+          "trade_volume_percentile_weight": 0.3,
+          "trade_count_percentile_weight": 0.15,
+          "high_value_threshold": 0.75,
+          "growth_threshold": 0.5,
+          "low_activity_rule": "no completed deposits, withdrawals, or trades"
+        },
+        "profiles": [
+          {
+            "segment": "High Value",
+            "customer_count": 278,
+            "customer_share": 0.04106351550960118,
+            "active_customer_count": 278,
+            "avg_value_score": 0.8424689511548655,
+            "total_deposits": 2721957.4699999997,
+            "avg_deposits": 9791.213920863309,
+            "deposit_share": 0.5582904450387265,
+            "total_withdrawals": 572145.17,
+            "avg_withdrawals": 2058.0761510791367,
+            "withdrawal_share": 0.6103453487200758,
+            "net_deposits": 2149812.3,
+            "avg_net_deposits": 7733.137769784172,
+            "total_trade_volume": 11759.147799999999,
+            "avg_trade_volume": 42.29909280575539,
+            "avg_trade_count": 7.215827338129497,
+            "avg_withdrawal_ratio": 0.14598972875193272
+          },
+          {
+            "segment": "Growth",
+            "customer_count": 415,
+            "customer_share": 0.061299852289512555,
+            "active_customer_count": 415,
+            "avg_value_score": 0.6175893468611288,
+            "total_deposits": 1497194.4,
+            "avg_deposits": 3607.69734939759,
+            "deposit_share": 0.3070839045422297,
+            "total_withdrawals": 281069.58999999997,
+            "avg_withdrawals": 677.2761204819276,
+            "withdrawal_share": 0.2998356464726578,
+            "net_deposits": 1216124.81,
+            "avg_net_deposits": 2930.4212289156626,
+            "total_trade_volume": 6073.071,
+            "avg_trade_volume": 14.633906024096385,
+            "avg_trade_count": 5.47710843373494,
+            "avg_withdrawal_ratio": 0.15638658090667854
+          },
+          {
+            "segment": "Core",
+            "customer_count": 732,
+            "customer_share": 0.10812407680945348,
+            "active_customer_count": 732,
+            "avg_value_score": 0.30395362381363245,
+            "total_deposits": 656370.35,
+            "avg_deposits": 896.6808060109289,
+            "deposit_share": 0.13462565041904373,
+            "total_withdrawals": 84197.43,
+            "avg_withdrawals": 115.02381147540983,
+            "withdrawal_share": 0.08981900480726625,
+            "net_deposits": 572172.9199999999,
+            "avg_net_deposits": 781.6569945355191,
+            "total_trade_volume": 3922.1468,
+            "avg_trade_volume": 5.358124043715847,
+            "avg_trade_count": 3.469945355191257,
+            "avg_withdrawal_ratio": 0.11736354866776125
+          },
+          {
+            "segment": "Low Activity",
+            "customer_count": 5345,
+            "customer_share": 0.7895125553914328,
+            "active_customer_count": 0,
+            "avg_value_score": 0.0,
+            "total_deposits": 0.0,
+            "avg_deposits": 0.0,
+            "deposit_share": 0.0,
+            "total_withdrawals": 0.0,
+            "avg_withdrawals": 0.0,
+            "withdrawal_share": 0.0,
+            "net_deposits": 0.0,
+            "avg_net_deposits": 0.0,
+            "total_trade_volume": 0.0,
+            "avg_trade_volume": 0.0,
+            "avg_trade_count": 0.0,
+            "avg_withdrawal_ratio": 0.0
+          }
+        ],
+        "top_deposit_segment": "High Value",
+        "top_deposit_segment_share": 0.5582904450387265,
+        "top_net_deposit_segment": "High Value",
+        "high_value_avg_deposits": 9791.213920863309,
+        "low_activity_avg_deposits": 0.0,
+        "sample_assignments": [
+          {
+            "customer_id": "C014223",
+            "segment": "High Value",
+            "value_score": 0.9936842105263157,
+            "total_deposits": 31787.34,
+            "total_withdrawals": 22886.88,
+            "trade_volume": 101.7002
+          },
+          {
+            "customer_id": "C001254",
+            "segment": "High Value",
+            "value_score": 0.9871929824561403,
+            "total_deposits": 24599.58,
+            "total_withdrawals": 1789.66,
+            "trade_volume": 117.55
+          },
+          {
+            "customer_id": "C013791",
+            "segment": "High Value",
+            "value_score": 0.9815964912280701,
+            "total_deposits": 30038.17,
+            "total_withdrawals": 26575.52,
+            "trade_volume": 88.1461
+          },
+          {
+            "customer_id": "C013816",
+            "segment": "Growth",
+            "value_score": 0.7498245614035087,
+            "total_deposits": 10817.07,
+            "total_withdrawals": 0.0,
+            "trade_volume": 14.9315
+          },
+          {
+            "customer_id": "C014181",
+            "segment": "Growth",
+            "value_score": 0.7492280701754386,
+            "total_deposits": 3076.09,
+            "total_withdrawals": 0.0,
+            "trade_volume": 26.939700000000002
+          },
+          {
+            "customer_id": "C001487",
+            "segment": "Growth",
+            "value_score": 0.7487543859649123,
+            "total_deposits": 4285.86,
+            "total_withdrawals": 1107.95,
+            "trade_volume": 17.312
+          },
+          {
+            "customer_id": "C018547",
+            "segment": "Core",
+            "value_score": 0.49801754385964914,
+            "total_deposits": 955.3399999999999,
+            "total_withdrawals": 151.04,
+            "trade_volume": 15.588899999999999
+          },
+          {
+            "customer_id": "C000102",
+            "segment": "Core",
+            "value_score": 0.4975964912280702,
+            "total_deposits": 4840.18,
+            "total_withdrawals": 0.0,
+            "trade_volume": 1.6117
+          },
+          {
+            "customer_id": "C015710",
+            "segment": "Core",
+            "value_score": 0.4960877192982457,
+            "total_deposits": 1985.46,
+            "total_withdrawals": 0.0,
+            "trade_volume": 6.0102
+          },
+          {
+            "customer_id": "C000002",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          },
+          {
+            "customer_id": "C000010",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          },
+          {
+            "customer_id": "C000016",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          }
+        ],
+        "source_evidence_id": "E0006",
+        "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+      },
+      "top_deposit_segment": "High Value",
+      "top_deposit_segment_share": 0.5582904450387265,
+      "top_withdrawal_segment": "High Value",
+      "top_withdrawal_segment_share": 0.6103453487200758,
+      "high_value_vs_low_activity_avg_deposit_multiple": null
+    },
+    "diagnosis": {
+      "analysis_type": "customer_intelligence_segmentation",
+      "root_cause_status": "descriptive_profile",
+      "driver_type": "behavioral_value_segmentation",
+      "segmentation_method": "behavioral_value_score_v1",
+      "segmentation_coverage": 1.0,
+      "segment_count": 4,
+      "top_deposit_segment": "High Value",
+      "causal_language_guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+    },
+    "evidence": [
+      {
+        "evidence_id": "E0001",
+        "tool_name": "agent.plan",
+        "parameters": {
+          "planner_mode": "structured_llm_adapter",
+          "intent": "customer_intelligence_segmentation",
+          "plan_version": "0.6"
+        },
+        "result_digest": "568699bdaa4a8579",
+        "created_at": "2026-08-11T06:27:48.017278+00:00",
+        "status": "success",
+        "result": {
+          "plan_version": "0.6",
+          "intent": "customer_intelligence_segmentation",
+          "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+          "planner_mode": "structured_llm_adapter",
+          "steps": [
+            {
+              "step_id": "AP1",
+              "action": "inspect_customer_schema",
+              "purpose": "Confirm the customer and behavioral transaction fields needed for descriptive segmentation."
+            },
+            {
+              "step_id": "AP2",
+              "action": "build_customer_behavior_features",
+              "purpose": "Aggregate observable deposit, withdrawal, and trading behavior without using hidden benchmark labels."
+            },
+            {
+              "step_id": "AP3",
+              "action": "segment_customer_value",
+              "purpose": "Apply the approved transparent behavioral-value segmentation policy."
+            },
+            {
+              "step_id": "AP4",
+              "action": "profile_segment_deposits",
+              "purpose": "Compare customer counts, deposits, net deposits, and trading activity across the derived segments."
+            },
+            {
+              "step_id": "AP5",
+              "action": "compare_withdrawal_pressure",
+              "purpose": "Describe segment-level withdrawal pressure without inferring motives or compliance risk."
+            },
+            {
+              "step_id": "AP6",
+              "action": "evidence_boundary",
+              "purpose": "Keep the result descriptive and outside credit, AML, suitability, eligibility, or adverse-action use."
+            }
+          ]
+        }
+      },
+      {
+        "evidence_id": "E0002",
+        "tool_name": "schema_inspector",
+        "parameters": {
+          "table": "customers"
+        },
+        "result_digest": "03068fac09f4d6b7",
+        "created_at": "2026-08-11T06:27:48.017377+00:00",
+        "status": "success",
+        "result": {
+          "backend": "sqlite",
+          "table": "customers",
+          "columns": [
+            {
+              "name": "customer_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "registration_date",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "region",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "country",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "acquisition_channel",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "assigned_salesperson",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "assigned_team",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "customer_segment_gt",
+              "type": "TEXT",
+              "nullable": true
+            }
+          ]
+        }
+      },
+      {
+        "evidence_id": "E0003",
+        "tool_name": "schema_inspector",
+        "parameters": {
+          "table": "deposits"
+        },
+        "result_digest": "7f9b633b2aae3c9f",
+        "created_at": "2026-08-11T06:27:48.017418+00:00",
+        "status": "success",
+        "result": {
+          "backend": "sqlite",
+          "table": "deposits",
+          "columns": [
+            {
+              "name": "deposit_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "customer_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "timestamp",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "amount",
+              "type": "REAL",
+              "nullable": true
+            },
+            {
+              "name": "currency",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "method",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "TEXT",
+              "nullable": true
+            }
+          ]
+        }
+      },
+      {
+        "evidence_id": "E0004",
+        "tool_name": "schema_inspector",
+        "parameters": {
+          "table": "withdrawals"
+        },
+        "result_digest": "4ba2a2c82fc13adf",
+        "created_at": "2026-08-11T06:27:48.017449+00:00",
+        "status": "success",
+        "result": {
+          "backend": "sqlite",
+          "table": "withdrawals",
+          "columns": [
+            {
+              "name": "withdrawal_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "customer_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "timestamp",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "amount",
+              "type": "REAL",
+              "nullable": true
+            },
+            {
+              "name": "currency",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "TEXT",
+              "nullable": true
+            }
+          ]
+        }
+      },
+      {
+        "evidence_id": "E0005",
+        "tool_name": "schema_inspector",
+        "parameters": {
+          "table": "trades"
+        },
+        "result_digest": "37e4082dc301ae13",
+        "created_at": "2026-08-11T06:27:48.017479+00:00",
+        "status": "success",
+        "result": {
+          "backend": "sqlite",
+          "table": "trades",
+          "columns": [
+            {
+              "name": "trade_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "customer_id",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "timestamp",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "instrument_group",
+              "type": "TEXT",
+              "nullable": true
+            },
+            {
+              "name": "volume",
+              "type": "REAL",
+              "nullable": true
+            },
+            {
+              "name": "pnl_mock",
+              "type": "REAL",
+              "nullable": true
+            }
+          ]
+        }
+      },
+      {
+        "evidence_id": "E0006",
+        "tool_name": "read_only_sql",
+        "parameters": {
+          "sql": "WITH dep AS (\n    SELECT customer_id,\n           COUNT(*) AS deposit_count,\n           COALESCE(SUM(amount), 0) AS total_deposits\n    FROM deposits\n    WHERE status = 'completed'\n    GROUP BY customer_id\n),\nwd AS (\n    SELECT customer_id,\n           COUNT(*) AS withdrawal_count,\n           COALESCE(SUM(amount), 0) AS total_withdrawals\n    FROM withdrawals\n    WHERE status = 'completed'\n    GROUP BY customer_id\n),\ntr AS (\n    SELECT customer_id,\n           COUNT(*) AS trade_count,\n           COALESCE(SUM(volume), 0) AS trade_volume\n    FROM trades\n    GROUP BY customer_id\n)\nSELECT c.customer_id,\n       c.region,\n       c.acquisition_channel,\n       c.assigned_team,\n       COALESCE(dep.deposit_count, 0) AS deposit_count,\n       COALESCE(dep.total_deposits, 0) AS total_deposits,\n       COALESCE(wd.withdrawal_count, 0) AS withdrawal_count,\n       COALESCE(wd.total_withdrawals, 0) AS total_withdrawals,\n       COALESCE(tr.trade_count, 0) AS trade_count,\n       COALESCE(tr.trade_volume, 0) AS trade_volume\nFROM customers c\nLEFT JOIN dep ON dep.customer_id = c.customer_id\nLEFT JOIN wd ON wd.customer_id = c.customer_id\nLEFT JOIN tr ON tr.customer_id = c.customer_id\nWHERE c.region = 'Europe'\nORDER BY c.customer_id",
+          "backend": "sqlite",
+          "max_rows": 25000,
+          "compact_evidence": true
+        },
+        "result_digest": "4a050ffdab2040ad",
+        "created_at": "2026-08-11T06:27:48.063367+00:00",
+        "status": "success",
+        "result": {
+          "columns": [
+            "customer_id",
+            "region",
+            "acquisition_channel",
+            "assigned_team",
+            "deposit_count",
+            "total_deposits",
+            "withdrawal_count",
+            "total_withdrawals",
+            "trade_count",
+            "trade_volume"
+          ],
+          "row_count": 6770,
+          "truncated": false,
+          "backend": "sqlite",
+          "rows_preview": [
+            {
+              "customer_id": "C000002",
+              "region": "Europe",
+              "acquisition_channel": "Referral",
+              "assigned_team": "Team C",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000009",
+              "region": "Europe",
+              "acquisition_channel": "Events",
+              "assigned_team": "Team C",
+              "deposit_count": 2,
+              "total_deposits": 2260.7,
+              "withdrawal_count": 2,
+              "total_withdrawals": 1043.73,
+              "trade_count": 10,
+              "trade_volume": 35.3642
+            },
+            {
+              "customer_id": "C000010",
+              "region": "Europe",
+              "acquisition_channel": "Organic",
+              "assigned_team": "Team D",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000012",
+              "region": "Europe",
+              "acquisition_channel": "Affiliate",
+              "assigned_team": "Team E",
+              "deposit_count": 1,
+              "total_deposits": 1957.14,
+              "withdrawal_count": 1,
+              "total_withdrawals": 631.05,
+              "trade_count": 9,
+              "trade_volume": 30.3331
+            },
+            {
+              "customer_id": "C000016",
+              "region": "Europe",
+              "acquisition_channel": "Referral",
+              "assigned_team": "Team A",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000021",
+              "region": "Europe",
+              "acquisition_channel": "Referral",
+              "assigned_team": "Team E",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000026",
+              "region": "Europe",
+              "acquisition_channel": "Paid Search",
+              "assigned_team": "Team A",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000031",
+              "region": "Europe",
+              "acquisition_channel": "Affiliate",
+              "assigned_team": "Team B",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000034",
+              "region": "Europe",
+              "acquisition_channel": "Affiliate",
+              "assigned_team": "Team B",
+              "deposit_count": 2,
+              "total_deposits": 2525.65,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 9,
+              "trade_volume": 19.9025
+            },
+            {
+              "customer_id": "C000036",
+              "region": "Europe",
+              "acquisition_channel": "Organic",
+              "assigned_team": "Team C",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000037",
+              "region": "Europe",
+              "acquisition_channel": "Paid Search",
+              "assigned_team": "Team A",
+              "deposit_count": 0,
+              "total_deposits": 0,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 0,
+              "trade_volume": 0
+            },
+            {
+              "customer_id": "C000040",
+              "region": "Europe",
+              "acquisition_channel": "Organic",
+              "assigned_team": "Team A",
+              "deposit_count": 3,
+              "total_deposits": 852.4200000000001,
+              "withdrawal_count": 0,
+              "total_withdrawals": 0,
+              "trade_count": 9,
+              "trade_volume": 10.9894
+            }
+          ],
+          "preview_row_count": 12,
+          "full_result_digest": "55337eb8ca503860",
+          "evidence_mode": "compact_preview"
+        }
+      },
+      {
+        "evidence_id": "E0007",
+        "tool_name": "customer_segmentation.behavioral_value",
+        "parameters": {
+          "region": "Europe",
+          "method": "behavioral_value_score_v1"
+        },
+        "result_digest": "2d1fff84f02ed156",
+        "created_at": "2026-08-11T06:27:48.086410+00:00",
+        "status": "success",
+        "result": {
+          "method": "behavioral_value_score_v1",
+          "region": "Europe",
+          "customer_count": 6770,
+          "active_customer_count": 1425,
+          "coverage": 1.0,
+          "segment_count": 4,
+          "segment_order": [
+            "High Value",
+            "Growth",
+            "Core",
+            "Low Activity"
+          ],
+          "score_formula": {
+            "deposit_percentile_weight": 0.55,
+            "trade_volume_percentile_weight": 0.3,
+            "trade_count_percentile_weight": 0.15,
+            "high_value_threshold": 0.75,
+            "growth_threshold": 0.5,
+            "low_activity_rule": "no completed deposits, withdrawals, or trades"
+          },
+          "profiles": [
+            {
+              "segment": "High Value",
+              "customer_count": 278,
+              "customer_share": 0.04106351550960118,
+              "active_customer_count": 278,
+              "avg_value_score": 0.8424689511548655,
+              "total_deposits": 2721957.4699999997,
+              "avg_deposits": 9791.213920863309,
+              "deposit_share": 0.5582904450387265,
+              "total_withdrawals": 572145.17,
+              "avg_withdrawals": 2058.0761510791367,
+              "withdrawal_share": 0.6103453487200758,
+              "net_deposits": 2149812.3,
+              "avg_net_deposits": 7733.137769784172,
+              "total_trade_volume": 11759.147799999999,
+              "avg_trade_volume": 42.29909280575539,
+              "avg_trade_count": 7.215827338129497,
+              "avg_withdrawal_ratio": 0.14598972875193272
+            },
+            {
+              "segment": "Growth",
+              "customer_count": 415,
+              "customer_share": 0.061299852289512555,
+              "active_customer_count": 415,
+              "avg_value_score": 0.6175893468611288,
+              "total_deposits": 1497194.4,
+              "avg_deposits": 3607.69734939759,
+              "deposit_share": 0.3070839045422297,
+              "total_withdrawals": 281069.58999999997,
+              "avg_withdrawals": 677.2761204819276,
+              "withdrawal_share": 0.2998356464726578,
+              "net_deposits": 1216124.81,
+              "avg_net_deposits": 2930.4212289156626,
+              "total_trade_volume": 6073.071,
+              "avg_trade_volume": 14.633906024096385,
+              "avg_trade_count": 5.47710843373494,
+              "avg_withdrawal_ratio": 0.15638658090667854
+            },
+            {
+              "segment": "Core",
+              "customer_count": 732,
+              "customer_share": 0.10812407680945348,
+              "active_customer_count": 732,
+              "avg_value_score": 0.30395362381363245,
+              "total_deposits": 656370.35,
+              "avg_deposits": 896.6808060109289,
+              "deposit_share": 0.13462565041904373,
+              "total_withdrawals": 84197.43,
+              "avg_withdrawals": 115.02381147540983,
+              "withdrawal_share": 0.08981900480726625,
+              "net_deposits": 572172.9199999999,
+              "avg_net_deposits": 781.6569945355191,
+              "total_trade_volume": 3922.1468,
+              "avg_trade_volume": 5.358124043715847,
+              "avg_trade_count": 3.469945355191257,
+              "avg_withdrawal_ratio": 0.11736354866776125
+            },
+            {
+              "segment": "Low Activity",
+              "customer_count": 5345,
+              "customer_share": 0.7895125553914328,
+              "active_customer_count": 0,
+              "avg_value_score": 0.0,
+              "total_deposits": 0.0,
+              "avg_deposits": 0.0,
+              "deposit_share": 0.0,
+              "total_withdrawals": 0.0,
+              "avg_withdrawals": 0.0,
+              "withdrawal_share": 0.0,
+              "net_deposits": 0.0,
+              "avg_net_deposits": 0.0,
+              "total_trade_volume": 0.0,
+              "avg_trade_volume": 0.0,
+              "avg_trade_count": 0.0,
+              "avg_withdrawal_ratio": 0.0
+            }
+          ],
+          "top_deposit_segment": "High Value",
+          "top_deposit_segment_share": 0.5582904450387265,
+          "top_net_deposit_segment": "High Value",
+          "high_value_avg_deposits": 9791.213920863309,
+          "low_activity_avg_deposits": 0.0,
+          "sample_assignments": [
+            {
+              "customer_id": "C014223",
+              "segment": "High Value",
+              "value_score": 0.9936842105263157,
+              "total_deposits": 31787.34,
+              "total_withdrawals": 22886.88,
+              "trade_volume": 101.7002
+            },
+            {
+              "customer_id": "C001254",
+              "segment": "High Value",
+              "value_score": 0.9871929824561403,
+              "total_deposits": 24599.58,
+              "total_withdrawals": 1789.66,
+              "trade_volume": 117.55
+            },
+            {
+              "customer_id": "C013791",
+              "segment": "High Value",
+              "value_score": 0.9815964912280701,
+              "total_deposits": 30038.17,
+              "total_withdrawals": 26575.52,
+              "trade_volume": 88.1461
+            },
+            {
+              "customer_id": "C013816",
+              "segment": "Growth",
+              "value_score": 0.7498245614035087,
+              "total_deposits": 10817.07,
+              "total_withdrawals": 0.0,
+              "trade_volume": 14.9315
+            },
+            {
+              "customer_id": "C014181",
+              "segment": "Growth",
+              "value_score": 0.7492280701754386,
+              "total_deposits": 3076.09,
+              "total_withdrawals": 0.0,
+              "trade_volume": 26.939700000000002
+            },
+            {
+              "customer_id": "C001487",
+              "segment": "Growth",
+              "value_score": 0.7487543859649123,
+              "total_deposits": 4285.86,
+              "total_withdrawals": 1107.95,
+              "trade_volume": 17.312
+            },
+            {
+              "customer_id": "C018547",
+              "segment": "Core",
+              "value_score": 0.49801754385964914,
+              "total_deposits": 955.3399999999999,
+              "total_withdrawals": 151.04,
+              "trade_volume": 15.588899999999999
+            },
+            {
+              "customer_id": "C000102",
+              "segment": "Core",
+              "value_score": 0.4975964912280702,
+              "total_deposits": 4840.18,
+              "total_withdrawals": 0.0,
+              "trade_volume": 1.6117
+            },
+            {
+              "customer_id": "C015710",
+              "segment": "Core",
+              "value_score": 0.4960877192982457,
+              "total_deposits": 1985.46,
+              "total_withdrawals": 0.0,
+              "trade_volume": 6.0102
+            },
+            {
+              "customer_id": "C000002",
+              "segment": "Low Activity",
+              "value_score": 0.0,
+              "total_deposits": 0.0,
+              "total_withdrawals": 0.0,
+              "trade_volume": 0.0
+            },
+            {
+              "customer_id": "C000010",
+              "segment": "Low Activity",
+              "value_score": 0.0,
+              "total_deposits": 0.0,
+              "total_withdrawals": 0.0,
+              "trade_volume": 0.0
+            },
+            {
+              "customer_id": "C000016",
+              "segment": "Low Activity",
+              "value_score": 0.0,
+              "total_deposits": 0.0,
+              "total_withdrawals": 0.0,
+              "trade_volume": 0.0
+            }
+          ],
+          "source_evidence_id": "E0006",
+          "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+        }
+      }
+    ]
+  },
+  "verification": {
+    "passed": true,
+    "verified_claims": 5,
+    "total_claims": 5,
+    "checks": [
+      {
+        "check_id": "claim_status:S-C1",
+        "passed": true,
+        "message": "S-C1: claim status allowed"
+      },
+      {
+        "check_id": "claim_evidence:S-C1",
+        "passed": true,
+        "message": "S-C1: evidence references exist"
+      },
+      {
+        "check_id": "evidence_integrity:S-C1:E0002",
+        "passed": true,
+        "message": "S-C1/E0002: evidence integrity OK"
+      },
+      {
+        "check_id": "evidence_integrity:S-C1:E0003",
+        "passed": true,
+        "message": "S-C1/E0003: evidence integrity OK"
+      },
+      {
+        "check_id": "evidence_integrity:S-C1:E0004",
+        "passed": true,
+        "message": "S-C1/E0004: evidence integrity OK"
+      },
+      {
+        "check_id": "evidence_integrity:S-C1:E0005",
+        "passed": true,
+        "message": "S-C1/E0005: evidence integrity OK"
+      },
+      {
+        "check_id": "evidence_integrity:S-C1:E0007",
+        "passed": true,
+        "message": "S-C1/E0007: evidence integrity OK"
+      },
+      {
+        "check_id": "causal_overclaim:S-C1",
+        "passed": true,
+        "message": "S-C1: causal wording within policy"
+      },
+      {
+        "check_id": "claim_status:S-C2",
+        "passed": true,
+        "message": "S-C2: claim status allowed"
+      },
+      {
+        "check_id": "claim_evidence:S-C2",
+        "passed": true,
+        "message": "S-C2: evidence references exist"
+      },
+      {
+        "check_id": "evidence_integrity:S-C2:E0007",
+        "passed": true,
+        "message": "S-C2/E0007: evidence integrity OK"
+      },
+      {
+        "check_id": "causal_overclaim:S-C2",
+        "passed": true,
+        "message": "S-C2: causal wording within policy"
+      },
+      {
+        "check_id": "claim_status:S-C3",
+        "passed": true,
+        "message": "S-C3: claim status allowed"
+      },
+      {
+        "check_id": "claim_evidence:S-C3",
+        "passed": true,
+        "message": "S-C3: evidence references exist"
+      },
+      {
+        "check_id": "evidence_integrity:S-C3:E0007",
+        "passed": true,
+        "message": "S-C3/E0007: evidence integrity OK"
+      },
+      {
+        "check_id": "causal_overclaim:S-C3",
+        "passed": true,
+        "message": "S-C3: causal wording within policy"
+      },
+      {
+        "check_id": "claim_status:S-C4",
+        "passed": true,
+        "message": "S-C4: claim status allowed"
+      },
+      {
+        "check_id": "claim_evidence:S-C4",
+        "passed": true,
+        "message": "S-C4: evidence references exist"
+      },
+      {
+        "check_id": "evidence_integrity:S-C4:E0007",
+        "passed": true,
+        "message": "S-C4/E0007: evidence integrity OK"
+      },
+      {
+        "check_id": "guardrail:S-C4",
+        "passed": true,
+        "message": "S-C4: causal-language guardrail present"
+      },
+      {
+        "check_id": "causal_overclaim:S-C4",
+        "passed": true,
+        "message": "S-C4: causal wording within policy"
+      },
+      {
+        "check_id": "claim_status:S-C5",
+        "passed": true,
+        "message": "S-C5: claim status allowed"
+      },
+      {
+        "check_id": "claim_evidence:S-C5",
+        "passed": true,
+        "message": "S-C5: evidence references exist"
+      },
+      {
+        "check_id": "evidence_integrity:S-C5:E0007",
+        "passed": true,
+        "message": "S-C5/E0007: evidence integrity OK"
+      },
+      {
+        "check_id": "guardrail:S-C5",
+        "passed": true,
+        "message": "S-C5: causal-language guardrail present"
+      },
+      {
+        "check_id": "causal_overclaim:S-C5",
+        "passed": true,
+        "message": "S-C5: causal wording within policy"
+      },
+      {
+        "check_id": "evaluation_boundary",
+        "passed": true,
+        "message": "No evaluation-only *_gt columns were queried"
+      },
+      {
+        "check_id": "nonempty_evidence_graph",
+        "passed": true,
+        "message": "Claims reference tool evidence"
+      }
+    ],
+    "violations": [],
+    "evidence_id": "E0008"
+  },
+  "final_answer": {
+    "status": "verified",
+    "headline": "A verified customer-value segmentation profile was generated.",
+    "findings": [
+      "FitzSight segmented 6,770 European customers into 4 transparent behavioral-value groups with 100% coverage.",
+      "High Value is the largest deposit-value segment, accounting for 55.8% of completed European deposits in the synthetic dataset.",
+      "High Value customers average $9,791.21 in completed deposits, versus $0.00 for Low Activity customers.",
+      "High Value accounts for the largest segment share of completed withdrawals (61.0%); this is descriptive withdrawal pressure, not evidence of customer motive or suspicious behavior.",
+      "The segmentation is a descriptive operational analytics layer and must not be used as an automated credit, AML, suitability, eligibility or adverse-action decision."
+    ],
+    "evidence_ids": [
+      "E0002",
+      "E0003",
+      "E0004",
+      "E0005",
+      "E0007"
+    ],
+    "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+  },
+  "final_answer_evidence_id": "E0009",
+  "audit_evidence": [
+    {
+      "evidence_id": "E0001",
+      "tool_name": "agent.plan",
+      "parameters": {
+        "planner_mode": "structured_llm_adapter",
+        "intent": "customer_intelligence_segmentation",
+        "plan_version": "0.6"
+      },
+      "result_digest": "568699bdaa4a8579",
+      "created_at": "2026-08-11T06:27:48.017278+00:00",
+      "status": "success",
+      "result": {
+        "plan_version": "0.6",
+        "intent": "customer_intelligence_segmentation",
+        "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+        "planner_mode": "structured_llm_adapter",
+        "steps": [
+          {
+            "step_id": "AP1",
+            "action": "inspect_customer_schema",
+            "purpose": "Confirm the customer and behavioral transaction fields needed for descriptive segmentation."
+          },
+          {
+            "step_id": "AP2",
+            "action": "build_customer_behavior_features",
+            "purpose": "Aggregate observable deposit, withdrawal, and trading behavior without using hidden benchmark labels."
+          },
+          {
+            "step_id": "AP3",
+            "action": "segment_customer_value",
+            "purpose": "Apply the approved transparent behavioral-value segmentation policy."
+          },
+          {
+            "step_id": "AP4",
+            "action": "profile_segment_deposits",
+            "purpose": "Compare customer counts, deposits, net deposits, and trading activity across the derived segments."
+          },
+          {
+            "step_id": "AP5",
+            "action": "compare_withdrawal_pressure",
+            "purpose": "Describe segment-level withdrawal pressure without inferring motives or compliance risk."
+          },
+          {
+            "step_id": "AP6",
+            "action": "evidence_boundary",
+            "purpose": "Keep the result descriptive and outside credit, AML, suitability, eligibility, or adverse-action use."
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0002",
+      "tool_name": "schema_inspector",
+      "parameters": {
+        "table": "customers"
+      },
+      "result_digest": "03068fac09f4d6b7",
+      "created_at": "2026-08-11T06:27:48.017377+00:00",
+      "status": "success",
+      "result": {
+        "backend": "sqlite",
+        "table": "customers",
+        "columns": [
+          {
+            "name": "customer_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "registration_date",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "region",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "country",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "acquisition_channel",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "assigned_salesperson",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "assigned_team",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "customer_segment_gt",
+            "type": "TEXT",
+            "nullable": true
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0003",
+      "tool_name": "schema_inspector",
+      "parameters": {
+        "table": "deposits"
+      },
+      "result_digest": "7f9b633b2aae3c9f",
+      "created_at": "2026-08-11T06:27:48.017418+00:00",
+      "status": "success",
+      "result": {
+        "backend": "sqlite",
+        "table": "deposits",
+        "columns": [
+          {
+            "name": "deposit_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "customer_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "timestamp",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "amount",
+            "type": "REAL",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "method",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "type": "TEXT",
+            "nullable": true
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0004",
+      "tool_name": "schema_inspector",
+      "parameters": {
+        "table": "withdrawals"
+      },
+      "result_digest": "4ba2a2c82fc13adf",
+      "created_at": "2026-08-11T06:27:48.017449+00:00",
+      "status": "success",
+      "result": {
+        "backend": "sqlite",
+        "table": "withdrawals",
+        "columns": [
+          {
+            "name": "withdrawal_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "customer_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "timestamp",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "amount",
+            "type": "REAL",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "type": "TEXT",
+            "nullable": true
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0005",
+      "tool_name": "schema_inspector",
+      "parameters": {
+        "table": "trades"
+      },
+      "result_digest": "37e4082dc301ae13",
+      "created_at": "2026-08-11T06:27:48.017479+00:00",
+      "status": "success",
+      "result": {
+        "backend": "sqlite",
+        "table": "trades",
+        "columns": [
+          {
+            "name": "trade_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "customer_id",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "timestamp",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "instrument_group",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "volume",
+            "type": "REAL",
+            "nullable": true
+          },
+          {
+            "name": "pnl_mock",
+            "type": "REAL",
+            "nullable": true
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0006",
+      "tool_name": "read_only_sql",
+      "parameters": {
+        "sql": "WITH dep AS (\n    SELECT customer_id,\n           COUNT(*) AS deposit_count,\n           COALESCE(SUM(amount), 0) AS total_deposits\n    FROM deposits\n    WHERE status = 'completed'\n    GROUP BY customer_id\n),\nwd AS (\n    SELECT customer_id,\n           COUNT(*) AS withdrawal_count,\n           COALESCE(SUM(amount), 0) AS total_withdrawals\n    FROM withdrawals\n    WHERE status = 'completed'\n    GROUP BY customer_id\n),\ntr AS (\n    SELECT customer_id,\n           COUNT(*) AS trade_count,\n           COALESCE(SUM(volume), 0) AS trade_volume\n    FROM trades\n    GROUP BY customer_id\n)\nSELECT c.customer_id,\n       c.region,\n       c.acquisition_channel,\n       c.assigned_team,\n       COALESCE(dep.deposit_count, 0) AS deposit_count,\n       COALESCE(dep.total_deposits, 0) AS total_deposits,\n       COALESCE(wd.withdrawal_count, 0) AS withdrawal_count,\n       COALESCE(wd.total_withdrawals, 0) AS total_withdrawals,\n       COALESCE(tr.trade_count, 0) AS trade_count,\n       COALESCE(tr.trade_volume, 0) AS trade_volume\nFROM customers c\nLEFT JOIN dep ON dep.customer_id = c.customer_id\nLEFT JOIN wd ON wd.customer_id = c.customer_id\nLEFT JOIN tr ON tr.customer_id = c.customer_id\nWHERE c.region = 'Europe'\nORDER BY c.customer_id",
+        "backend": "sqlite",
+        "max_rows": 25000,
+        "compact_evidence": true
+      },
+      "result_digest": "4a050ffdab2040ad",
+      "created_at": "2026-08-11T06:27:48.063367+00:00",
+      "status": "success",
+      "result": {
+        "columns": [
+          "customer_id",
+          "region",
+          "acquisition_channel",
+          "assigned_team",
+          "deposit_count",
+          "total_deposits",
+          "withdrawal_count",
+          "total_withdrawals",
+          "trade_count",
+          "trade_volume"
+        ],
+        "row_count": 6770,
+        "truncated": false,
+        "backend": "sqlite",
+        "rows_preview": [
+          {
+            "customer_id": "C000002",
+            "region": "Europe",
+            "acquisition_channel": "Referral",
+            "assigned_team": "Team C",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000009",
+            "region": "Europe",
+            "acquisition_channel": "Events",
+            "assigned_team": "Team C",
+            "deposit_count": 2,
+            "total_deposits": 2260.7,
+            "withdrawal_count": 2,
+            "total_withdrawals": 1043.73,
+            "trade_count": 10,
+            "trade_volume": 35.3642
+          },
+          {
+            "customer_id": "C000010",
+            "region": "Europe",
+            "acquisition_channel": "Organic",
+            "assigned_team": "Team D",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000012",
+            "region": "Europe",
+            "acquisition_channel": "Affiliate",
+            "assigned_team": "Team E",
+            "deposit_count": 1,
+            "total_deposits": 1957.14,
+            "withdrawal_count": 1,
+            "total_withdrawals": 631.05,
+            "trade_count": 9,
+            "trade_volume": 30.3331
+          },
+          {
+            "customer_id": "C000016",
+            "region": "Europe",
+            "acquisition_channel": "Referral",
+            "assigned_team": "Team A",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000021",
+            "region": "Europe",
+            "acquisition_channel": "Referral",
+            "assigned_team": "Team E",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000026",
+            "region": "Europe",
+            "acquisition_channel": "Paid Search",
+            "assigned_team": "Team A",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000031",
+            "region": "Europe",
+            "acquisition_channel": "Affiliate",
+            "assigned_team": "Team B",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000034",
+            "region": "Europe",
+            "acquisition_channel": "Affiliate",
+            "assigned_team": "Team B",
+            "deposit_count": 2,
+            "total_deposits": 2525.65,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 9,
+            "trade_volume": 19.9025
+          },
+          {
+            "customer_id": "C000036",
+            "region": "Europe",
+            "acquisition_channel": "Organic",
+            "assigned_team": "Team C",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000037",
+            "region": "Europe",
+            "acquisition_channel": "Paid Search",
+            "assigned_team": "Team A",
+            "deposit_count": 0,
+            "total_deposits": 0,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 0,
+            "trade_volume": 0
+          },
+          {
+            "customer_id": "C000040",
+            "region": "Europe",
+            "acquisition_channel": "Organic",
+            "assigned_team": "Team A",
+            "deposit_count": 3,
+            "total_deposits": 852.4200000000001,
+            "withdrawal_count": 0,
+            "total_withdrawals": 0,
+            "trade_count": 9,
+            "trade_volume": 10.9894
+          }
+        ],
+        "preview_row_count": 12,
+        "full_result_digest": "55337eb8ca503860",
+        "evidence_mode": "compact_preview"
+      }
+    },
+    {
+      "evidence_id": "E0007",
+      "tool_name": "customer_segmentation.behavioral_value",
+      "parameters": {
+        "region": "Europe",
+        "method": "behavioral_value_score_v1"
+      },
+      "result_digest": "2d1fff84f02ed156",
+      "created_at": "2026-08-11T06:27:48.086410+00:00",
+      "status": "success",
+      "result": {
+        "method": "behavioral_value_score_v1",
+        "region": "Europe",
+        "customer_count": 6770,
+        "active_customer_count": 1425,
+        "coverage": 1.0,
+        "segment_count": 4,
+        "segment_order": [
+          "High Value",
+          "Growth",
+          "Core",
+          "Low Activity"
+        ],
+        "score_formula": {
+          "deposit_percentile_weight": 0.55,
+          "trade_volume_percentile_weight": 0.3,
+          "trade_count_percentile_weight": 0.15,
+          "high_value_threshold": 0.75,
+          "growth_threshold": 0.5,
+          "low_activity_rule": "no completed deposits, withdrawals, or trades"
+        },
+        "profiles": [
+          {
+            "segment": "High Value",
+            "customer_count": 278,
+            "customer_share": 0.04106351550960118,
+            "active_customer_count": 278,
+            "avg_value_score": 0.8424689511548655,
+            "total_deposits": 2721957.4699999997,
+            "avg_deposits": 9791.213920863309,
+            "deposit_share": 0.5582904450387265,
+            "total_withdrawals": 572145.17,
+            "avg_withdrawals": 2058.0761510791367,
+            "withdrawal_share": 0.6103453487200758,
+            "net_deposits": 2149812.3,
+            "avg_net_deposits": 7733.137769784172,
+            "total_trade_volume": 11759.147799999999,
+            "avg_trade_volume": 42.29909280575539,
+            "avg_trade_count": 7.215827338129497,
+            "avg_withdrawal_ratio": 0.14598972875193272
+          },
+          {
+            "segment": "Growth",
+            "customer_count": 415,
+            "customer_share": 0.061299852289512555,
+            "active_customer_count": 415,
+            "avg_value_score": 0.6175893468611288,
+            "total_deposits": 1497194.4,
+            "avg_deposits": 3607.69734939759,
+            "deposit_share": 0.3070839045422297,
+            "total_withdrawals": 281069.58999999997,
+            "avg_withdrawals": 677.2761204819276,
+            "withdrawal_share": 0.2998356464726578,
+            "net_deposits": 1216124.81,
+            "avg_net_deposits": 2930.4212289156626,
+            "total_trade_volume": 6073.071,
+            "avg_trade_volume": 14.633906024096385,
+            "avg_trade_count": 5.47710843373494,
+            "avg_withdrawal_ratio": 0.15638658090667854
+          },
+          {
+            "segment": "Core",
+            "customer_count": 732,
+            "customer_share": 0.10812407680945348,
+            "active_customer_count": 732,
+            "avg_value_score": 0.30395362381363245,
+            "total_deposits": 656370.35,
+            "avg_deposits": 896.6808060109289,
+            "deposit_share": 0.13462565041904373,
+            "total_withdrawals": 84197.43,
+            "avg_withdrawals": 115.02381147540983,
+            "withdrawal_share": 0.08981900480726625,
+            "net_deposits": 572172.9199999999,
+            "avg_net_deposits": 781.6569945355191,
+            "total_trade_volume": 3922.1468,
+            "avg_trade_volume": 5.358124043715847,
+            "avg_trade_count": 3.469945355191257,
+            "avg_withdrawal_ratio": 0.11736354866776125
+          },
+          {
+            "segment": "Low Activity",
+            "customer_count": 5345,
+            "customer_share": 0.7895125553914328,
+            "active_customer_count": 0,
+            "avg_value_score": 0.0,
+            "total_deposits": 0.0,
+            "avg_deposits": 0.0,
+            "deposit_share": 0.0,
+            "total_withdrawals": 0.0,
+            "avg_withdrawals": 0.0,
+            "withdrawal_share": 0.0,
+            "net_deposits": 0.0,
+            "avg_net_deposits": 0.0,
+            "total_trade_volume": 0.0,
+            "avg_trade_volume": 0.0,
+            "avg_trade_count": 0.0,
+            "avg_withdrawal_ratio": 0.0
+          }
+        ],
+        "top_deposit_segment": "High Value",
+        "top_deposit_segment_share": 0.5582904450387265,
+        "top_net_deposit_segment": "High Value",
+        "high_value_avg_deposits": 9791.213920863309,
+        "low_activity_avg_deposits": 0.0,
+        "sample_assignments": [
+          {
+            "customer_id": "C014223",
+            "segment": "High Value",
+            "value_score": 0.9936842105263157,
+            "total_deposits": 31787.34,
+            "total_withdrawals": 22886.88,
+            "trade_volume": 101.7002
+          },
+          {
+            "customer_id": "C001254",
+            "segment": "High Value",
+            "value_score": 0.9871929824561403,
+            "total_deposits": 24599.58,
+            "total_withdrawals": 1789.66,
+            "trade_volume": 117.55
+          },
+          {
+            "customer_id": "C013791",
+            "segment": "High Value",
+            "value_score": 0.9815964912280701,
+            "total_deposits": 30038.17,
+            "total_withdrawals": 26575.52,
+            "trade_volume": 88.1461
+          },
+          {
+            "customer_id": "C013816",
+            "segment": "Growth",
+            "value_score": 0.7498245614035087,
+            "total_deposits": 10817.07,
+            "total_withdrawals": 0.0,
+            "trade_volume": 14.9315
+          },
+          {
+            "customer_id": "C014181",
+            "segment": "Growth",
+            "value_score": 0.7492280701754386,
+            "total_deposits": 3076.09,
+            "total_withdrawals": 0.0,
+            "trade_volume": 26.939700000000002
+          },
+          {
+            "customer_id": "C001487",
+            "segment": "Growth",
+            "value_score": 0.7487543859649123,
+            "total_deposits": 4285.86,
+            "total_withdrawals": 1107.95,
+            "trade_volume": 17.312
+          },
+          {
+            "customer_id": "C018547",
+            "segment": "Core",
+            "value_score": 0.49801754385964914,
+            "total_deposits": 955.3399999999999,
+            "total_withdrawals": 151.04,
+            "trade_volume": 15.588899999999999
+          },
+          {
+            "customer_id": "C000102",
+            "segment": "Core",
+            "value_score": 0.4975964912280702,
+            "total_deposits": 4840.18,
+            "total_withdrawals": 0.0,
+            "trade_volume": 1.6117
+          },
+          {
+            "customer_id": "C015710",
+            "segment": "Core",
+            "value_score": 0.4960877192982457,
+            "total_deposits": 1985.46,
+            "total_withdrawals": 0.0,
+            "trade_volume": 6.0102
+          },
+          {
+            "customer_id": "C000002",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          },
+          {
+            "customer_id": "C000010",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          },
+          {
+            "customer_id": "C000016",
+            "segment": "Low Activity",
+            "value_score": 0.0,
+            "total_deposits": 0.0,
+            "total_withdrawals": 0.0,
+            "trade_volume": 0.0
+          }
+        ],
+        "source_evidence_id": "E0006",
+        "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+      }
+    },
+    {
+      "evidence_id": "E0008",
+      "tool_name": "agent.verifier",
+      "parameters": {
+        "claim_count": 5,
+        "root_cause_status": "descriptive_profile"
+      },
+      "result_digest": "0f826ac2beb2f867",
+      "created_at": "2026-08-11T06:27:48.087664+00:00",
+      "status": "success",
+      "result": {
+        "passed": true,
+        "verified_claims": 5,
+        "total_claims": 5,
+        "violations": [],
+        "checks": [
+          {
+            "check_id": "claim_status:S-C1",
+            "passed": true,
+            "message": "S-C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C1",
+            "passed": true,
+            "message": "S-C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0002",
+            "passed": true,
+            "message": "S-C1/E0002: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0003",
+            "passed": true,
+            "message": "S-C1/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0004",
+            "passed": true,
+            "message": "S-C1/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0005",
+            "passed": true,
+            "message": "S-C1/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0007",
+            "passed": true,
+            "message": "S-C1/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C1",
+            "passed": true,
+            "message": "S-C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C2",
+            "passed": true,
+            "message": "S-C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C2",
+            "passed": true,
+            "message": "S-C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C2:E0007",
+            "passed": true,
+            "message": "S-C2/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C2",
+            "passed": true,
+            "message": "S-C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C3",
+            "passed": true,
+            "message": "S-C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C3",
+            "passed": true,
+            "message": "S-C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C3:E0007",
+            "passed": true,
+            "message": "S-C3/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C3",
+            "passed": true,
+            "message": "S-C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C4",
+            "passed": true,
+            "message": "S-C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C4",
+            "passed": true,
+            "message": "S-C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C4:E0007",
+            "passed": true,
+            "message": "S-C4/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:S-C4",
+            "passed": true,
+            "message": "S-C4: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:S-C4",
+            "passed": true,
+            "message": "S-C4: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C5",
+            "passed": true,
+            "message": "S-C5: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C5",
+            "passed": true,
+            "message": "S-C5: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C5:E0007",
+            "passed": true,
+            "message": "S-C5/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:S-C5",
+            "passed": true,
+            "message": "S-C5: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:S-C5",
+            "passed": true,
+            "message": "S-C5: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "E0009",
+      "tool_name": "agent.final_answer",
+      "parameters": {
+        "verification_evidence_id": "E0008",
+        "status": "verified",
+        "intent": "customer_intelligence_segmentation"
+      },
+      "result_digest": "cc7c662fe71854f8",
+      "created_at": "2026-08-11T06:27:48.087710+00:00",
+      "status": "success",
+      "result": {
+        "status": "verified",
+        "headline": "A verified customer-value segmentation profile was generated.",
+        "findings": [
+          "FitzSight segmented 6,770 European customers into 4 transparent behavioral-value groups with 100% coverage.",
+          "High Value is the largest deposit-value segment, accounting for 55.8% of completed European deposits in the synthetic dataset.",
+          "High Value customers average $9,791.21 in completed deposits, versus $0.00 for Low Activity customers.",
+          "High Value accounts for the largest segment share of completed withdrawals (61.0%); this is descriptive withdrawal pressure, not evidence of customer motive or suspicious behavior.",
+          "The segmentation is a descriptive operational analytics layer and must not be used as an automated credit, AML, suitability, eligibility or adverse-action decision."
+        ],
+        "evidence_ids": [
+          "E0002",
+          "E0003",
+          "E0004",
+          "E0005",
+          "E0007"
+        ],
+        "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions."
+      }
+    }
+  ],
+  "runtime": {
+    "backend": "sqlite",
+    "data_dir": "/mnt/data/work_v06/data/generated"
+  }
+}

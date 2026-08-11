@@ -1,111 +1,51 @@
 # FitzSight Repository Manifest
 
-**Version:** v0.5.0  
-**Generated:** 2026-08-11  
+**Version:** v0.6.0  
+**Date:** 2026-08-11  
+**Verified source baseline:** `AplusNeutrino/FitzSight` main commit `c8e751b2e7afe68f7d96837bbeffbebd4e957fd2` (`Release FitzSight v0.5.0`)
 
-This manifest records the v0.5.0 delivery snapshot. Generated benchmark CSVs are intentionally excluded; only `data/generated/.gitkeep` is shipped.
+This manifest records the v0.6.0 delivery snapshot. Generated synthetic benchmark CSV files are intentionally excluded; only `data/generated/.gitkeep` is shipped. The application regenerates deterministic synthetic data when required.
 
-## Key v0.5 additions
+## Key v0.6 additions
 
-- `src/fitzsight/agent/catalog.py` — approved multi-intent/action catalog
-- `src/fitzsight/investigation/net_deposit.py` — second deterministic investigation
-- `src/fitzsight/investigation/router.py` — deterministic intent router
-- `src/fitzsight/providers/openai_planner.py` — optional Responses structured planner
-- `streamlit_app.py` — minimal verified-results demo shell
-- `evaluation/benchmark_catalog.json` — two-scenario catalog
-- `scripts/run_benchmark.py` — deterministic benchmark runner
-- `docs/V0.5_VALIDATION.md` — v0.5 validation evidence
+- `src/fitzsight/tools/segmentation.py` — transparent behavioral-value Customer Segmentation Tool
+- `src/fitzsight/investigation/customer_intelligence.py` — third deterministic investigation engine
+- `src/fitzsight/agent/catalog.py` — three approved Agent intents
+- `src/fitzsight/investigation/router.py` — three-intent deterministic router
+- `src/fitzsight/tools/sql.py` — compact evidence preview/digest mode for large bounded queries
+- `streamlit_app.py` — three demo presets + KPI cards + verified charts + plan trace + Evidence cards
+- `evaluation/benchmark_catalog.json` — three-scenario benchmark catalog
+- `scripts/run_benchmark.py` — scenario pass / root-cause / evidence / verifier / latency metrics
+- `examples/valid_customer_intelligence_plan.json` — third structured-plan example
+- `docs/CUSTOMER_INTELLIGENCE.md`
+- `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`
+- `docs/PITCH_DECK_CONTENT.md`
+- `docs/V0.6_VALIDATION.md`
+- `docs/V0.6_BENCHMARK_RESULTS.json`
+- `docs/V0.6_SAMPLE_CUSTOMER_INTELLIGENCE.json`
+- `LICENSE` — MIT
+- `THIRD_PARTY_NOTICES.md`
+- v0.6 automated tests
 
-## Files (93)
+## Validation evidence
 
-- `.env.example`
-- `.gitignore`
-- `IMPLEMENTATION_STATUS.md`
-- `MASTER_PLAN.md`
-- `PROJECT_PROGRESS.md`
-- `README.md`
-- `RELEASE_NOTES_v0.1.md`
-- `RELEASE_NOTES_v0.2.md`
-- `RELEASE_NOTES_v0.3.md`
-- `RELEASE_NOTES_v0.4.md`
-- `RELEASE_NOTES_v0.5.md`
-- `data/generated/.gitkeep`
-- `docs/AGENT_LAYER.md`
-- `docs/ARCHITECTURE.md`
-- `docs/BASELINE_RESULTS.md`
-- `docs/DATA_DICTIONARY.md`
-- `docs/DIAGNOSTIC_TOOLS.md`
-- `docs/MODEL_PROVIDER.md`
-- `docs/MULTI_INTENT.md`
-- `docs/TOOL_LAYER.md`
-- `docs/UI_DEMO.md`
-- `docs/V0.2_VALIDATION.md`
-- `docs/V0.3_SAMPLE_INVESTIGATION.json`
-- `docs/V0.3_VALIDATION.md`
-- `docs/V0.4_SAMPLE_AGENT_SUMMARY.json`
-- `docs/V0.4_VALIDATION.md`
-- `docs/V0.5_SAMPLE_NET_DEPOSIT_SUMMARY.json`
-- `docs/V0.5_VALIDATION.md`
-- `evaluation/benchmark_catalog.json`
-- `examples/valid_agent_plan.json`
-- `examples/valid_net_deposit_plan.json`
-- `pyproject.toml`
-- `scripts/agent_investigate.py`
-- `scripts/generate_data.py`
-- `scripts/investigate.py`
-- `scripts/run_baseline.py`
-- `scripts/run_benchmark.py`
-- `src/fitzsight/__init__.py`
-- `src/fitzsight/agent/__init__.py`
-- `src/fitzsight/agent/catalog.py`
-- `src/fitzsight/agent/models.py`
-- `src/fitzsight/agent/orchestrator.py`
-- `src/fitzsight/agent/planner.py`
-- `src/fitzsight/agent/renderer.py`
-- `src/fitzsight/agent/verifier.py`
-- `src/fitzsight/analytics/__init__.py`
-- `src/fitzsight/analytics/baseline.py`
-- `src/fitzsight/analytics/kpis.py`
-- `src/fitzsight/data/__init__.py`
-- `src/fitzsight/data/generator.py`
-- `src/fitzsight/data/scenarios.py`
-- `src/fitzsight/data/store.py`
-- `src/fitzsight/evidence/__init__.py`
-- `src/fitzsight/evidence/registry.py`
-- `src/fitzsight/investigation/__init__.py`
-- `src/fitzsight/investigation/engine.py`
-- `src/fitzsight/investigation/models.py`
-- `src/fitzsight/investigation/net_deposit.py`
-- `src/fitzsight/investigation/router.py`
-- `src/fitzsight/providers/__init__.py`
-- `src/fitzsight/providers/openai_planner.py`
-- `src/fitzsight/runtime.py`
-- `src/fitzsight/tools/__init__.py`
-- `src/fitzsight/tools/anomaly.py`
-- `src/fitzsight/tools/base.py`
-- `src/fitzsight/tools/comparison.py`
-- `src/fitzsight/tools/contribution.py`
-- `src/fitzsight/tools/kpi.py`
-- `src/fitzsight/tools/schema.py`
-- `src/fitzsight/tools/sql.py`
-- `src/fitzsight/tools/statistics.py`
-- `streamlit_app.py`
-- `tests/test_agent_orchestrator.py`
-- `tests/test_agent_planner.py`
-- `tests/test_agent_verifier.py`
-- `tests/test_anomaly.py`
-- `tests/test_benchmark_catalog.py`
-- `tests/test_contribution.py`
-- `tests/test_evidence.py`
-- `tests/test_generator.py`
-- `tests/test_investigation.py`
-- `tests/test_kpi_tools.py`
-- `tests/test_kpis.py`
-- `tests/test_multi_intent_planner.py`
-- `tests/test_net_deposit_agent.py`
-- `tests/test_net_deposit_scenario.py`
-- `tests/test_openai_planner.py`
-- `tests/test_scenario_crm_routing.py`
-- `tests/test_sql_safety.py`
-- `tests/test_statistics.py`
-- `tests/test_store_tools.py`
+```text
+Test group 1: 25 passed
+Test group 2: 21 passed, 1 skipped
+Aggregate:    46 passed, 1 skipped
+compileall:   PASS
+benchmark:    3 / 3 PASS
+```
+
+The single build-environment skip is the DuckDB-specific test because the build sandbox lacks DuckDB. Separate deployment evidence has already validated the DuckDB runtime using `data/generated`, with both the default constrained planner and JSON-file planner reaching final status `verified`.
+
+## External runtime state
+
+Still requiring separate real runtime evidence:
+
+- OpenAI Responses live API planner
+- Streamlit runtime smoke test
+
+## Delivery integrity
+
+`SHA256SUMS.txt` contains a SHA-256 checksum for every shipped repository file except itself.

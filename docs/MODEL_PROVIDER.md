@@ -2,7 +2,7 @@
 
 ## OpenAI Responses planner
 
-v0.5 includes an optional `OpenAIResponsesPlanner`.
+v0.6 includes an optional `OpenAIResponsesPlanner`.
 
 The provider exists only above the deterministic FitzSight intent/tool boundary.
 
@@ -65,6 +65,6 @@ or CLI `--model`.
 
 ## Build validation boundary
 
-The build sandbox does not have a live API credential. Therefore v0.5 validates the provider using a fake Responses client and verifies the exact request configuration and local post-generation validation.
+The build sandbox does not have a live API credential. Therefore v0.6 validates the provider using a fake Responses client and verifies the exact request configuration and local post-generation validation.
 
 A live API call remains a deployment-environment validation task.

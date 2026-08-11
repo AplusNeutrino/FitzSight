@@ -13,7 +13,7 @@ from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
 class NetDepositInvestigationEngine:
-    """Deterministic engine for the second FitzSight v0.5 business intent."""
+    """Deterministic engine for the second FitzSight financial-operations business intent."""
 
     intent = "net_deposit_anomaly_investigation"
 
@@ -399,7 +399,7 @@ class NetDepositInvestigationEngine:
 
         return InvestigationResult(
             product="FitzSight",
-            mode="deterministic_net_deposit_v0.5",
+            mode="deterministic_net_deposit_v0.6",
             question=question,
             plan=plan,
             claims=claims,

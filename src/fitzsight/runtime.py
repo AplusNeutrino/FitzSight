@@ -8,10 +8,12 @@ from fitzsight.agent.verifier import EvidenceClaimVerifier
 from fitzsight.data.generator import GeneratorConfig, write_csv_bundle
 from fitzsight.data.store import AnalyticsStore
 from fitzsight.evidence.registry import EvidenceRegistry
+from fitzsight.investigation.customer_intelligence import CustomerIntelligenceInvestigationEngine
 from fitzsight.investigation.engine import DeterministicInvestigationEngine
 from fitzsight.investigation.net_deposit import NetDepositInvestigationEngine
 from fitzsight.investigation.router import MultiIntentInvestigationEngine
 from fitzsight.tools.schema import SchemaInspectorTool
+from fitzsight.tools.segmentation import CustomerSegmentationTool
 from fitzsight.tools.sql import ReadOnlySQLTool
 from fitzsight.tools.statistics import StatisticalTestTool
 
@@ -23,16 +25,20 @@ def build_agent_runtime(
     planner: Planner,
     generator_config: GeneratorConfig | None = None,
 ):
-    """Build the audited v0.5 runtime and return `(store, registry, agent)`.
+    """Build the audited v0.6 runtime and return ``(store, registry, agent)``.
 
-    The caller owns the returned store and must close it.
+    The caller owns the returned store and must close it. The SQL row bound is
+    sized for the 20k-customer synthetic benchmark so customer segmentation can
+    analyze the complete European cohort without truncation.
     """
 
     data_dir = Path(data_dir)
     required = (
+        data_dir / "customers.csv",
         data_dir / "sales_activity.csv",
         data_dir / "deposits.csv",
         data_dir / "withdrawals.csv",
+        data_dir / "trades.csv",
     )
     if not all(path.exists() for path in required):
         write_csv_bundle(data_dir, generator_config or GeneratorConfig())
@@ -42,8 +48,9 @@ def build_agent_runtime(
     store.load_csv_directory()
 
     schema_tool = SchemaInspectorTool(store, registry)
-    sql_tool = ReadOnlySQLTool(store, registry, max_rows=5000)
+    sql_tool = ReadOnlySQLTool(store, registry, max_rows=25_000)
     stats_tool = StatisticalTestTool(registry)
+    segmentation_tool = CustomerSegmentationTool(sql_tool, registry)
 
     crm_engine = DeterministicInvestigationEngine(
         schema_tool=schema_tool,
@@ -56,9 +63,15 @@ def build_agent_runtime(
         sql_tool=sql_tool,
         registry=registry,
     )
+    customer_engine = CustomerIntelligenceInvestigationEngine(
+        schema_tool=schema_tool,
+        segmentation_tool=segmentation_tool,
+        registry=registry,
+    )
     router = MultiIntentInvestigationEngine(
         crm_engine=crm_engine,
         net_deposit_engine=net_engine,
+        customer_intelligence_engine=customer_engine,
     )
 
     agent = FitzSightAgent(

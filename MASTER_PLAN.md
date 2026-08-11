@@ -3405,3 +3405,23 @@ The first concrete provider adapter uses the OpenAI Responses API with strict JS
 
 The Streamlit demo shell renders verified outputs and audit evidence. It must not recalculate business metrics or bypass the verifier. Final competition UI work should preserve this separation.
 
+
+---
+
+# v0.6 Implementation Decisions (2026-08-11)
+
+## D-017 — Customer segmentation must be transparent and descriptive
+
+FitzSight v0.6 introduces `behavioral_value_score_v1`, a deterministic segmentation based only on observable deposit value, trading volume and trading frequency. Hidden benchmark labels such as `customer_segment_gt` remain prohibited from normal Agent SQL. The segments are business-analysis groupings, not credit, AML, suitability, eligibility or adverse-action decisions.
+
+## D-018 — The benchmark harness now reports evidence quality as a first-class metric
+
+The benchmark runner reports scenario pass rate, root-cause scenario accuracy, mean evidence coverage, verifier-violation count and deterministic latency. Benchmark success therefore requires more than producing the expected headline number: the evidence and verifier path must also remain intact.
+
+## D-019 — FitzSight is released under the MIT License
+
+The public implementation repository uses the MIT License for the project-owned code. Third-party dependencies remain governed by their own licenses and are documented separately. This decision may be revisited only if a competition rule or future dependency creates a specific incompatibility.
+
+## D-020 — UI charts and KPI cards are presentation-only
+
+v0.6 UI code renders business KPI cards, intent-specific charts, plan trace and evidence cards from the verified Agent result. The UI is not allowed to recompute KPI logic or create a second, unverified analytical path.

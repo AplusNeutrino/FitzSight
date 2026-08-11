@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -13,7 +14,7 @@ from fitzsight.runtime import build_agent_runtime
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run the FitzSight v0.5 deterministic benchmark catalog.")
+    parser = argparse.ArgumentParser(description="Run the FitzSight v0.6 deterministic benchmark catalog.")
     parser.add_argument("--catalog", default=str(ROOT / "evaluation" / "benchmark_catalog.json"))
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument("--backend", choices=["auto", "duckdb", "sqlite"], default="auto")
@@ -31,6 +32,14 @@ def sign_ok(value: float, expected: str) -> bool:
     raise ValueError(f"Unsupported expected sign: {expected}")
 
 
+def claim_evidence_coverage(result: dict) -> float:
+    claims = result["investigation"].get("claims", [])
+    if not claims:
+        return 0.0
+    covered = sum(1 for claim in claims if claim.get("evidence_ids"))
+    return covered / len(claims)
+
+
 def evaluate(scenario, result):
     expected = scenario["expected"]
     investigation = result["investigation"]
@@ -40,6 +49,9 @@ def evaluate(scenario, result):
     checks = {
         "verification_passed": result["verification"]["passed"] is expected["verification_passed"],
         "root_cause_status": diagnosis["root_cause_status"] == expected["root_cause_status"],
+        "final_answer_verified": result["final_answer"]["status"] == "verified",
+        "evidence_coverage_complete": claim_evidence_coverage(result) == 1.0,
+        "verifier_has_no_violations": not result["verification"]["violations"],
     }
 
     if scenario["intent"] == "crm_routing_ftd_investigation":
@@ -64,6 +76,23 @@ def evaluate(scenario, result):
             metrics["customer_concentration"]["share_of_current_withdrawals"]
             >= expected["minimum_top_11_withdrawal_share"]
         )
+    elif scenario["intent"] == "customer_intelligence_segmentation":
+        segmentation = metrics["segmentation"]
+        checks["segmentation_method"] = (
+            segmentation["method"] == expected["segmentation_method"]
+        )
+        checks["minimum_coverage"] = segmentation["coverage"] >= expected["minimum_coverage"]
+        checks["minimum_segment_count"] = (
+            segmentation["segment_count"] >= expected["minimum_segment_count"]
+        )
+        checks["expected_top_deposit_segment"] = (
+            segmentation["top_deposit_segment"] == expected["expected_top_deposit_segment"]
+        )
+        if expected["high_value_avg_deposits_exceeds_low_activity"]:
+            checks["high_value_avg_deposits_exceeds_low_activity"] = (
+                segmentation["high_value_avg_deposits"]
+                > segmentation["low_activity_avg_deposits"]
+            )
     else:
         checks["known_intent"] = False
 
@@ -81,11 +110,13 @@ def main():
             backend=args.backend,
             planner=ConstrainedRulePlanner(),
         )
+        started = time.perf_counter()
         try:
             run = agent.run(scenario["question"]).to_dict()
             backend = store.backend
         finally:
             store.close()
+        latency_ms = (time.perf_counter() - started) * 1000
 
         checks = evaluate(scenario, run)
         results.append(
@@ -96,16 +127,42 @@ def main():
                 "checks": checks,
                 "verification": run["verification"],
                 "final_answer_status": run["final_answer"]["status"],
+                "evidence_coverage": claim_evidence_coverage(run),
+                "verifier_violation_count": len(run["verification"]["violations"]),
+                "latency_ms": latency_ms,
                 "backend": backend,
             }
         )
 
+    root_cause_scenarios = [
+        item for item in results
+        if item["intent"] in {"crm_routing_ftd_investigation", "net_deposit_anomaly_investigation"}
+    ]
     payload = {
         "product": "FitzSight",
         "benchmark_version": catalog["catalog_version"],
         "scenario_count": len(results),
         "passed": sum(1 for item in results if item["passed"]),
         "failed": sum(1 for item in results if not item["passed"]),
+        "metrics": {
+            "scenario_pass_rate": (
+                sum(1 for item in results if item["passed"]) / len(results)
+                if results else 0.0
+            ),
+            "root_cause_scenario_accuracy": (
+                sum(1 for item in root_cause_scenarios if item["passed"]) / len(root_cause_scenarios)
+                if root_cause_scenarios else None
+            ),
+            "mean_evidence_coverage": (
+                sum(item["evidence_coverage"] for item in results) / len(results)
+                if results else 0.0
+            ),
+            "total_verifier_violations": sum(item["verifier_violation_count"] for item in results),
+            "mean_latency_ms": (
+                sum(item["latency_ms"] for item in results) / len(results)
+                if results else 0.0
+            ),
+        },
         "results": results,
     }
 
