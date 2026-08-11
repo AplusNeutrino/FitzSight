@@ -1,0 +1,5 @@
+def ftd_conversion_rate(df): return 0.0 if df.empty else float(df["converted_ftd"].astype(bool).mean())
+def total_deposits(df): return 0.0 if df.empty else float(df.loc[df.status.eq("completed"),"amount"].sum())
+def total_withdrawals(df): return 0.0 if df.empty else float(df.loc[df.status.eq("completed"),"amount"].sum())
+def net_deposits(deposits, withdrawals): return total_deposits(deposits)-total_withdrawals(withdrawals)
+def trading_volume(df): return 0.0 if df.empty else float(df["volume"].sum())
