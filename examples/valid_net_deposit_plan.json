@@ -1,0 +1,33 @@
+{
+  "intent": "net_deposit_anomaly_investigation",
+  "steps": [
+    {
+      "action": "inspect_schema",
+      "purpose": "Perform approved inspect schema analysis."
+    },
+    {
+      "action": "measure_period_net_deposits",
+      "purpose": "Perform approved measure period net deposits analysis."
+    },
+    {
+      "action": "decompose_deposit_withdrawal_drivers",
+      "purpose": "Perform approved decompose deposit withdrawal drivers analysis."
+    },
+    {
+      "action": "identify_customer_concentration",
+      "purpose": "Perform approved identify customer concentration analysis."
+    },
+    {
+      "action": "compare_regional_control",
+      "purpose": "Perform approved compare regional control analysis."
+    },
+    {
+      "action": "event_check",
+      "purpose": "Perform approved event check analysis."
+    },
+    {
+      "action": "evidence_boundary",
+      "purpose": "Perform approved evidence boundary analysis."
+    }
+  ]
+}

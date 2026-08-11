@@ -1,0 +1,28 @@
+{
+  "catalog_version": "0.5",
+  "scenarios": [
+    {
+      "id": "crm_routing_ftd_20260715",
+      "intent": "crm_routing_ftd_investigation",
+      "question": "Why did European FTD conversion deteriorate after July 15?",
+      "expected": {
+        "verification_passed": true,
+        "root_cause_status": "supported_candidate",
+        "affected_conversion_change_sign": "negative",
+        "affected_response_change_sign": "positive"
+      }
+    },
+    {
+      "id": "europe_net_deposit_20260803",
+      "intent": "net_deposit_anomaly_investigation",
+      "question": "Why did European net deposits fall in the week starting August 3?",
+      "expected": {
+        "verification_passed": true,
+        "root_cause_status": "supported_candidate",
+        "net_deposit_change_sign": "negative",
+        "withdrawal_change_sign": "positive",
+        "minimum_top_11_withdrawal_share": 0.5
+      }
+    }
+  ]
+}

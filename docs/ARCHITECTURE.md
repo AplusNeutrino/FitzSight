@@ -1,158 +1,177 @@
-# FitzSight Architecture — v0.2
+# FitzSight Architecture
 
-## Objective
+Version: v0.5.0
 
-v0.2 proves that a business question can be transformed into a deterministic, evidence-linked investigation before any LLM is allowed to control planning or narration.
-
-## Components
+## North-star boundary
 
 ```text
-CLI / future UI
-    |
-    v
-DeterministicInvestigationEngine
-    |
-    +--> SchemaInspectorTool
-    +--> ReadOnlySQLTool
-    +--> StatisticalTestTool
-    +--> KPITool
-    +--> PeriodComparisonTool
-    |
-    v
-EvidenceRegistry
-    |
-    v
-AnalyticsStore
-    +--> DuckDB (preferred)
-    +--> SQLite (offline fallback)
-    |
-    v
+LLM / Planner = decide what approved investigation to run
+SQL / Python   = calculate
+Evidence       = prove what ran
+Verifier       = decide whether claims may be shown
+UI             = render verified results
+```
+
+No layer above the deterministic tools is allowed to invent business numbers.
+
+## Runtime architecture
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                        User / UI                            │
+│              CLI or Streamlit demo shell                   │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Supported Intent Gate                    │
+│  CRM/FTD investigation | Net-deposit anomaly investigation │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Constrained Planner                       │
+│ deterministic fallback | structured JSON | OpenAI optional │
+│        approved intent + approved actions only             │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│              MultiIntentInvestigationEngine                 │
+│                                                             │
+│  ┌──────────────────────┐  ┌──────────────────────────────┐ │
+│  │ CRM/FTD Engine       │  │ Net Deposit Engine           │ │
+│  │ conversion/control   │  │ deposits/withdrawals         │ │
+│  │ stats/contribution   │  │ concentration/control       │ │
+│  │ anomaly/events       │  │ events/guardrail            │ │
+│  └──────────────────────┘  └──────────────────────────────┘ │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Deterministic Tools                      │
+│ Schema | Read-only SQL | Statistics | Contribution | KPI   │
+│ Anomaly | local decomposition                              │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Evidence Registry                       │
+│ Evidence ID | inputs | status | digest | compact result    │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   EvidenceClaimVerifier                     │
+│ references | digest | status | *_gt boundary | causality   │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                        PASS │ FAIL
+                     ┌───────┴────────┐
+                     ▼                ▼
+              Verified answer    Fail closed
+```
+
+## Data layer
+
+Current reproducible source:
+
+```text
 Synthetic CSV bundle
+├── customers
+├── salespeople
+├── sales_activity
+├── deposits
+├── withdrawals
+├── trades
+└── business_events
 ```
 
-## Responsibility boundaries
-
-### Investigation Engine
-
-- understands only explicitly supported v0.2 intents;
-- creates a fixed investigation plan;
-- chooses predeclared Tools;
-- builds supported claims from Tool outputs;
-- applies causal-language guardrails;
-- never reads evaluation-only `*_gt` fields.
-
-### Tool Layer
-
-- performs deterministic calculations;
-- provides explicit failure states;
-- creates evidence records;
-- does not ask an LLM to calculate metrics.
-
-### Analytics Store
-
-- loads local synthetic CSV files;
-- prefers DuckDB;
-- exposes an offline SQLite fallback for restricted environments;
-- does not accept arbitrary user file paths during SQL execution.
-
-### Evidence Registry
-
-Each record contains:
-
-- Evidence ID;
-- Tool name;
-- parameters;
-- result digest;
-- timestamp;
-- status;
-- compact result payload.
-
-## Future v0.3 boundary
-
-The future LLM layer should sit **above** the current deterministic Tools:
+Preferred analytical backend:
 
 ```text
-LLM Planner / Orchestrator
-        ↓
-existing v0.2 Tool contracts
-        ↓
-Evidence Registry
-        ↓
-Verifier
-        ↓
-Auditable report
+DuckDB
 ```
 
-The LLM should not receive direct authority to mutate the database or fabricate numeric results.
-
----
-
-## v0.3 diagnostic extension
-
-v0.3 inserts two deterministic diagnostics between the core statistical layer and final evidence rendering:
+Restricted/offline fallback:
 
 ```text
-Read-only SQL / KPI / statistics
-          ↓
-ContributionAnalysisTool
-          ↓
-AnomalyDetectionTool
-          ↓
-Evidence-linked diagnostic claims
+SQLite
 ```
 
-The contribution tool performs an additive symmetric rate decomposition so that team-level impacts reconstruct the aggregate FTD-rate movement. The anomaly tool compares current observations with a robust historical baseline using median/MAD thresholds.
+The SQL Tool never receives direct model-generated SQL.
 
-Neither tool is permitted to turn an observed contribution or anomaly into a causal, compliance, fraud, or investment conclusion on its own.
+## Intent 1: CRM routing / FTD
 
----
-
-## v0.4 constrained Agent extension
-
-v0.4 places a constrained planning and verification layer above the existing deterministic stack:
+Deterministic path:
 
 ```text
-Question
-  ↓
-ConstrainedRulePlanner / StructuredJSONPlanner
-  ↓
-validate_plan() allow-list
-  ↓
-FitzSightAgent
-  ↓
-DeterministicInvestigationEngine
-  ↓
-Read-only SQL / statistics / contribution / anomaly tools
-  ↓
-EvidenceRegistry
-  ↓
-EvidenceClaimVerifier
-  ↓
-Verified FinalAnswer
+schema
+→ affected cohort SQL
+→ control SQL
+→ two-proportion test
+→ response-time test
+→ team contribution decomposition
+→ robust daily anomaly scan
+→ business event check
+→ evidence-linked claims
 ```
 
-### New responsibility boundaries
+## Intent 2: net deposits
 
-**Planner**
+Deterministic path:
 
-- classifies only currently approved intent(s);
-- emits high-level actions only;
-- cannot emit SQL, arbitrary tool parameters, or business actions;
-- unsupported scope is refused before a structured external planner callback is invoked.
+```text
+schema
+→ baseline/current deposit SQL
+→ baseline/current withdrawal SQL
+→ net-deposit identity decomposition
+→ top-customer withdrawal concentration
+→ regional per-customer control
+→ business event check
+→ evidence-linked claims
+```
 
-**Agent Orchestrator**
+The identity enforced by the engine is:
 
-- validates the plan again at execution time;
-- routes the approved intent into the deterministic engine;
-- records planning, verification, and final-answer audit events;
-- does not give the planner direct access to the analytical store.
+```text
+net_change = deposit_change - withdrawal_change
+```
 
-**Verifier**
+## Optional model provider
 
-- fails closed when claim evidence is missing or corrupted;
-- checks evidence digest/status;
-- checks the evaluation-only `_gt` SQL boundary;
-- rejects causal wording that exceeds the root-cause evidence status;
-- controls whether final findings may be rendered.
+The OpenAI provider is above the local scope gate.
 
-This creates a deliberate separation between **planning**, **calculation**, **evidence**, and **presentation**.
+```text
+question
+→ local supported-intent classifier
+→ provider Structured Output
+→ local plan validator
+→ deterministic executor
+```
+
+It is impossible for the provider contract to authorize an unknown intent, direct SQL, arbitrary tool parameters, or a high-impact financial action.
+
+## UI boundary
+
+`streamlit_app.py` only:
+
+- submits a question;
+- selects approved runtime options;
+- renders verified findings;
+- shows metrics/evidence.
+
+It does not recompute financial metrics.
+
+## Expansion rule
+
+Future functionality should generally be added in this order:
+
+1. deterministic data/tool capability;
+2. tests and evidence;
+3. benchmark scenario;
+4. approved Agent intent/action contract;
+5. optional model planning;
+6. UI.
+
+This prevents the interface or LLM layer from outrunning the analytical evidence layer.

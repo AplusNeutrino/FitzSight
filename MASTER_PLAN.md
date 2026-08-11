@@ -3384,3 +3384,24 @@ The Agent planner can only choose from an approved high-level action policy. SQL
 ## D-012 — Deterministic planner fallback is a required competition capability
 
 The default Agent planner remains usable without an external model or network connection. A provider-neutral structured LLM adapter exists above the same constrained plan contract; future model providers may be connected without weakening the deterministic Tool Layer or evidence/verifier boundary.
+
+---
+
+# v0.5 Implementation Decisions (2026-08-11)
+
+## D-013 — Expand by approved business intents, not unrestricted tool autonomy
+
+FitzSight v0.5 adds a second explicit business intent, `net_deposit_anomaly_investigation`. Each supported intent has a fixed high-level action contract and a deterministic executor. The project will expand the approved intent catalog gradually rather than allowing an LLM to invent arbitrary workflows or tool parameters.
+
+## D-014 — Net-deposit analysis distinguishes observed drivers from customer motives
+
+The second benchmark may identify withdrawal pressure, concentration, and nearby operational events as supported observed drivers. It must not infer why customers withdrew, label customers as suspicious, or produce investment/compliance conclusions without separate evidence and authorization.
+
+## D-015 — External model providers remain optional and bounded
+
+The first concrete provider adapter uses the OpenAI Responses API with strict JSON-schema output and `store=False`. The local intent classifier and plan validator remain authoritative. An external model is optional; the deterministic fallback remains the default competition-safe path.
+
+## D-016 — UI is a presentation layer, not an analytical authority
+
+The Streamlit demo shell renders verified outputs and audit evidence. It must not recalculate business metrics or bypass the verifier. Final competition UI work should preserve this separation.
+

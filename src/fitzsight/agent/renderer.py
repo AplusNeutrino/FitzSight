@@ -16,11 +16,15 @@ def render_verified_answer(
             headline="FitzSight withheld the analytical answer because verification failed.",
             findings=(),
             evidence_ids=(verification.evidence_id,),
-            guardrail="Resolve verifier violations before presenting the result as decision support.",
+            guardrail=(
+                "Resolve verifier violations before presenting the result as decision support."
+            ),
         )
 
     findings = tuple(
-        claim.text for claim in result.claims if claim.status in {"supported", "supported_with_guardrail"}
+        claim.text
+        for claim in result.claims
+        if claim.status in {"supported", "supported_with_guardrail"}
     )
     evidence_ids = tuple(
         dict.fromkeys(
@@ -30,12 +34,16 @@ def render_verified_answer(
             for evidence_id in claim.evidence_ids
         )
     )
+
     root_status = result.diagnosis.get("root_cause_status")
-    headline = (
-        "A supported root-cause candidate was identified."
-        if root_status == "supported_candidate"
-        else "The available evidence is insufficient for a root-cause candidate."
-    )
+    driver_type = result.diagnosis.get("driver_type")
+    if root_status == "supported_candidate" and driver_type == "observed_withdrawal_concentration":
+        headline = "A supported financial-operations driver was identified."
+    elif root_status == "supported_candidate":
+        headline = "A supported root-cause candidate was identified."
+    else:
+        headline = "The available evidence is insufficient for a supported driver/root-cause candidate."
+
     return FinalAnswer(
         status="verified",
         headline=headline,

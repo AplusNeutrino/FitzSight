@@ -1,51 +1,103 @@
 # FitzSight Implementation Status
 
-**Version:** v0.4.0  
+**Version:** v0.5.0  
 **Date:** 2026-08-11  
-**Phase:** Constrained Agent MVP implemented above deterministic evidence-first tools.
+**Phase:** Multi-intent Agent + optional model-provider/UI integration
 
-## v0.4 completed
+## v0.5 completed in this delivery
 
-- [x] v0.3 contribution and anomaly diagnostic tools retained
-- [x] constrained intent/planning contract
-- [x] deterministic no-API planner fallback
-- [x] provider-neutral structured LLM planner adapter
-- [x] strict approved action sequence
-- [x] unsupported-question refusal before external planner call
-- [x] planner SQL/tool-argument prohibition
-- [x] Agent orchestration layer
-- [x] EvidenceClaimVerifier
-- [x] evidence existence, digest and success-status verification
-- [x] evaluation-only `_gt` SQL boundary verification
-- [x] causal-overclaim verification
-- [x] fail-closed final answer rendering
-- [x] planning/verifier/final-answer audit records
-- [x] Agent CLI
-- [x] structured plan example
-- [x] expanded tests and documentation
+- [x] existing CRM / FTD Agent intent retained
+- [x] second financial-operations intent: `net_deposit_anomaly_investigation`
+- [x] deterministic high-value withdrawal shock benchmark
+- [x] weekly deposit / withdrawal / net-deposit measurement
+- [x] exact deposit-vs-withdrawal driver decomposition
+- [x] top-customer withdrawal concentration analysis
+- [x] regional net-deposit-per-customer control
+- [x] multi-intent deterministic router
+- [x] intent-specific constrained action catalog
+- [x] local scope classifier before provider invocation
+- [x] optional OpenAI Responses structured planner provider
+- [x] strict JSON-schema provider request
+- [x] `store=False` provider request
+- [x] provider fake-client integration tests
+- [x] minimal Streamlit demo shell
+- [x] two-scenario benchmark catalog
+- [x] deterministic benchmark runner
+- [x] existing EvidenceClaimVerifier retained across both intents
+- [x] v0.5 docs and examples
 
-## Important architecture boundary
+## Build-environment validation
+
+Test suite is executed in groups because the sandbox has a strict process-time ceiling.
 
 ```text
-Planner / future LLM
-    ↓ approved high-level actions only
-Deterministic tools
-    ↓
-Evidence Registry
-    ↓
-Verifier
-    ↓
-Final answer
+Planner + provider tests:         13 passed
+Net-deposit / benchmark tests:     3 passed
+Agent + verifier tests:            5 passed
+Tool/evidence/statistics tests:   14 passed
+Generator/investigation/store:     5 passed, 1 skipped
+-----------------------------------------------------
+Aggregate:                        40 passed, 1 skipped
 ```
 
-An LLM is not a calculator and does not receive unrestricted SQL execution authority.
+After the final median-control fix, the affected v0.5 net-deposit tests were re-run and passed.
 
-## Still pending
+Collection check:
 
-- DuckDB runtime validation in an environment with `duckdb` installed;
-- customer segmentation (P1);
-- a concrete external model-provider adapter and credentials;
-- multi-intent planning;
-- Streamlit UI;
-- final license;
-- competition submission assets.
+```text
+41 tests collected
+```
+
+(40 pass + one DuckDB-specific skip in the grouped build validation; see `docs/V0.5_VALIDATION.md` for exact commands.)
+
+Additional validation:
+
+```text
+python -m compileall -q src scripts tests streamlit_app.py
+PASS
+```
+
+Two-scenario deterministic benchmark:
+
+```text
+scenario_count: 2
+passed:         2
+failed:         0
+backend:        sqlite
+```
+
+Default-seed net-deposit result:
+
+```text
+Baseline net deposits:       $141,733.52
+Current net deposits:        -$82,168.18
+Net-deposit change:          -$223,901.70
+Deposit change:               +$24,365.52
+Withdrawal change:           +$248,267.22
+Top-11 withdrawal share:      92.2%
+Verification:                 5/5 PASS
+```
+
+## Runtime validation still pending outside this build environment
+
+- [ ] DuckDB-specific backend integration with actual `duckdb`
+- [ ] live OpenAI API call with user credentials/model access
+- [ ] Streamlit runtime smoke test with optional UI dependency
+- [ ] final open-source license selection
+
+## Still not implemented
+
+- customer segmentation Agent capability;
+- third/fourth/fifth benchmark scenarios;
+- production authentication / RBAC;
+- final visual design and charts;
+- final GOAI PPT/PDF and demo recording;
+- production database connectors.
+
+## Next P0/P1 slice
+
+1. validate DuckDB / OpenAI / Streamlit in deployment environment;
+2. add Customer Intelligence / segmentation as the next Agent capability;
+3. expand benchmark catalog toward five scenarios;
+4. add UI business KPI cards and charts;
+5. begin initial-round competition deck and demo narrative.

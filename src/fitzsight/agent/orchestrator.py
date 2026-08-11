@@ -1,26 +1,32 @@
 from __future__ import annotations
 
+from typing import Protocol
+
 from fitzsight.evidence.registry import EvidenceRegistry
-from fitzsight.investigation.engine import DeterministicInvestigationEngine
 from .models import AgentRunResult
 from .planner import Planner, validate_plan
 from .renderer import render_verified_answer
 from .verifier import EvidenceClaimVerifier
 
 
-class FitzSightAgent:
-    """Constrained v0.4 Agent orchestration layer.
+class InvestigationExecutor(Protocol):
+    def investigate(self, question: str): ...
 
-    Planning may be deterministic or supplied by a structured LLM adapter, but
-    execution stays inside the audited deterministic investigation engine. The
-    planner never emits SQL or arbitrary tool arguments.
+
+class FitzSightAgent:
+    """Constrained v0.5 multi-intent Agent orchestration layer.
+
+    The planner may be deterministic, a structured JSON adapter, or the optional
+    OpenAI Responses provider. Execution remains inside deterministic audited
+    engines; planner/model output never contains executable SQL or arbitrary
+    tool parameters.
     """
 
     def __init__(
         self,
         *,
         planner: Planner,
-        engine: DeterministicInvestigationEngine,
+        engine: InvestigationExecutor,
         verifier: EvidenceClaimVerifier,
         registry: EvidenceRegistry,
     ) -> None:
@@ -33,7 +39,11 @@ class FitzSightAgent:
         plan = validate_plan(self.planner.plan(question))
         plan_record = self.registry.register(
             "agent.plan",
-            {"planner_mode": plan.planner_mode, "intent": plan.intent},
+            {
+                "planner_mode": plan.planner_mode,
+                "intent": plan.intent,
+                "plan_version": plan.plan_version,
+            },
             plan.to_dict(),
         )
 
@@ -50,6 +60,7 @@ class FitzSightAgent:
             {
                 "verification_evidence_id": verification.evidence_id,
                 "status": final_answer.status,
+                "intent": plan.intent,
             },
             final_answer.to_dict(),
             status="success" if verification.passed else "error",
@@ -57,7 +68,7 @@ class FitzSightAgent:
 
         return AgentRunResult(
             product="FitzSight",
-            mode="agent_v0.4_constrained",
+            mode="agent_v0.5_multi_intent",
             question=question,
             planner_mode=plan.planner_mode,
             plan=plan,

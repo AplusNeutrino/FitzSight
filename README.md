@@ -2,217 +2,405 @@
 
 **Evidence-grounded Financial Operations Intelligence Agent**
 
-FitzSight is the implementation project for **GOAI 2026 · Boundless Agents · AI+金融**.
+FitzSight is a GOAI 2026 · Boundless Agents · AI+金融 project focused on one question:
 
-The core product question is simple:
+> **Why did this financial-operations metric change?**
 
-> **Why did this business metric change?**
+Instead of letting an LLM invent an explanation, FitzSight separates reasoning from calculation:
 
-FitzSight is designed to turn that question into a reproducible investigation based on real tool execution, SQL, statistics, comparison cohorts, and traceable evidence instead of an unsupported LLM narrative.
+```text
+Business question
+        ↓
+Constrained planner
+        ↓
+Approved intent + approved action sequence
+        ↓
+Deterministic SQL / Python analysis
+        ↓
+Evidence Registry
+        ↓
+EvidenceClaimVerifier
+        ↓
+Verified decision-support answer
+```
 
-## Current release: v0.4.0
+## Current release: v0.5.0
 
-v0.4 adds the first constrained Agent orchestration layer above the deterministic diagnostic and evidence stack.
+v0.5 turns the v0.4 single-intent Agent MVP into a **multi-intent financial-operations Agent** and adds an optional live OpenAI Responses planner plus a minimal Streamlit demo shell.
 
-Implemented:
+### Supported intent 1 — CRM / FTD investigation
 
-- deterministic synthetic financial-operations dataset generator;
-- customers, salespeople, sales activity, deposits, withdrawals, trades, and business events;
-- injected `CRM_ROUTING_CHANGE` ground-truth scenario;
-- preferred DuckDB analytical-store backend plus explicit SQLite offline fallback;
-- Schema Inspector;
-- read-only SQL Tool with destructive-statement and external-file/network guards;
-- canonical KPI Tool;
-- Period Comparison Tool;
-- two-proportion, Mann–Whitney and Welch t-test support;
-- evidence IDs, tool parameters, result digests, status, and compact evidence payloads;
-- deterministic investigation engine for the European FTD / July 15 benchmark;
-- symmetric team-level contribution decomposition for FTD-rate changes;
-- robust baseline anomaly detection for post-change response-time medians;
-- claim-to-evidence mapping and causal-language guardrail;
-- automated test suite.
+Question:
 
-Not yet implemented:
+```text
+Why did European FTD conversion deteriorate after July 15?
+```
 
-- LLM orchestration / dynamic Agent planning;
-- customer segmentation;
-- interactive Streamlit UI;
-- multi-scenario benchmark harness.
+The synthetic benchmark contains a CRM routing change affecting European Team A/B. FitzSight investigates:
+
+- affected vs control conversion;
+- response-time movement;
+- statistical significance;
+- team contribution decomposition;
+- daily response anomalies;
+- nearby operational events;
+- causal-language boundaries.
+
+### Supported intent 2 — Net-deposit investigation
+
+Question:
+
+```text
+Why did European net deposits fall in the week starting August 3?
+```
+
+The v0.5 synthetic benchmark contains a concentrated European high-value withdrawal shock. FitzSight investigates:
+
+- baseline vs current deposits;
+- baseline vs current withdrawals;
+- exact net-deposit driver decomposition;
+- customer withdrawal concentration;
+- Europe vs other-region control movement;
+- nearby operational events;
+- explicit boundary between an observed financial driver and an unsupported claim about customer motives.
+
+Default-seed v0.5 benchmark result:
+
+```text
+CRM benchmark:
+  affected FTD change:      -7.53 pp
+  control FTD change:       -1.21 pp
+  response median change:  +29.15 min
+  verification:             PASS
+
+Net-deposit benchmark:
+  net-deposit change:      -$223,901.70
+  deposit change:          +$24,365.52
+  withdrawal change:       +$248,267.22
+  top-11 withdrawal share:  92.2%
+  verification:             PASS
+```
+
+These are **synthetic benchmark results**, not real-company performance data.
+
+---
+
+## Why FitzSight is not "chat with CSV"
+
+A chat interface is not the core product.
+
+FitzSight requires:
+
+1. a recognized business intent;
+2. an approved investigation plan;
+3. actual tool execution;
+4. evidence IDs for factual claims;
+5. verification of evidence integrity and causal wording;
+6. fail-closed output if verification fails.
+
+The LLM, when enabled, is a planner—not a calculator and not an unrestricted SQL agent.
+
+---
 
 ## Quick start
 
-Requires Python 3.11+.
+Python 3.11+.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
+```
 
+Generate synthetic data:
+
+```bash
 python scripts/generate_data.py
-python scripts/run_baseline.py
-python scripts/investigate.py --question "Why did European FTD conversion deteriorate after July 15?"
+```
+
+Run the reliable no-API Agent fallback:
+
+```bash
+python scripts/agent_investigate.py \
+  --backend sqlite \
+  --question "Why did European FTD conversion deteriorate after July 15?"
+```
+
+Second intent:
+
+```bash
+python scripts/agent_investigate.py \
+  --backend sqlite \
+  --question "Why did European net deposits fall in the week starting August 3?"
+```
+
+Run the two-scenario benchmark catalog:
+
+```bash
+python scripts/run_benchmark.py --backend sqlite
+```
+
+Run tests:
+
+```bash
 pytest -q
 ```
 
-`pip install -e ".[dev]"` installs DuckDB. The runtime defaults to DuckDB when available. A SQLite fallback exists for restricted/offline development environments:
+---
+
+## DuckDB
+
+DuckDB is the preferred competition backend.
 
 ```bash
-python scripts/investigate.py --backend sqlite
+pip install -e ".[dev]"
+python scripts/agent_investigate.py --backend duckdb
 ```
 
-Generated files are written to `data/generated/` and ignored by Git.
+A SQLite fallback remains available for restricted/offline environments.
 
-## Current benchmark scenario
+---
 
-On **2026-07-15**, a synthetic CRM routing change affects European `Team A` and `Team B`:
+## Optional OpenAI Responses planner
 
-```text
-CRM routing change
-      ↓
-lead response time increases
-      ↓
-FTD conversion probability decreases
-```
+The core project does **not** require an external model.
 
-The deterministic v0.3 investigation should recover:
-
-- a material FTD conversion decline in the affected teams;
-- a large response-time increase;
-- a materially smaller conversion movement in the European control cohort;
-- a statistically significant affected conversion shift;
-- a matching operational event in the business-event log.
-
-The engine reports this event as a **supported root-cause candidate** rather than automatically converting temporal association into a real-world causal conclusion.
-
-## Evidence-first architecture
-
-```text
-Business question
-      ↓
-Deterministic investigation plan (v0.3)
-      ↓
-Schema Inspector
-      ↓
-Read-only SQL
-      ↓
-Statistics / KPI / period comparison
-      ↓
-Contribution decomposition / anomaly detection
-      ↓
-Evidence Registry
-      ↓
-Supported claims + evidence IDs + guardrails
-```
-
-The next stage will replace the deterministic planner with an LLM planner/orchestrator while retaining the same deterministic calculation and evidence tools.
-
-
-### v0.4 Agent layer
-
-```text
-User question
-      ↓
-Constrained planner
-      ↓
-Strict plan validation / approved action sequence
-      ↓
-Deterministic investigation engine
-      ↓
-SQL + statistics + contribution + anomaly tools
-      ↓
-EvidenceClaimVerifier (fail closed)
-      ↓
-Verified final answer
-```
-
-The planner is deliberately **not allowed to generate SQL or arbitrary tool arguments**. `ConstrainedRulePlanner` is the reliable no-API fallback. `StructuredJSONPlanner` is a provider-neutral adapter for future LLM integration and accepts only strict JSON plans that match the approved action policy.
-
-Run the Agent MVP:
+To enable the optional OpenAI planner:
 
 ```bash
-python scripts/agent_investigate.py --backend sqlite
+pip install -e ".[openai]"
+export OPENAI_API_KEY="..."
+export FITZSIGHT_MODEL="<your enabled model>"
 ```
 
-Validate a pre-generated structured planner plan:
+Then:
 
 ```bash
-python scripts/agent_investigate.py --backend sqlite --planner json-file --plan-json examples/valid_agent_plan.json
+python scripts/agent_investigate.py \
+  --backend duckdb \
+  --planner openai \
+  --question "Why did European net deposits fall in the week starting August 3?"
 ```
+
+The provider:
+
+- uses the Responses API;
+- requests strict JSON-schema output;
+- sets `store=False`;
+- is locally scope-gated before API invocation;
+- cannot emit SQL or arbitrary tool arguments;
+- remains subject to local plan validation.
+
+No API key is ever committed to the repository.
+
+---
+
+## Streamlit demo
+
+Install:
+
+```bash
+pip install -e ".[ui]"
+```
+
+or with both UI and model provider:
+
+```bash
+pip install -e ".[demo]"
+```
+
+Run:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The initial UI exposes:
+
+- the two supported demo questions;
+- planner/backend selection;
+- verification status;
+- verified findings;
+- investigation plan;
+- metrics;
+- evidence/audit trace.
+
+The UI is a demo shell, not yet the final competition interface.
+
+---
+
+## Planner safety policy
+
+Model/planner output is treated as untrusted input.
+
+The planner may only return one of the published intents and that intent's exact action sequence.
+
+It may not:
+
+- produce SQL;
+- choose arbitrary tables;
+- submit free-form tool arguments;
+- execute trades;
+- transfer funds;
+- freeze accounts;
+- contact customers;
+- create compliance conclusions;
+- make investment recommendations.
+
+Unsupported questions fail before external model invocation.
+
+---
 
 ## SQL safety policy
 
-The read-only SQL Tool:
+The read-only SQL tool:
 
-- allows only `SELECT` / `WITH` queries;
+- accepts only `SELECT` / `WITH`;
 - rejects multi-statement SQL;
-- rejects mutation / DDL / configuration commands;
-- rejects SQL comments in Agent-generated queries;
-- rejects external file/network scan functions such as `read_csv`, `read_parquet`, `glob`, and database scan helpers;
-- applies a maximum returned-row limit;
-- records failed executions as evidence before raising an error.
+- rejects write/DDL/admin keywords;
+- rejects external file/network scan functions;
+- applies a bounded row limit;
+- writes successful and failed calls to the Evidence Registry.
 
-This is defense in depth for a local competition prototype, not a substitute for enterprise database permissions.
+---
 
-## Design principles
+## Evidence-first verification
 
-1. **Evidence first** — numeric claims come from deterministic tools.
-2. **Synthetic by default** — never use former-employer or real customer data.
-3. **Read-only analytics** — no automated trading or high-impact financial actions.
-4. **One reliable investigation loop before feature expansion.**
-5. **LLM = planner/orchestrator; Python/SQL = calculator.**
-6. **Reproducible benchmark data from a fixed random seed.**
-7. **Unsupported evidence must remain unsupported** — the system should be able to say it does not know.
+For every supported claim, `EvidenceClaimVerifier` checks:
 
-## Safety and compliance
+- referenced Evidence IDs exist;
+- evidence digests still match;
+- tool execution status is successful;
+- supported claims have evidence;
+- evaluation-only `*_gt` fields were not queried;
+- guarded claims include causal-language boundaries;
+- wording does not exceed the evidence status.
 
-Do not commit:
+If verification fails:
 
-- API keys;
-- customer PII;
-- confidential CRM exports;
-- former-employer internal data;
-- non-public trading or transaction records.
+```text
+answer = withheld
+```
 
-FitzSight is an analytical decision-support prototype. It is **not** an investment adviser, trading engine, AML enforcement system, credit decision system, or automated compliance decision-maker.
+---
 
-## Limitations
+## Synthetic-data policy
 
-v0.4 deliberately has a narrow scope:
+All benchmark data is synthetic.
 
-- the deterministic investigation engine currently recognizes one benchmark intent;
-- the benchmark uses synthetic data and does not prove real-world causal validity;
-- the preferred DuckDB backend requires the `duckdb` dependency; restricted build environments may use SQLite fallback;
-- SQL safety is conservative and intentionally rejects some otherwise valid read-only SQL patterns;
-- evidence IDs prove traceability to tool outputs, not truthfulness of the underlying source data;
-- the default planner is a deterministic fallback; a provider-neutral structured LLM planner adapter is implemented but no external model provider is bundled yet;
-- contribution decomposition explains observed metric movement but does not independently establish causality;
-- anomaly flags only indicate unusual values relative to the configured baseline.
+Never add:
+
+- real customer PII;
+- former-employer CRM exports;
+- confidential transaction data;
+- internal sales reports;
+- real API secrets.
+
+The `_gt` fields used by the benchmark generator are evaluation-only and must never be queried by the normal Agent workflow.
+
+---
+
+## Repository structure
+
+```text
+FitzSight/
+├── README.md
+├── MASTER_PLAN.md
+├── IMPLEMENTATION_STATUS.md
+├── streamlit_app.py
+├── evaluation/
+│   └── benchmark_catalog.json
+├── examples/
+│   ├── valid_agent_plan.json
+│   └── valid_net_deposit_plan.json
+├── scripts/
+│   ├── generate_data.py
+│   ├── agent_investigate.py
+│   └── run_benchmark.py
+├── src/fitzsight/
+│   ├── agent/
+│   │   ├── catalog.py
+│   │   ├── planner.py
+│   │   ├── orchestrator.py
+│   │   └── verifier.py
+│   ├── providers/
+│   │   └── openai_planner.py
+│   ├── investigation/
+│   │   ├── engine.py
+│   │   ├── net_deposit.py
+│   │   └── router.py
+│   ├── tools/
+│   ├── evidence/
+│   └── data/
+└── tests/
+```
+
+---
+
+## Current limitations
+
+v0.5 remains intentionally constrained:
+
+- only two approved business intents exist;
+- all data is synthetic;
+- the OpenAI provider code is integration-tested with a fake Responses client in the build environment, but a live API call requires user credentials;
+- Streamlit code is syntax-validated in the build environment, but runtime validation requires the optional package;
+- DuckDB runtime validation requires an environment with the dependency installed;
+- customer segmentation is not yet integrated into the Agent;
+- the benchmark catalog contains two scenarios, not the planned five;
+- evidence traceability proves what the tools returned, not that an external real-world data source is intrinsically correct;
+- observed drivers are not automatically causal explanations.
+
+---
+
+## Safety boundary
+
+FitzSight is analytical decision support.
+
+It is **not**:
+
+- an investment adviser;
+- an automated trading system;
+- an AML enforcement engine;
+- a credit-decision system;
+- an automated compliance decision-maker.
+
+High-impact actions remain outside the MVP.
+
+---
 
 ## Documentation
 
 - `MASTER_PLAN.md` — competition/product master plan
-- `IMPLEMENTATION_STATUS.md` — implementation snapshot
-- `docs/ARCHITECTURE.md` — current architecture
-- `docs/TOOL_LAYER.md` — core Tool Layer specification
-- `docs/DIAGNOSTIC_TOOLS.md` — v0.3 contribution/anomaly diagnostics
-- `docs/BASELINE_RESULTS.md` — original synthetic baseline
-- `docs/V0.2_VALIDATION.md` — v0.2 validation evidence
-- `docs/V0.3_VALIDATION.md` — v0.3 validation evidence
-- `docs/V0.3_SAMPLE_INVESTIGATION.json` — deterministic v0.3 output sample
-- `docs/AGENT_LAYER.md` — v0.4 constrained planner/orchestrator/verifier specification
-- `docs/V0.4_VALIDATION.md` — v0.4 test and end-to-end validation evidence
-- `docs/V0.4_SAMPLE_AGENT_SUMMARY.json` — compact Agent-run summary
-- `PROJECT_PROGRESS.md` — pointer to the external progress source of truth
+- `IMPLEMENTATION_STATUS.md` — current implementation snapshot
+- `docs/ARCHITECTURE.md` — system architecture
+- `docs/AGENT_LAYER.md` — constrained Agent policy
+- `docs/MULTI_INTENT.md` — v0.5 intent catalog
+- `docs/MODEL_PROVIDER.md` — optional OpenAI provider boundary
+- `docs/V0.5_VALIDATION.md` — v0.5 validation evidence
+- `evaluation/benchmark_catalog.json` — current benchmark catalog
+- `PROJECT_PROGRESS.md` — pointer to the external progress truth source
+
+---
 
 ## Progress source of truth
 
-Project progress is maintained outside this implementation repository:
+Project status is maintained in:
 
-- Tracker: https://neutriverse.uk/projfitzgerald/
-- Source document: https://neutriverse.uk/docs/PROJFITZGERALD_PROGRESS.md
-- Source repository: https://github.com/AplusNeutrino/My_Blog
+```text
+AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md
+```
+
+The public tracker is:
+
+```text
+https://neutriverse.uk/projfitzgerald/
+```
+
+When implementation and tracker disagree, verified code/tests/commit evidence must be used to correct the tracker.
+
+---
 
 ## License
 
-A final project license is intentionally deferred until competition submission and third-party dependency requirements are rechecked.
-
+Final open-source license selection remains pending competition/dependency review.

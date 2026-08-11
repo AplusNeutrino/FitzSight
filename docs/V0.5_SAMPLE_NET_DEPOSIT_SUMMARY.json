@@ -1,0 +1,50 @@
+{
+  "product": "FitzSight",
+  "mode": "agent_v0.5_multi_intent",
+  "question": "Why did European net deposits fall in the week starting August 3?",
+  "planner_mode": "deterministic_fallback",
+  "intent": "net_deposit_anomaly_investigation",
+  "verification": {
+    "passed": true,
+    "verified_claims": 5,
+    "total_claims": 5
+  },
+  "final_answer": {
+    "status": "verified",
+    "headline": "A supported financial-operations driver was identified.",
+    "findings": [
+      "European net deposits changed by $-223,901.70 week over week (2026-07-27–2026-08-02 versus 2026-08-03–2026-08-09).",
+      "Deposits changed by $24,365.52, while withdrawals changed by $248,267.22; the decomposition exactly reconstructs the net-deposit movement.",
+      "The largest 11 European customer withdrawals account for 92.2% of current-week European withdrawals.",
+      "Europe's weekly net-deposit movement per registered customer was $-33.07, versus a median of $-0.73 across the other regions.",
+      "A high-value withdrawal-cluster event is present in the nearby operational event log. Together with the measured withdrawal concentration, this is a supported observed driver, not evidence of why individual customers withdrew."
+    ],
+    "evidence_ids": [
+      "E0006",
+      "E0007",
+      "E0008",
+      "E0009",
+      "E0010",
+      "E0011",
+      "E0012",
+      "E0013",
+      "E0014",
+      "E0015",
+      "E0016",
+      "E0017",
+      "E0018"
+    ],
+    "guardrail": "The evidence supports concentrated high-value withdrawals as an observed driver of the synthetic net-deposit deterioration. It does not establish why those customers withdrew or justify an investment, compliance, or customer-risk conclusion without additional evidence."
+  },
+  "key_metrics": {
+    "baseline_net_deposits": 141733.52,
+    "current_net_deposits": -82168.18,
+    "net_change": -223901.69999999998,
+    "deposit_change": 24365.52000000002,
+    "withdrawal_change": 248267.22,
+    "top_11_withdrawal_share": 0.9221572912071373,
+    "europe_per_customer_change": -33.07262924667651,
+    "other_region_median_change": -0.725092446952873
+  },
+  "audit_evidence_count": 20
+}

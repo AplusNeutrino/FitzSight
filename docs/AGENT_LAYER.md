@@ -1,92 +1,124 @@
-# FitzSight v0.4 Agent Layer
+# FitzSight Agent Layer
+
+Version: v0.5.0
 
 ## Purpose
 
-v0.4 is the first FitzSight release that introduces an **Agent orchestration layer**. The design is intentionally constrained: language-model planning may decide *which approved analytical actions are needed*, but it cannot calculate business metrics, write SQL, invent tables, or bypass evidence registration.
+The Agent layer converts a supported natural-language financial-operations question into an approved deterministic investigation.
 
-## Architecture
+It is deliberately **not** an unrestricted autonomous agent.
+
+## Trust model
+
+Planner output is untrusted.
+
+The local application controls:
+
+- which intents exist;
+- which action names exist;
+- the exact action order for each intent;
+- which deterministic executor handles the question;
+- whether final claims pass evidence verification.
+
+## Planner modes
+
+### Deterministic fallback
+
+`ConstrainedRulePlanner`
+
+- default;
+- no API/network required;
+- competition-safe fallback;
+- produces the same approved plan contract.
+
+### Structured JSON adapter
+
+`StructuredJSONPlanner`
+
+- provider neutral;
+- accepts JSON text from an external completion function;
+- validates exact keys, intent, step list, order and purposes.
+
+### OpenAI Responses planner
+
+`OpenAIResponsesPlanner`
+
+- optional dependency;
+- strict JSON-schema output;
+- `store=False`;
+- local scope classifier runs before provider invocation;
+- local `validate_plan` runs after provider output.
+
+## Supported v0.5 intents
+
+### CRM/FTD
+
+`crm_routing_ftd_investigation`
+
+Eight approved actions.
+
+### Net deposits
+
+`net_deposit_anomaly_investigation`
+
+Seven approved actions.
+
+See `docs/MULTI_INTENT.md`.
+
+## Prohibited planner capabilities
+
+The planner may not authorize or construct:
+
+- SQL;
+- table names as dynamic tool targets;
+- arbitrary filters or free-form tool arguments;
+- trades;
+- fund transfers;
+- account freezes;
+- customer outreach;
+- investment advice;
+- legal/compliance decisions.
+
+## Executor independence
+
+The executor re-classifies the question through the same local intent catalog.
+
+If:
 
 ```text
-Question
-  ↓
-Planner
-  ├─ ConstrainedRulePlanner (default / no API)
-  └─ StructuredJSONPlanner (provider-neutral LLM adapter)
-  ↓
-Plan Policy Validation
-  ↓
-DeterministicInvestigationEngine
-  ↓
-Read-only SQL + Statistics + Contribution + Anomaly tools
-  ↓
-Evidence Registry
-  ↓
-EvidenceClaimVerifier
-  ↓
-Verified FinalAnswer
+planner intent != executor intent
 ```
 
-## Planner policy
+the run fails.
 
-Current intent:
+The planner cannot trick the executor into running another workflow.
 
-```text
-crm_routing_ftd_investigation
-```
+## Verification
 
-Approved action sequence:
+Every `InvestigationResult` goes through `EvidenceClaimVerifier`.
 
-1. `inspect_schema`
-2. `query_affected_cohort`
-3. `query_control_cohort`
-4. `statistical_validation`
-5. `contribution_decomposition`
-6. `anomaly_scan`
-7. `event_check`
-8. `evidence_boundary`
-
-The model cannot add actions such as `execute_trade`, cannot emit raw SQL, and cannot alter tool parameters.
-
-## Why the planner is constrained
-
-The competition value is not demonstrated by giving an LLM unrestricted database access. FitzSight needs a reproducible and auditable analysis chain. In v0.4:
-
-- LLM/planner output is treated as untrusted input;
-- unsupported questions are rejected before model invocation;
-- structured planner JSON is validated against an allow-list;
-- numeric work remains inside deterministic Python/SQL tools;
-- SQL remains read-only;
-- benchmark `_gt` fields remain evaluation-only;
-- final claims are withheld if the verifier fails.
-
-## Deterministic fallback
-
-`ConstrainedRulePlanner` is a deliberate competition reliability feature. The core demo can operate without network connectivity, API credentials, or model availability.
-
-## Structured LLM adapter
-
-`StructuredJSONPlanner` accepts a callable:
-
-```python
-planner = StructuredJSONPlanner(completion_fn)
-```
-
-The provider integration is intentionally outside v0.4. A future provider adapter only needs to transform a prompt into JSON text; it still cannot bypass `validate_plan()`.
-
-## Verifier
+A supported claim must have valid evidence IDs.
 
 The verifier checks:
 
-- supported claims have evidence;
-- referenced Evidence IDs exist;
-- evidence records have successful status;
-- evidence payload digests still match;
-- evaluation-only `_gt` fields were not used in SQL;
-- guarded causal claims actually include a guardrail;
-- unqualified causal wording is rejected when the root cause is not confirmed.
+- evidence existence;
+- evidence result digest;
+- successful tool status;
+- ground-truth-field SQL boundary;
+- causal-language guardrail;
+- non-empty evidence graph.
 
-The final answer renderer only reuses verified claim text. It does not recalculate or invent metrics.
+If verification fails, `render_verified_answer` returns a withheld result.
 
-## Scope limitation
+## Multi-intent growth policy
 
-v0.4 remains intentionally narrow and supports the current European FTD / July 15 benchmark intent. Multi-intent planning and a live external model provider are later steps.
+Adding an intent requires all of:
+
+1. a deterministic executor;
+2. data/tool evidence;
+3. test coverage;
+4. a benchmark or reproducible scenario;
+5. an approved action contract;
+6. verifier-compatible claims.
+
+Do not add an intent by prompt engineering alone.
