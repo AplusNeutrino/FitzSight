@@ -10,9 +10,9 @@ The core product question is simple:
 
 FitzSight is designed to turn that question into a reproducible investigation based on real tool execution, SQL, statistics, comparison cohorts, and traceable evidence instead of an unsupported LLM narrative.
 
-## Current release: v0.3.0
+## Current release: v0.4.0
 
-v0.3 strengthens the deterministic diagnostic and evidence layer **before an LLM Agent is introduced**.
+v0.4 adds the first constrained Agent orchestration layer above the deterministic diagnostic and evidence stack.
 
 Implemented:
 
@@ -106,6 +106,39 @@ Supported claims + evidence IDs + guardrails
 
 The next stage will replace the deterministic planner with an LLM planner/orchestrator while retaining the same deterministic calculation and evidence tools.
 
+
+### v0.4 Agent layer
+
+```text
+User question
+      ↓
+Constrained planner
+      ↓
+Strict plan validation / approved action sequence
+      ↓
+Deterministic investigation engine
+      ↓
+SQL + statistics + contribution + anomaly tools
+      ↓
+EvidenceClaimVerifier (fail closed)
+      ↓
+Verified final answer
+```
+
+The planner is deliberately **not allowed to generate SQL or arbitrary tool arguments**. `ConstrainedRulePlanner` is the reliable no-API fallback. `StructuredJSONPlanner` is a provider-neutral adapter for future LLM integration and accepts only strict JSON plans that match the approved action policy.
+
+Run the Agent MVP:
+
+```bash
+python scripts/agent_investigate.py --backend sqlite
+```
+
+Validate a pre-generated structured planner plan:
+
+```bash
+python scripts/agent_investigate.py --backend sqlite --planner json-file --plan-json examples/valid_agent_plan.json
+```
+
 ## SQL safety policy
 
 The read-only SQL Tool:
@@ -144,14 +177,14 @@ FitzSight is an analytical decision-support prototype. It is **not** an investme
 
 ## Limitations
 
-v0.3 deliberately has a narrow scope:
+v0.4 deliberately has a narrow scope:
 
 - the deterministic investigation engine currently recognizes one benchmark intent;
 - the benchmark uses synthetic data and does not prove real-world causal validity;
 - the preferred DuckDB backend requires the `duckdb` dependency; restricted build environments may use SQLite fallback;
 - SQL safety is conservative and intentionally rejects some otherwise valid read-only SQL patterns;
 - evidence IDs prove traceability to tool outputs, not truthfulness of the underlying source data;
-- no LLM is used in v0.3, so natural-language question coverage is intentionally limited;
+- the default planner is a deterministic fallback; a provider-neutral structured LLM planner adapter is implemented but no external model provider is bundled yet;
 - contribution decomposition explains observed metric movement but does not independently establish causality;
 - anomaly flags only indicate unusual values relative to the configured baseline.
 
@@ -166,6 +199,9 @@ v0.3 deliberately has a narrow scope:
 - `docs/V0.2_VALIDATION.md` — v0.2 validation evidence
 - `docs/V0.3_VALIDATION.md` — v0.3 validation evidence
 - `docs/V0.3_SAMPLE_INVESTIGATION.json` — deterministic v0.3 output sample
+- `docs/AGENT_LAYER.md` — v0.4 constrained planner/orchestrator/verifier specification
+- `docs/V0.4_VALIDATION.md` — v0.4 test and end-to-end validation evidence
+- `docs/V0.4_SAMPLE_AGENT_SUMMARY.json` — compact Agent-run summary
 - `PROJECT_PROGRESS.md` — pointer to the external progress source of truth
 
 ## Progress source of truth
@@ -179,3 +215,4 @@ Project progress is maintained outside this implementation repository:
 ## License
 
 A final project license is intentionally deferred until competition submission and third-party dependency requirements are rechecked.
+

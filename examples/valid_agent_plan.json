@@ -1,0 +1,13 @@
+{
+  "intent": "crm_routing_ftd_investigation",
+  "steps": [
+    {"action": "inspect_schema", "purpose": "Confirm the required operational fields are available."},
+    {"action": "query_affected_cohort", "purpose": "Measure the affected European teams before and after the change."},
+    {"action": "query_control_cohort", "purpose": "Measure other European teams over the same periods."},
+    {"action": "statistical_validation", "purpose": "Validate whether the observed differences are statistically distinguishable."},
+    {"action": "contribution_decomposition", "purpose": "Rank team-level contributions to the Europe-wide conversion movement."},
+    {"action": "anomaly_scan", "purpose": "Check post-change response-time behavior against the robust pre-change baseline."},
+    {"action": "event_check", "purpose": "Check nearby business events for a plausible operational explanation."},
+    {"action": "evidence_boundary", "purpose": "Separate supported findings from causal overclaims."}
+  ]
+}

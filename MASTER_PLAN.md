@@ -3372,3 +3372,15 @@ Open Source
 **Current Owner:** Project Team  
 **Status:** Preliminary Competition Sprint  
 **Single Source of Truth:** This document
+
+---
+
+# v0.4 Implementation Decisions (2026-08-11)
+
+## D-011 — Planner output is untrusted and cannot generate SQL
+
+The Agent planner can only choose from an approved high-level action policy. SQL and numerical calculations remain inside deterministic tools. Unknown actions, malformed JSON, executable SQL text in plan purposes, and unsupported intents are rejected.
+
+## D-012 — Deterministic planner fallback is a required competition capability
+
+The default Agent planner remains usable without an external model or network connection. A provider-neutral structured LLM adapter exists above the same constrained plan contract; future model providers may be connected without weakening the deterministic Tool Layer or evidence/verifier boundary.

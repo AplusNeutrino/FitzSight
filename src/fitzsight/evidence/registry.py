@@ -59,5 +59,9 @@ class EvidenceRegistry:
                 return record
         raise KeyError(evidence_id)
 
+    def records(self) -> tuple[EvidenceRecord, ...]:
+        """Return an immutable snapshot of registered evidence records."""
+        return tuple(self._records)
+
     def to_dicts(self) -> list[dict[str, Any]]:
         return [asdict(record) for record in self._records]

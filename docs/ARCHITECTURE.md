@@ -104,3 +104,55 @@ Evidence-linked diagnostic claims
 The contribution tool performs an additive symmetric rate decomposition so that team-level impacts reconstruct the aggregate FTD-rate movement. The anomaly tool compares current observations with a robust historical baseline using median/MAD thresholds.
 
 Neither tool is permitted to turn an observed contribution or anomaly into a causal, compliance, fraud, or investment conclusion on its own.
+
+---
+
+## v0.4 constrained Agent extension
+
+v0.4 places a constrained planning and verification layer above the existing deterministic stack:
+
+```text
+Question
+  ↓
+ConstrainedRulePlanner / StructuredJSONPlanner
+  ↓
+validate_plan() allow-list
+  ↓
+FitzSightAgent
+  ↓
+DeterministicInvestigationEngine
+  ↓
+Read-only SQL / statistics / contribution / anomaly tools
+  ↓
+EvidenceRegistry
+  ↓
+EvidenceClaimVerifier
+  ↓
+Verified FinalAnswer
+```
+
+### New responsibility boundaries
+
+**Planner**
+
+- classifies only currently approved intent(s);
+- emits high-level actions only;
+- cannot emit SQL, arbitrary tool parameters, or business actions;
+- unsupported scope is refused before a structured external planner callback is invoked.
+
+**Agent Orchestrator**
+
+- validates the plan again at execution time;
+- routes the approved intent into the deterministic engine;
+- records planning, verification, and final-answer audit events;
+- does not give the planner direct access to the analytical store.
+
+**Verifier**
+
+- fails closed when claim evidence is missing or corrupted;
+- checks evidence digest/status;
+- checks the evaluation-only `_gt` SQL boundary;
+- rejects causal wording that exceeds the root-cause evidence status;
+- controls whether final findings may be rendered.
+
+This creates a deliberate separation between **planning**, **calculation**, **evidence**, and **presentation**.

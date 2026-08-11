@@ -1,9 +1,9 @@
 # FitzSight Repository Manifest
 
-**Version:** v0.3.0  
+**Version:** v0.4.0  
 **Generated:** 2026-08-11
 
-Tracked delivery files (excluding this manifest/SHA metadata rules): **56**
+Tracked delivery files (excluding SHA/manifest metadata): **70**
 
 ## Files
 
@@ -16,8 +16,9 @@ Tracked delivery files (excluding this manifest/SHA metadata rules): **56**
 - `RELEASE_NOTES_v0.1.md`
 - `RELEASE_NOTES_v0.2.md`
 - `RELEASE_NOTES_v0.3.md`
-- `REPOSITORY_MANIFEST.md`
+- `RELEASE_NOTES_v0.4.md`
 - `data/generated/.gitkeep`
+- `docs/AGENT_LAYER.md`
 - `docs/ARCHITECTURE.md`
 - `docs/BASELINE_RESULTS.md`
 - `docs/DATA_DICTIONARY.md`
@@ -26,11 +27,21 @@ Tracked delivery files (excluding this manifest/SHA metadata rules): **56**
 - `docs/V0.2_VALIDATION.md`
 - `docs/V0.3_SAMPLE_INVESTIGATION.json`
 - `docs/V0.3_VALIDATION.md`
+- `docs/V0.4_SAMPLE_AGENT_SUMMARY.json`
+- `docs/V0.4_VALIDATION.md`
+- `examples/valid_agent_plan.json`
 - `pyproject.toml`
+- `scripts/agent_investigate.py`
 - `scripts/generate_data.py`
 - `scripts/investigate.py`
 - `scripts/run_baseline.py`
 - `src/fitzsight/__init__.py`
+- `src/fitzsight/agent/__init__.py`
+- `src/fitzsight/agent/models.py`
+- `src/fitzsight/agent/orchestrator.py`
+- `src/fitzsight/agent/planner.py`
+- `src/fitzsight/agent/renderer.py`
+- `src/fitzsight/agent/verifier.py`
 - `src/fitzsight/analytics/__init__.py`
 - `src/fitzsight/analytics/baseline.py`
 - `src/fitzsight/analytics/kpis.py`
@@ -52,6 +63,9 @@ Tracked delivery files (excluding this manifest/SHA metadata rules): **56**
 - `src/fitzsight/tools/schema.py`
 - `src/fitzsight/tools/sql.py`
 - `src/fitzsight/tools/statistics.py`
+- `tests/test_agent_orchestrator.py`
+- `tests/test_agent_planner.py`
+- `tests/test_agent_verifier.py`
 - `tests/test_anomaly.py`
 - `tests/test_contribution.py`
 - `tests/test_evidence.py`

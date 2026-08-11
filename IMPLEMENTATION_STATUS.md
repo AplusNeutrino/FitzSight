@@ -1,77 +1,51 @@
 # FitzSight Implementation Status
 
-**Version:** v0.3.0  
+**Version:** v0.4.0  
 **Date:** 2026-08-11  
-**Phase:** Deterministic diagnostic layer expanded; LLM planner/orchestrator not yet introduced.
+**Phase:** Constrained Agent MVP implemented above deterministic evidence-first tools.
 
-## v0.3 completed in this delivery
+## v0.4 completed
 
-- [x] v0.2 deterministic Tool Layer retained and revalidated
-- [x] `ContributionAnalysisTool`
-- [x] symmetric binary-rate decomposition by categorical dimension
-- [x] performance-effect and composition-effect breakdown
-- [x] exact aggregate-change reconstruction within floating-point precision
-- [x] `AnomalyDetectionTool`
-- [x] median/MAD robust baseline with safe fallbacks
-- [x] high / low / two-sided anomaly directions
-- [x] team contribution step integrated into the benchmark investigation
-- [x] post-change response-time anomaly scan integrated into the benchmark investigation
-- [x] six evidence-linked investigation claims
-- [x] ten evidence records in the default v0.3 benchmark run
-- [x] diagnostic-tool documentation
-- [x] expanded automated tests
+- [x] v0.3 contribution and anomaly diagnostic tools retained
+- [x] constrained intent/planning contract
+- [x] deterministic no-API planner fallback
+- [x] provider-neutral structured LLM planner adapter
+- [x] strict approved action sequence
+- [x] unsupported-question refusal before external planner call
+- [x] planner SQL/tool-argument prohibition
+- [x] Agent orchestration layer
+- [x] EvidenceClaimVerifier
+- [x] evidence existence, digest and success-status verification
+- [x] evaluation-only `_gt` SQL boundary verification
+- [x] causal-overclaim verification
+- [x] fail-closed final answer rendering
+- [x] planning/verifier/final-answer audit records
+- [x] Agent CLI
+- [x] structured plan example
+- [x] expanded tests and documentation
 
-## Build-environment validation
-
-```text
-pytest -q
-19 passed, 1 skipped
-```
-
-The single skipped test is the DuckDB-specific backend integration test because this build environment cannot install the `duckdb` package. The SQLite fallback executes the full v0.3 deterministic investigation.
+## Important architecture boundary
 
 ```text
-python -m compileall -q src scripts tests
-PASS
+Planner / future LLM
+    ↓ approved high-level actions only
+Deterministic tools
+    ↓
+Evidence Registry
+    ↓
+Verifier
+    ↓
+Final answer
 ```
 
-Default benchmark output in the build environment:
+An LLM is not a calculator and does not receive unrestricted SQL execution authority.
 
-```text
-Affected FTD change:              -7.53 pp
-Europe control FTD change:        -1.21 pp
-Affected response median change: +29.15 min
-Largest negative contributor:     Team A
-Second negative contributor:      Team B
-Post-change response anomalies:   8 days
-Contribution reconstruction err: ~0 pp
-Root-cause status:                supported_candidate
-Evidence records:                 10
-Claims:                           6
-```
+## Still pending
 
-## Verification still pending
-
-- [ ] DuckDB-specific runtime/integration validation in an environment with `duckdb` installed
-- [ ] final open-source license selection
-
-## Still not implemented
-
-- customer segmentation;
-- LLM planner/orchestrator;
-- autonomous free-form tool selection;
-- Verifier Agent layer;
+- DuckDB runtime validation in an environment with `duckdb` installed;
+- customer segmentation (P1);
+- a concrete external model-provider adapter and credentials;
+- multi-intent planning;
 - Streamlit UI;
-- multi-scenario evaluation harness;
-- final competition submission assets.
-
-## Next P0 implementation slice
-
-1. Introduce a constrained planner/orchestrator contract above deterministic tools.
-2. Keep all numeric computation inside SQL/Python tools.
-3. Require structured plans and explicit allowed-tool lists.
-4. Reject unsupported intents instead of hallucinating workflows.
-5. Add deterministic planner fallback so the demo remains usable without model/API access.
-6. Add a Verifier layer that checks claims against Evidence IDs before final rendering.
-
-The LLM integration must not bypass read-only SQL, evidence registration, or causal-language guardrails.
+- final license;
+- competition submission assets.

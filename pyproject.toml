@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fitzsight"
-version = "0.3.0"
-description = "Evidence-grounded financial operations intelligence and deterministic investigation and diagnostic tools"
+version = "0.4.0"
+description = "Evidence-grounded financial operations intelligence with constrained Agent planning, deterministic tools, and claim verification"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
