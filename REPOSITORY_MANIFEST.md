@@ -1,17 +1,60 @@
-# Repository Manifest
+# FitzSight v0.2.0 Repository Manifest
 
-This package is the clean GitHub-ready FinSight v0.1.0 starter repository.
+This manifest describes the intended GitHub snapshot for the v0.2.0 delivery.
 
-Key files:
+## Root
 
-- `MASTER_PLAN.md` — full GOAI/product/engineering plan and single project plan.
-- `IMPLEMENTATION_STATUS.md` — current implementation truth for this release.
-- `RELEASE_NOTES_v0.1.md` — what has actually been implemented and validated.
-- `README.md` — public repository landing page.
-- `src/finsight/` — implementation package.
-- `scripts/` — runnable data-generation and baseline-analysis entry points.
-- `tests/` — automated tests.
-- `docs/BASELINE_RESULTS.md` — deterministic first benchmark result.
-- `docs/DATA_DICTIONARY.md` — synthetic schema documentation.
+- `.env.example` — secret-free configuration template
+- `.gitignore` — generated-data, cache and secret exclusions
+- `README.md` — project overview, quick start, safety and limitations
+- `MASTER_PLAN.md` — competition/product master plan, normalized to FitzSight
+- `PROJECT_PROGRESS.md` — pointer to external progress source of truth
+- `IMPLEMENTATION_STATUS.md` — v0.2 implementation and validation state
+- `RELEASE_NOTES_v0.1.md` — historical v0.1 notes with current product naming
+- `RELEASE_NOTES_v0.2.md` — v0.2 release notes
+- `pyproject.toml` — Python package/dependencies (`fitzsight` v0.2.0)
+- `SHA256SUMS.txt` — integrity hashes for repository files other than itself
 
-Generated CSVs are deliberately excluded from the release package because they are reproducible from a fixed seed and are ignored by Git. Run `python scripts/generate_data.py` after setup.
+## Source package
+
+```text
+src/fitzsight/
+├── analytics/
+├── data/
+│   └── store.py
+├── evidence/
+├── investigation/
+└── tools/
+```
+
+v0.2 introduces the analytical store, read-only Tool Layer, expanded evidence registry and deterministic investigation engine.
+
+## Scripts
+
+- `scripts/generate_data.py`
+- `scripts/run_baseline.py`
+- `scripts/investigate.py`
+
+## Tests
+
+The repository contains v0.1 regression tests plus v0.2 tests for:
+
+- evidence registry;
+- SQL safety;
+- store/schema/SQL integration;
+- KPI and period comparison;
+- statistical tests;
+- deterministic investigation;
+- optional DuckDB backend integration.
+
+## Documentation
+
+- `docs/DATA_DICTIONARY.md`
+- `docs/BASELINE_RESULTS.md`
+- `docs/ARCHITECTURE.md`
+- `docs/TOOL_LAYER.md`
+- `docs/V0.2_VALIDATION.md`
+
+## Generated data
+
+`data/generated/` contains only `.gitkeep` in the repository. CSV/JSON outputs are generated locally and ignored by Git.

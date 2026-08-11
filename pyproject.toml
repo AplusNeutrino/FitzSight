@@ -3,15 +3,20 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "finsight"
-version = "0.1.0"
-description = "Evidence-grounded financial operations analytics agent"
+name = "fitzsight"
+version = "0.2.0"
+description = "Evidence-grounded financial operations intelligence and deterministic investigation tools"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["numpy>=1.26,<3", "pandas>=2.2,<3", "scipy>=1.12,<2"]
+dependencies = [
+    "duckdb>=1.4,<2",
+    "numpy>=1.26,<3",
+    "pandas>=2.2,<3",
+    "scipy>=1.12,<2",
+]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9"]
+dev = ["pytest>=8,<10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

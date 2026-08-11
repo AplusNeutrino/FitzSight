@@ -1,5 +1,5 @@
-from finsight.data.generator import GeneratorConfig, generate_all
-from finsight.analytics.baseline import investigate_crm_routing_change
+from fitzsight.data.generator import GeneratorConfig, generate_all
+from fitzsight.analytics.baseline import investigate_crm_routing_change
 
 def test_crm_routing_scenario_is_detectable():
     t=generate_all(GeneratorConfig())

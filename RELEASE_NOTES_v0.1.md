@@ -1,4 +1,4 @@
-# FinSight v0.1 Release Notes
+# FitzSight v0.1 Release Notes
 
 Date: 2026-08-11
 

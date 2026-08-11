@@ -1,7 +1,7 @@
 # GOAI 2026 — Boundless Agents × AI+金融 × 数据分析
 # Master Plan / 项目总计划（GitHub 长期维护版）
 
-> **Working Title / 暂定项目名：FinSight — Financial Operations Intelligence Agent**  
+> **Formal Product Name / 正式项目名：FitzSight — Financial Operations Intelligence Agent**  
 > 中文：**金融经营智能分析与风险研判 Agent**  
 > 赛道：**GOAI 2026 · Boundless Agents（无界应用）· AI+金融**  
 > 文档定位：本文件是项目的**唯一主计划（Single Source of Truth）**。后续需求、架构、数据、实验、Demo、提交材料、风险、时间表和评审策略均应尽量在此同步维护。  
@@ -89,7 +89,7 @@ docs/
 
 ## 1.1 一句话项目定义
 
-> **FinSight 是一个面向金融企业经营分析人员、销售管理者和风险管理人员的 Agentic Data Analysis 系统。它能够从业务问题出发，自主选择并调用数据工具，对客户、交易、入出金、销售转化等经营数据进行分析，识别异常、下钻原因、完成统计验证，并输出带有可追溯证据的经营结论与行动建议。**
+> **FitzSight 是一个面向金融企业经营分析人员、销售管理者和风险管理人员的 Agentic Data Analysis 系统。它能够从业务问题出发，自主选择并调用数据工具，对客户、交易、入出金、销售转化等经营数据进行分析，识别异常、下钻原因、完成统计验证，并输出带有可追溯证据的经营结论与行动建议。**
 
 最核心的产品闭环是：
 
@@ -563,7 +563,7 @@ Ask Colleague
 Write Report
 ```
 
-FinSight：
+FitzSight：
 
 ```text
 User asks a business question
@@ -1747,7 +1747,7 @@ MVP：
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ FinSight                                               │
+│ FitzSight                                               │
 ├───────────────┬────────────────────────────────────────┤
 │ KPI Overview  │ Chat / Investigation                   │
 │               │                                        │
@@ -2009,7 +2009,7 @@ THIRD_PARTY_NOTICES.md
 推荐：
 
 ```text
-finsight/
+FitzSight/
 ├── README.md
 ├── MASTER_PLAN.md
 ├── LICENSE
@@ -2069,7 +2069,7 @@ finsight/
 README 第一屏：
 
 ```text
-What is FinSight?
+What is FitzSight?
 What problem does it solve?
 Who is it for?
 What can it actually do?
@@ -2230,7 +2230,7 @@ p = 0.004
 Dashboard tells you WHAT happened.
 ```
 
-FinSight：
+FitzSight：
 
 ```text
 Agent investigates WHY it happened.
@@ -2521,7 +2521,7 @@ docker compose up
 
 ### Slide 1 — Title
 
-FinSight  
+FitzSight  
 Agentic Financial Operations Intelligence
 
 ### Slide 2 — Problem
@@ -2585,7 +2585,7 @@ Data Science + Financial Analytics experience。
 回答重点：
 
 - BI 擅长可视化和查询；
-- FinSight 强调 multi-step investigation；
+- FitzSight 强调 multi-step investigation；
 - 自动下钻；
 - hypothesis；
 - statistics；
@@ -2598,7 +2598,7 @@ Data Science + Financial Analytics experience。
 
 回答：
 
-> ChatCSV 通常是问答层；FinSight 是 investigation workflow。用户不需要知道要查哪张表、写什么 SQL、做什么统计。Agent 负责构造并验证调查链。
+> ChatCSV 通常是问答层；FitzSight 是 investigation workflow。用户不需要知道要查哪张表、写什么 SQL、做什么统计。Agent 负责构造并验证调查链。
 
 展示：
 
@@ -3114,6 +3114,20 @@ No
 
 ---
 
+## D-008 — 正式产品命名固定为 FitzSight
+
+**Decision:** 所有维护中的代码、文档、包元数据、UI、PPT 与演示材料统一使用 **FitzSight**。Python import package 使用 `fitzsight`。历史 Git commit 不重写。
+
+---
+
+## D-009 — 代码交付包必须同步附带进度真源
+
+**Decision:** 后续每次 AI 向用户交付新的 FitzSight 代码/文件包时，必须在同一 ZIP 中附带当次更新后的 `PROJFITZGERALD_PROGRESS.md`。
+
+用户收到交付包后自行拆分：实现内容更新至 `AplusNeutrino/FitzSight`，进度真源更新至 `AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md`。
+
+---
+
 # 45. Known Unknowns / 尚待确认
 
 - [ ] 团队人数最终限制
@@ -3220,7 +3234,7 @@ No
 创建 GitHub：
 
 ```text
-finsight
+FitzSight
 ```
 
 ### Step 2
@@ -3236,7 +3250,7 @@ MASTER_PLAN.md
 建立最小目录：
 
 ```text
-finsight/
+FitzSight/
 ├── README.md
 ├── MASTER_PLAN.md
 ├── data/
@@ -3281,7 +3295,7 @@ CRM Routing Change
 
 如果开发过程中不知道下一步该做什么，就回到这一句话：
 
-> **FinSight 必须能让一个金融业务管理者提出“为什么这个指标变了？”，然后由 Agent 自主完成数据调查、统计验证和证据化解释，而不是只生成一个听起来像答案的文本。**
+> **FitzSight 必须能让一个金融业务管理者提出“为什么这个指标变了？”，然后由 Agent 自主完成数据调查、统计验证和证据化解释，而不是只生成一个听起来像答案的文本。**
 
 任何不帮助这个目标的功能，都不是当前优先级。
 
@@ -3307,19 +3321,19 @@ CRM Routing Change
 
 # Appendix A — 项目一句话版本
 
-> **FinSight is an evidence-grounded financial operations intelligence agent that autonomously investigates business anomalies by querying enterprise-style data, performing statistical validation, and producing traceable, decision-ready insights.**
+> **FitzSight is an evidence-grounded financial operations intelligence agent that autonomously investigates business anomalies by querying enterprise-style data, performing statistical validation, and producing traceable, decision-ready insights.**
 
 ---
 
 # Appendix B — 30 秒英文 Pitch
 
-> Financial teams already have dashboards, SQL and BI tools, but answering a simple question such as “Why did net deposits fall this week?” can still require hours of manual investigation. FinSight is an agentic financial operations analyst. It plans the investigation, queries the relevant data, drills into regions, sales teams and customer segments, performs statistical validation, and links every important claim back to executable evidence. Instead of chatting with a CSV, FinSight turns a business question into a reproducible investigation and an auditable decision brief.
+> Financial teams already have dashboards, SQL and BI tools, but answering a simple question such as “Why did net deposits fall this week?” can still require hours of manual investigation. FitzSight is an agentic financial operations analyst. It plans the investigation, queries the relevant data, drills into regions, sales teams and customer segments, performs statistical validation, and links every important claim back to executable evidence. Instead of chatting with a CSV, FitzSight turns a business question into a reproducible investigation and an auditable decision brief.
 
 ---
 
 # Appendix C — 30 秒中文 Pitch
 
-> 金融企业并不缺 Dashboard、SQL 或 BI，但当管理者问“为什么本周净入金下降”时，分析师仍需要在多张表、多个指标和大量人工判断之间反复切换。FinSight 是一个金融经营分析 Agent：它能够自主规划调查、调用 SQL 和 Python、按区域和销售团队下钻、做统计验证，并把每一个重要结论绑定到可追溯证据。它不是“和 CSV 聊天”，而是把一个经营问题转化成一条可复现、可验证的分析闭环。
+> 金融企业并不缺 Dashboard、SQL 或 BI，但当管理者问“为什么本周净入金下降”时，分析师仍需要在多张表、多个指标和大量人工判断之间反复切换。FitzSight 是一个金融经营分析 Agent：它能够自主规划调查、调用 SQL 和 Python、按区域和销售团队下钻、做统计验证，并把每一个重要结论绑定到可追溯证据。它不是“和 CSV 聊天”，而是把一个经营问题转化成一条可复现、可验证的分析闭环。
 
 ---
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict
 import pandas as pd
 from scipy.stats import chi2_contingency
-from finsight.data.scenarios import CRM_ROUTING_SCENARIO
+from fitzsight.data.scenarios import CRM_ROUTING_SCENARIO
 
 @dataclass(frozen=True)
 class CohortComparison:

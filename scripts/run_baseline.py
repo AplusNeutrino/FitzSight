@@ -1,8 +1,8 @@
 from pathlib import Path
 import json, sys, pandas as pd
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT/"src"))
-from finsight.data.generator import write_csv_bundle
-from finsight.analytics.baseline import investigate_crm_routing_change
+from fitzsight.data.generator import write_csv_bundle
+from fitzsight.analytics.baseline import investigate_crm_routing_change
 if __name__=="__main__":
     p=ROOT/"data/generated/sales_activity.csv"
     if not p.exists(): write_csv_bundle(ROOT/"data/generated")

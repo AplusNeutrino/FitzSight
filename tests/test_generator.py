@@ -1,4 +1,4 @@
-from finsight.data.generator import GeneratorConfig, generate_all
+from fitzsight.data.generator import GeneratorConfig, generate_all
 
 def test_generator_is_deterministic():
     cfg=GeneratorConfig(seed=123,n_customers=1000,n_salespeople=20)
