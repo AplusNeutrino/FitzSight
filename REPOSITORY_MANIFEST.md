@@ -1,60 +1,65 @@
-# FitzSight v0.2.0 Repository Manifest
+# FitzSight Repository Manifest
 
-This manifest describes the intended GitHub snapshot for the v0.2.0 delivery.
+**Version:** v0.3.0  
+**Generated:** 2026-08-11
 
-## Root
+Tracked delivery files (excluding this manifest/SHA metadata rules): **56**
 
-- `.env.example` — secret-free configuration template
-- `.gitignore` — generated-data, cache and secret exclusions
-- `README.md` — project overview, quick start, safety and limitations
-- `MASTER_PLAN.md` — competition/product master plan, normalized to FitzSight
-- `PROJECT_PROGRESS.md` — pointer to external progress source of truth
-- `IMPLEMENTATION_STATUS.md` — v0.2 implementation and validation state
-- `RELEASE_NOTES_v0.1.md` — historical v0.1 notes with current product naming
-- `RELEASE_NOTES_v0.2.md` — v0.2 release notes
-- `pyproject.toml` — Python package/dependencies (`fitzsight` v0.2.0)
-- `SHA256SUMS.txt` — integrity hashes for repository files other than itself
+## Files
 
-## Source package
-
-```text
-src/fitzsight/
-├── analytics/
-├── data/
-│   └── store.py
-├── evidence/
-├── investigation/
-└── tools/
-```
-
-v0.2 introduces the analytical store, read-only Tool Layer, expanded evidence registry and deterministic investigation engine.
-
-## Scripts
-
-- `scripts/generate_data.py`
-- `scripts/run_baseline.py`
-- `scripts/investigate.py`
-
-## Tests
-
-The repository contains v0.1 regression tests plus v0.2 tests for:
-
-- evidence registry;
-- SQL safety;
-- store/schema/SQL integration;
-- KPI and period comparison;
-- statistical tests;
-- deterministic investigation;
-- optional DuckDB backend integration.
-
-## Documentation
-
-- `docs/DATA_DICTIONARY.md`
-- `docs/BASELINE_RESULTS.md`
+- `.env.example`
+- `.gitignore`
+- `IMPLEMENTATION_STATUS.md`
+- `MASTER_PLAN.md`
+- `PROJECT_PROGRESS.md`
+- `README.md`
+- `RELEASE_NOTES_v0.1.md`
+- `RELEASE_NOTES_v0.2.md`
+- `RELEASE_NOTES_v0.3.md`
+- `REPOSITORY_MANIFEST.md`
+- `data/generated/.gitkeep`
 - `docs/ARCHITECTURE.md`
+- `docs/BASELINE_RESULTS.md`
+- `docs/DATA_DICTIONARY.md`
+- `docs/DIAGNOSTIC_TOOLS.md`
 - `docs/TOOL_LAYER.md`
 - `docs/V0.2_VALIDATION.md`
-
-## Generated data
-
-`data/generated/` contains only `.gitkeep` in the repository. CSV/JSON outputs are generated locally and ignored by Git.
+- `docs/V0.3_SAMPLE_INVESTIGATION.json`
+- `docs/V0.3_VALIDATION.md`
+- `pyproject.toml`
+- `scripts/generate_data.py`
+- `scripts/investigate.py`
+- `scripts/run_baseline.py`
+- `src/fitzsight/__init__.py`
+- `src/fitzsight/analytics/__init__.py`
+- `src/fitzsight/analytics/baseline.py`
+- `src/fitzsight/analytics/kpis.py`
+- `src/fitzsight/data/__init__.py`
+- `src/fitzsight/data/generator.py`
+- `src/fitzsight/data/scenarios.py`
+- `src/fitzsight/data/store.py`
+- `src/fitzsight/evidence/__init__.py`
+- `src/fitzsight/evidence/registry.py`
+- `src/fitzsight/investigation/__init__.py`
+- `src/fitzsight/investigation/engine.py`
+- `src/fitzsight/investigation/models.py`
+- `src/fitzsight/tools/__init__.py`
+- `src/fitzsight/tools/anomaly.py`
+- `src/fitzsight/tools/base.py`
+- `src/fitzsight/tools/comparison.py`
+- `src/fitzsight/tools/contribution.py`
+- `src/fitzsight/tools/kpi.py`
+- `src/fitzsight/tools/schema.py`
+- `src/fitzsight/tools/sql.py`
+- `src/fitzsight/tools/statistics.py`
+- `tests/test_anomaly.py`
+- `tests/test_contribution.py`
+- `tests/test_evidence.py`
+- `tests/test_generator.py`
+- `tests/test_investigation.py`
+- `tests/test_kpi_tools.py`
+- `tests/test_kpis.py`
+- `tests/test_scenario_crm_routing.py`
+- `tests/test_sql_safety.py`
+- `tests/test_statistics.py`
+- `tests/test_store_tools.py`

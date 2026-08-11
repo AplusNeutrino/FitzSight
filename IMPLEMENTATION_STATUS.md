@@ -1,87 +1,77 @@
 # FitzSight Implementation Status
 
-**Version:** v0.2.0  
+**Version:** v0.3.0  
 **Date:** 2026-08-11  
-**Phase:** Deterministic Tool Layer complete in build environment; DuckDB runtime validation pending on an environment where the dependency is installed.
+**Phase:** Deterministic diagnostic layer expanded; LLM planner/orchestrator not yet introduced.
 
-## v0.2 completed in this delivery
+## v0.3 completed in this delivery
 
-- [x] Formal product naming normalized to **FitzSight** across the implementation snapshot
-- [x] Python import package moved to `src/fitzsight`
-- [x] Project metadata renamed to `fitzsight`
-- [x] Synthetic-data generator preserved and revalidated
-- [x] AnalyticsStore abstraction
-- [x] Preferred DuckDB backend implementation
-- [x] SQLite offline/restricted-environment fallback
-- [x] Schema Inspector Tool
-- [x] Read-only SQL safety validator
-- [x] Bounded SQL execution with success/error evidence
-- [x] Canonical KPI Tool
-- [x] Period Comparison Tool
-- [x] Two-proportion statistical test + 95% difference CI
-- [x] Mann–Whitney U and Welch t-test support
-- [x] Evidence Registry expanded with result payload, digest, status and lookup
-- [x] Evidence IDs integrated into v0.2 Tool executions
-- [x] Deterministic investigation plan and engine
-- [x] Claim-to-evidence mapping
-- [x] Causal-language guardrail
-- [x] Architecture and Tool Layer documentation
-- [x] README with explicit limitations
-- [x] New automated tests
+- [x] v0.2 deterministic Tool Layer retained and revalidated
+- [x] `ContributionAnalysisTool`
+- [x] symmetric binary-rate decomposition by categorical dimension
+- [x] performance-effect and composition-effect breakdown
+- [x] exact aggregate-change reconstruction within floating-point precision
+- [x] `AnomalyDetectionTool`
+- [x] median/MAD robust baseline with safe fallbacks
+- [x] high / low / two-sided anomaly directions
+- [x] team contribution step integrated into the benchmark investigation
+- [x] post-change response-time anomaly scan integrated into the benchmark investigation
+- [x] six evidence-linked investigation claims
+- [x] ten evidence records in the default v0.3 benchmark run
+- [x] diagnostic-tool documentation
+- [x] expanded automated tests
 
-## Validation completed in the build environment
+## Build-environment validation
 
 ```text
 pytest -q
-17 passed, 1 skipped
+19 passed, 1 skipped
 ```
 
-The single skipped test is the DuckDB-specific backend integration test because the build environment does not have the `duckdb` package installed and cannot install packages from the internet. The same analytical workflow was executed end-to-end using the explicit SQLite fallback.
-
-Additional validation:
+The single skipped test is the DuckDB-specific backend integration test because this build environment cannot install the `duckdb` package. The SQLite fallback executes the full v0.3 deterministic investigation.
 
 ```text
 python -m compileall -q src scripts tests
 PASS
 ```
 
-Deterministic investigation (SQLite fallback):
+Default benchmark output in the build environment:
 
 ```text
-Affected FTD:        23.37% -> 15.84%
-Affected change:     -7.53 pp
-Control change:      -1.21 pp
-Response median:     +29.15 min
-Conversion p-value:  0.002346
-Response p-value:    1.86e-17
-Root-cause status:   supported_candidate
-Evidence records:    6
-Claims:              4
+Affected FTD change:              -7.53 pp
+Europe control FTD change:        -1.21 pp
+Affected response median change: +29.15 min
+Largest negative contributor:     Team A
+Second negative contributor:      Team B
+Post-change response anomalies:   8 days
+Contribution reconstruction err: ~0 pp
+Root-cause status:                supported_candidate
+Evidence records:                 10
+Claims:                           6
 ```
 
-## Verification still required after deployment
+## Verification still pending
 
-Run in an internet-enabled local/GitHub environment:
-
-```bash
-pip install -e ".[dev]"
-pytest -q
-python scripts/investigate.py --backend duckdb
-```
-
-Expected: the DuckDB backend test should no longer skip and the investigation should recover the same benchmark pattern.
+- [ ] DuckDB-specific runtime/integration validation in an environment with `duckdb` installed
+- [ ] final open-source license selection
 
 ## Still not implemented
 
-- general contribution-analysis Tool;
-- generic anomaly-detection Tool;
 - customer segmentation;
 - LLM planner/orchestrator;
-- verifier Agent layer;
+- autonomous free-form tool selection;
+- Verifier Agent layer;
 - Streamlit UI;
 - multi-scenario evaluation harness;
-- final project license.
+- final competition submission assets.
 
-## Next implementation priority
+## Next P0 implementation slice
 
-Once DuckDB runtime validation is confirmed, proceed to the remaining pre-Agent analytical capabilities, then introduce the LLM only above the deterministic v0.2 Tool contracts.
+1. Introduce a constrained planner/orchestrator contract above deterministic tools.
+2. Keep all numeric computation inside SQL/Python tools.
+3. Require structured plans and explicit allowed-tool lists.
+4. Reject unsupported intents instead of hallucinating workflows.
+5. Add deterministic planner fallback so the demo remains usable without model/API access.
+6. Add a Verifier layer that checks claims against Evidence IDs before final rendering.
+
+The LLM integration must not bypass read-only SQL, evidence registration, or causal-language guardrails.

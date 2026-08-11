@@ -84,3 +84,23 @@ Auditable report
 ```
 
 The LLM should not receive direct authority to mutate the database or fabricate numeric results.
+
+---
+
+## v0.3 diagnostic extension
+
+v0.3 inserts two deterministic diagnostics between the core statistical layer and final evidence rendering:
+
+```text
+Read-only SQL / KPI / statistics
+          ↓
+ContributionAnalysisTool
+          ↓
+AnomalyDetectionTool
+          ↓
+Evidence-linked diagnostic claims
+```
+
+The contribution tool performs an additive symmetric rate decomposition so that team-level impacts reconstruct the aggregate FTD-rate movement. The anomaly tool compares current observations with a robust historical baseline using median/MAD thresholds.
+
+Neither tool is permitted to turn an observed contribution or anomaly into a causal, compliance, fraud, or investment conclusion on its own.

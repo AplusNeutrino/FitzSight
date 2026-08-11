@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict
+from collections import defaultdict
 from datetime import date
 from typing import Any
 
@@ -8,6 +8,8 @@ import numpy as np
 
 from fitzsight.data.scenarios import CRM_ROUTING_SCENARIO
 from fitzsight.evidence.registry import EvidenceRegistry
+from fitzsight.tools.anomaly import AnomalyDetectionTool
+from fitzsight.tools.contribution import ContributionAnalysisTool
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
 from fitzsight.tools.statistics import StatisticalTestTool
@@ -15,14 +17,16 @@ from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
 class UnsupportedQuestionError(ValueError):
-    """Raised when the deterministic v0.2 engine does not support a question."""
+    """Raised when the deterministic engine does not support a question."""
 
 
 class DeterministicInvestigationEngine:
-    """v0.2 deterministic investigation engine.
+    """Deterministic FitzSight investigation engine.
 
-    This is intentionally *not* an LLM Agent. It proves the analytical tool and
-    evidence loop before a language model is allowed to plan or narrate.
+    v0.3 extends the evidence-first v0.2 loop with additive rate-contribution
+    decomposition and robust anomaly detection. It is intentionally still not an
+    LLM Agent: all planning in this class is explicit and all numeric conclusions
+    originate from deterministic tools.
     """
 
     def __init__(
@@ -32,11 +36,15 @@ class DeterministicInvestigationEngine:
         sql_tool: ReadOnlySQLTool,
         stats_tool: StatisticalTestTool,
         registry: EvidenceRegistry,
+        contribution_tool: ContributionAnalysisTool | None = None,
+        anomaly_tool: AnomalyDetectionTool | None = None,
     ) -> None:
         self.schema_tool = schema_tool
         self.sql_tool = sql_tool
         self.stats_tool = stats_tool
         self.registry = registry
+        self.contribution_tool = contribution_tool or ContributionAnalysisTool(sql_tool, registry)
+        self.anomaly_tool = anomaly_tool or AnomalyDetectionTool(registry)
 
     @staticmethod
     def supports(question: str) -> bool:
@@ -56,9 +64,11 @@ class DeterministicInvestigationEngine:
                 PlanStep("P1", "inspect_schema", "Confirm required operational fields exist without using evaluation-only ground-truth columns."),
                 PlanStep("P2", "query_affected_cohort", "Measure pre/post FTD conversion and response time for Europe Team A+B."),
                 PlanStep("P3", "query_control_cohort", "Measure the same metrics for other European teams."),
-                PlanStep("P4", "statistical_validation", "Test whether the affected conversion shift is statistically distinguishable."),
-                PlanStep("P5", "event_check", "Check nearby business events for a plausible operational explanation."),
-                PlanStep("P6", "evidence_boundary", "Separate supported findings from causal overclaims."),
+                PlanStep("P4", "statistical_validation", "Test whether the affected conversion and response-time shifts are statistically distinguishable."),
+                PlanStep("P5", "contribution_decomposition", "Decompose Europe-wide FTD-rate change by sales team and rank negative contributors."),
+                PlanStep("P6", "anomaly_scan", "Compare post-change daily response-time medians against the robust pre-change baseline."),
+                PlanStep("P7", "event_check", "Check nearby business events for a plausible operational explanation."),
+                PlanStep("P8", "evidence_boundary", "Separate supported findings from causal overclaims."),
             ),
         )
 
@@ -83,10 +93,20 @@ class DeterministicInvestigationEngine:
             "median_response_minutes": float(np.median(response)),
         }
 
+    @staticmethod
+    def _daily_medians(rows: list[dict[str, Any]], value_column: str) -> tuple[list[str], list[float]]:
+        by_day: dict[str, list[float]] = defaultdict(list)
+        for row in rows:
+            day = str(row["lead_created_at"])[:10]
+            by_day[day].append(float(row[value_column]))
+        labels = sorted(by_day)
+        values = [float(np.median(by_day[label])) for label in labels]
+        return labels, values
+
     def investigate(self, question: str) -> InvestigationResult:
         if not self.supports(question):
             raise UnsupportedQuestionError(
-                "v0.2 deterministic engine currently supports the European FTD conversion / July 15 benchmark question only."
+                "The deterministic engine currently supports the European FTD conversion / July 15 benchmark question only."
             )
 
         scenario = CRM_ROUTING_SCENARIO
@@ -105,7 +125,7 @@ class DeterministicInvestigationEngine:
         if missing:
             raise RuntimeError(f"sales_activity schema missing required fields: {missing}")
 
-        # Explicitly avoid benchmark-only *_gt columns in the investigation query.
+        # Explicitly avoid benchmark-only *_gt columns in normal investigation SQL.
         select_columns = "lead_created_at, region, assigned_team, response_time_minutes, converted_ftd"
         affected_sql = (
             f"SELECT {select_columns} FROM sales_activity "
@@ -144,6 +164,27 @@ class DeterministicInvestigationEngine:
             label_b="affected_post",
         )
 
+        boundary = scenario.change_date.isoformat()
+        contribution = self.contribution_tool.binary_rate_by_dimension(
+            table="sales_activity",
+            dimension="assigned_team",
+            outcome_column="converted_ftd",
+            baseline_where=f"region = 'Europe' AND lead_created_at < '{boundary}'",
+            current_where=f"region = 'Europe' AND lead_created_at >= '{boundary}'",
+            baseline_label="Europe pre-change",
+            current_label="Europe post-change",
+        )
+
+        pre_days, pre_daily_response = self._daily_medians(affected_pre, "response_time_minutes")
+        post_days, post_daily_response = self._daily_medians(affected_post, "response_time_minutes")
+        response_anomalies = self.anomaly_tool.baseline_threshold(
+            baseline_values=pre_daily_response,
+            current_values=post_daily_response,
+            current_labels=post_days,
+            direction="high",
+            threshold=2.5,
+        )
+
         event_sql = (
             "SELECT event_id, date, event_type, region, affected_team, description "
             "FROM business_events WHERE region = 'Europe' "
@@ -151,16 +192,14 @@ class DeterministicInvestigationEngine:
         )
         events = self.sql_tool.run(event_sql)
         matching_events = [
-            row for row in events.data["rows"]
-            if row.get("event_type") == scenario.event_type
+            row for row in events.data["rows"] if row.get("event_type") == scenario.event_type
         ]
 
         affected_change_pp = (ao["conversion"] - ap["conversion"]) * 100
         control_change_pp = (co["conversion"] - cp["conversion"]) * 100
-        response_change = (
-            float(ao["median_response_minutes"]) - float(ap["median_response_minutes"])
-        )
+        response_change = float(ao["median_response_minutes"]) - float(ap["median_response_minutes"])
 
+        most_negative = contribution.data["segments"][0] if contribution.data["segments"] else None
         metrics = {
             "change_date": scenario.change_date.isoformat(),
             "affected": {"pre": ap, "post": ao, "conversion_change_pp": affected_change_pp},
@@ -168,6 +207,8 @@ class DeterministicInvestigationEngine:
             "affected_response_median_change_minutes": response_change,
             "conversion_test": proportion_test.data,
             "response_test": response_test.data,
+            "team_contribution_analysis": contribution.data,
+            "post_change_response_anomalies": response_anomalies.data,
             "nearby_business_events": matching_events,
         }
 
@@ -178,14 +219,18 @@ class DeterministicInvestigationEngine:
             "conversion_shift_significant": proportion_test.data["p_value"] < 0.05,
             "response_shift_significant": response_test.data["p_value"] < 0.05,
             "matching_operational_event_found": bool(matching_events),
+            "top_negative_team_contributor": None if most_negative is None else most_negative["segment"],
+            "post_change_response_anomaly_count": response_anomalies.data["anomaly_count"],
             "root_cause_status": (
-                "supported_candidate" if (
+                "supported_candidate"
+                if (
                     affected_change_pp < 0
                     and response_change > 0
                     and affected_change_pp < control_change_pp
                     and proportion_test.data["p_value"] < 0.05
                     and bool(matching_events)
-                ) else "insufficient_evidence"
+                )
+                else "insufficient_evidence"
             ),
             "causal_language_guardrail": (
                 "The evidence supports the CRM routing change as the primary root-cause candidate in this synthetic benchmark; "
@@ -193,7 +238,7 @@ class DeterministicInvestigationEngine:
             ),
         }
 
-        claims = (
+        claims: list[Claim] = [
             Claim(
                 "C1",
                 f"Affected Europe Team A+B FTD conversion changed by {affected_change_pp:.2f} percentage points after {scenario.change_date.isoformat()}.",
@@ -222,14 +267,41 @@ class DeterministicInvestigationEngine:
                 "high" if matching_events else "low",
                 (events.evidence_id, affected_query.evidence_id, proportion_test.evidence_id, response_test.evidence_id),
             ),
+        ]
+
+        if most_negative is not None:
+            claims.append(
+                Claim(
+                    "C5",
+                    (
+                        f"{most_negative['segment']} is the largest negative team-level contributor in the symmetric Europe FTD-rate decomposition "
+                        f"({most_negative['total_contribution_pp']:.2f} pp contribution)."
+                    ),
+                    "supported",
+                    "medium",
+                    (contribution.evidence_id,),
+                )
+            )
+
+        claims.append(
+            Claim(
+                "C6",
+                (
+                    f"{response_anomalies.data['anomaly_count']} of {response_anomalies.data['current_n']} post-change daily response-time medians "
+                    "exceed the robust pre-change high-anomaly threshold."
+                ),
+                "supported",
+                "medium",
+                (response_anomalies.evidence_id,),
+            )
         )
 
         return InvestigationResult(
             product="FitzSight",
-            mode="deterministic_v0.2",
+            mode="deterministic_v0.3",
             question=question,
             plan=plan,
-            claims=claims,
+            claims=tuple(claims),
             metrics=metrics,
             diagnosis=diagnosis,
             evidence=tuple(self.registry.to_dicts()),

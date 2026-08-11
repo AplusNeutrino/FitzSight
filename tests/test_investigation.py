@@ -29,11 +29,15 @@ def test_deterministic_investigation_recovers_supported_candidate(tmp_path: Path
 
     payload = result.to_dict()
     assert payload["product"] == "FitzSight"
+    assert payload["mode"] == "deterministic_v0.3"
     assert payload["diagnosis"]["root_cause_status"] == "supported_candidate"
     assert payload["metrics"]["affected"]["conversion_change_pp"] < -5
     assert payload["metrics"]["affected_response_median_change_minutes"] > 15
     assert payload["metrics"]["conversion_test"]["p_value"] < 0.05
-    assert len(payload["evidence"]) >= 6
+    assert abs(payload["metrics"]["team_contribution_analysis"]["reconstruction_error_pp"]) < 1e-9
+    assert payload["metrics"]["post_change_response_anomalies"]["current_n"] > 0
+    assert len(payload["evidence"]) >= 10
+    assert len(payload["claims"]) >= 6
     # Normal investigation must not query the evaluation-only ground-truth flag.
     sql_evidence = [e for e in payload["evidence"] if e["tool_name"] == "read_only_sql"]
     assert all("_gt" not in e["parameters"]["sql"] for e in sql_evidence)

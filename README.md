@@ -10,9 +10,9 @@ The core product question is simple:
 
 FitzSight is designed to turn that question into a reproducible investigation based on real tool execution, SQL, statistics, comparison cohorts, and traceable evidence instead of an unsupported LLM narrative.
 
-## Current release: v0.2.0
+## Current release: v0.3.0
 
-v0.2 establishes the deterministic tool and evidence layer **before an LLM Agent is introduced**.
+v0.3 strengthens the deterministic diagnostic and evidence layer **before an LLM Agent is introduced**.
 
 Implemented:
 
@@ -27,14 +27,14 @@ Implemented:
 - two-proportion, Mann–Whitney and Welch t-test support;
 - evidence IDs, tool parameters, result digests, status, and compact evidence payloads;
 - deterministic investigation engine for the European FTD / July 15 benchmark;
+- symmetric team-level contribution decomposition for FTD-rate changes;
+- robust baseline anomaly detection for post-change response-time medians;
 - claim-to-evidence mapping and causal-language guardrail;
 - automated test suite.
 
 Not yet implemented:
 
 - LLM orchestration / dynamic Agent planning;
-- general-purpose contribution analysis;
-- generic anomaly-detection Tool;
 - customer segmentation;
 - interactive Streamlit UI;
 - multi-scenario benchmark harness.
@@ -74,7 +74,7 @@ lead response time increases
 FTD conversion probability decreases
 ```
 
-The deterministic v0.2 investigation should recover:
+The deterministic v0.3 investigation should recover:
 
 - a material FTD conversion decline in the affected teams;
 - a large response-time increase;
@@ -89,13 +89,15 @@ The engine reports this event as a **supported root-cause candidate** rather tha
 ```text
 Business question
       ↓
-Deterministic investigation plan (v0.2)
+Deterministic investigation plan (v0.3)
       ↓
 Schema Inspector
       ↓
 Read-only SQL
       ↓
 Statistics / KPI / period comparison
+      ↓
+Contribution decomposition / anomaly detection
       ↓
 Evidence Registry
       ↓
@@ -106,7 +108,7 @@ The next stage will replace the deterministic planner with an LLM planner/orches
 
 ## SQL safety policy
 
-The v0.2 SQL Tool:
+The read-only SQL Tool:
 
 - allows only `SELECT` / `WITH` queries;
 - rejects multi-statement SQL;
@@ -142,23 +144,28 @@ FitzSight is an analytical decision-support prototype. It is **not** an investme
 
 ## Limitations
 
-v0.2 deliberately has a narrow scope:
+v0.3 deliberately has a narrow scope:
 
 - the deterministic investigation engine currently recognizes one benchmark intent;
 - the benchmark uses synthetic data and does not prove real-world causal validity;
 - the preferred DuckDB backend requires the `duckdb` dependency; restricted build environments may use SQLite fallback;
 - SQL safety is conservative and intentionally rejects some otherwise valid read-only SQL patterns;
 - evidence IDs prove traceability to tool outputs, not truthfulness of the underlying source data;
-- no LLM is used in v0.2, so natural-language question coverage is intentionally limited.
+- no LLM is used in v0.3, so natural-language question coverage is intentionally limited;
+- contribution decomposition explains observed metric movement but does not independently establish causality;
+- anomaly flags only indicate unusual values relative to the configured baseline.
 
 ## Documentation
 
 - `MASTER_PLAN.md` — competition/product master plan
 - `IMPLEMENTATION_STATUS.md` — implementation snapshot
 - `docs/ARCHITECTURE.md` — current architecture
-- `docs/TOOL_LAYER.md` — v0.2 Tool Layer specification
+- `docs/TOOL_LAYER.md` — core Tool Layer specification
+- `docs/DIAGNOSTIC_TOOLS.md` — v0.3 contribution/anomaly diagnostics
 - `docs/BASELINE_RESULTS.md` — original synthetic baseline
 - `docs/V0.2_VALIDATION.md` — v0.2 validation evidence
+- `docs/V0.3_VALIDATION.md` — v0.3 validation evidence
+- `docs/V0.3_SAMPLE_INVESTIGATION.json` — deterministic v0.3 output sample
 - `PROJECT_PROGRESS.md` — pointer to the external progress source of truth
 
 ## Progress source of truth

@@ -20,7 +20,7 @@ DEFAULT_QUESTION = "Why did European FTD conversion deteriorate after July 15?"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the FitzSight v0.2 deterministic investigation.")
+    parser = argparse.ArgumentParser(description="Run the FitzSight v0.3 deterministic investigation.")
     parser.add_argument("--question", default=DEFAULT_QUESTION)
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument("--backend", choices=["auto", "duckdb", "sqlite"], default="auto")
