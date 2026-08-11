@@ -58,14 +58,14 @@ Using the fixed benchmark seed:
 
 | Segment | Customers | Customer share | Deposit share | Withdrawal share | Net deposits |
 |---|---:|---:|---:|---:|---:|
-| High Value | 278 | 4.1% | 55.8% | 61.0% | $2,149,812.30 |
-| Growth | 415 | 6.1% | 30.7% | 30.0% | $1,216,124.81 |
-| Core | 732 | 10.8% | 13.5% | 9.0% | $572,172.92 |
-| Low Activity | 5,345 | 79.0% | 0.0% | 0.0% | $0.00 |
+| High Value | 252 | 3.7% | 53.7% | 63.7% | $2,054,709.70 |
+| Growth | 440 | 6.5% | 33.4% | 26.8% | $1,401,103.92 |
+| Core | 732 | 10.8% | 12.9% | 9.5% | $548,265.20 |
+| Low Activity | 5,346 | 79.0% | 0.0% | 0.0% | $0.00 |
 
 Total European customers segmented: **6,770**. Coverage: **100%**.
 
-The `High Value` group contains about 4.1% of customers but accounts for about 55.8% of completed European deposits in the synthetic dataset.
+The `High Value` group contains about 3.7% of customers but accounts for about 53.7% of completed European deposits in the current fixed-seed synthetic dataset.
 
 ## Evidence boundary
 

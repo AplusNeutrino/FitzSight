@@ -33,7 +33,12 @@ class FakeResponses:
                 for action in actions
             ],
         }
-        return SimpleNamespace(output_text=json.dumps(payload))
+        return SimpleNamespace(
+            output_text=json.dumps(payload),
+            id="resp_test_123",
+            model=kwargs["model"],
+            usage=SimpleNamespace(input_tokens=42, output_tokens=18, total_tokens=60),
+        )
 
 
 class FakeClient:
@@ -58,6 +63,11 @@ def test_openai_responses_planner_uses_strict_structured_output_and_local_valida
     assert call["text"]["format"]["schema"]["properties"]["intent"]["enum"] == [
         NET_DEPOSIT_INTENT
     ]
+    assert planner.last_telemetry is not None
+    assert planner.last_telemetry["response_id"] == "resp_test_123"
+    assert planner.last_telemetry["total_tokens"] == 60
+    assert planner.last_telemetry["store"] is False
+    assert planner.last_telemetry["planning_seconds"] >= 0
 
 
 def test_openai_responses_schema_supports_customer_intelligence_intent():

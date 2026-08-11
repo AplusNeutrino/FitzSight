@@ -1,0 +1,20 @@
+{
+  "product": "FitzSight",
+  "runtime": "streamlit",
+  "port": 40267,
+  "command": [
+    "/opt/pyvenv/bin/python",
+    "-m",
+    "streamlit",
+    "run",
+    "/mnt/data/work_v09/streamlit_app.py",
+    "--server.headless=true",
+    "--server.address=127.0.0.1",
+    "--server.port=40267",
+    "--browser.gatherUsageStats=false"
+  ],
+  "health_url": "http://127.0.0.1:40267/_stcore/health",
+  "passed": false,
+  "status": "not_run_dependency_missing",
+  "message": "Streamlit is not installed; install with pip install -e \".[ui]\"."
+}

@@ -139,7 +139,7 @@ def run_suite(data_dir: Path, backend: str):
 
     payload = {
         "product": "FitzSight",
-        "suite_version": "0.7",
+        "suite_version": "0.9",
         "case_count": len(results),
         "passed": sum(1 for r in results if r["passed"]),
         "failed": sum(1 for r in results if not r["passed"]),
@@ -158,7 +158,7 @@ def run_suite(data_dir: Path, backend: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run FitzSight v0.7 adversarial safety/evidence evaluation.")
+    parser = argparse.ArgumentParser(description="Run FitzSight v0.9 adversarial safety/evidence evaluation.")
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument("--backend", choices=["auto", "duckdb", "sqlite"], default="auto")
     parser.add_argument("--output", default=None)

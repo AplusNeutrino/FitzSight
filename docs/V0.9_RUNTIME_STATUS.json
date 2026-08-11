@@ -1,0 +1,50 @@
+{
+  "product": "FitzSight",
+  "runtime_doctor_version": "0.9",
+  "checks": {
+    "python": {
+      "ok": true,
+      "detail": "3.13.5"
+    },
+    "fitzsight_source": {
+      "ok": true,
+      "detail": "/mnt/data/work_v09/src/fitzsight"
+    },
+    "duckdb": {
+      "ok": false,
+      "detail": "not installed in this environment"
+    },
+    "streamlit": {
+      "ok": false,
+      "detail": "install with pip install -e \".[ui]\""
+    },
+    "openai_sdk": {
+      "ok": false,
+      "detail": "install with pip install -e \".[openai]\""
+    },
+    "openai_api_key": {
+      "ok": false,
+      "detail": "not configured"
+    },
+    "fitzsight_model": {
+      "ok": false,
+      "detail": "not configured"
+    },
+    "data_directory": {
+      "ok": true,
+      "detail": "/mnt/data/work_v09/data/generated"
+    },
+    "generated_dataset": {
+      "ok": true,
+      "detail": "complete"
+    },
+    "presentation_assets": {
+      "ok": true,
+      "detail": "PPTX/PDF present"
+    }
+  },
+  "core_demo_ready": true,
+  "streamlit_live_ready": false,
+  "openai_live_ready": false,
+  "secrets_disclosed": false
+}

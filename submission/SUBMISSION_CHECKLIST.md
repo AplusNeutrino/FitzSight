@@ -13,8 +13,8 @@
 - [x] `FitzSight_GOAI_Initial_Round.pptx` generated.
 - [x] `FitzSight_GOAI_Initial_Round.pdf` exported from the same deck.
 - [x] PDF rendered and visually reviewed for clipping / overlap.
-- [x] 12-slide narrative aligns with the implemented v0.7/v0.8 product state.
-- [x] Benchmark metrics in the deck are synthetic and labelled through the project narrative.
+- [x] 12-slide narrative aligns with the implemented v0.9 product state.
+- [x] Slides 4-8 regenerate numeric claims from fresh verified deterministic Agent runs; stale current-release constants are not used.
 
 ## Technical evidence
 
@@ -42,14 +42,15 @@
 - [x] CLI fallback available.
 - [x] Demo runbook prepared.
 - [ ] Streamlit live path verified on final presentation laptop.
-- [ ] Screen recording completed.
-- [ ] Offline/local recording copied to a second location.
+- [x] Deterministic offline MP4 backup generated from five verified Agent outputs.
+- [ ] Live Streamlit screen recording completed on the final demo machine.
+- [ ] Offline/local/video assets copied to a second location.
 
 ## Portal submission — user action
 
 These items require the actual GOAI portal / email workflow and must not be marked complete from repository evidence alone.
 
-- [ ] Re-check the latest official submission fields and file-size limits.
+- [ ] Re-check the latest official portal fields and any portal-specific file-size/character limits immediately before upload.
 - [ ] Upload project introduction.
 - [ ] Upload PPT/PDF.
 - [ ] Add repository link.

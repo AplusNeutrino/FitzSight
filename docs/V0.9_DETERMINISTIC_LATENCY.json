@@ -1,0 +1,80 @@
+{
+  "product": "FitzSight",
+  "measurement": "deterministic_end_to_end_latency",
+  "backend": "sqlite",
+  "repeats_per_workflow": 3,
+  "workflow_count": 5,
+  "total_runs": 15,
+  "overall_mean_ms": 292.2884801334779,
+  "overall_p50_ms": 300.9031050005433,
+  "overall_p95_ms": 343.35107159986364,
+  "provider_cost_measured": false,
+  "provider_cost_note": "OpenAI live planner cost cannot be measured without a real provider call. Use scripts/validate_openai_runtime.py to capture token/latency telemetry without logging the API key.",
+  "results": [
+    {
+      "label": "CRM / FTD anomaly",
+      "question": "Why did European FTD conversion deteriorate after July 15?",
+      "samples_ms": [
+        342.64119599993137,
+        345.0074479997056,
+        321.12579900058336
+      ],
+      "mean_ms": 336.2581476667401,
+      "p50_ms": 342.64119599993137,
+      "p95_ms": 344.7708227997282,
+      "verified_runs": 3
+    },
+    {
+      "label": "Net-deposit anomaly",
+      "question": "Why did European net deposits fall in the week starting August 3?",
+      "samples_ms": [
+        295.81719300040277,
+        300.9031050005433,
+        308.0301360005251
+      ],
+      "mean_ms": 301.5834780004904,
+      "p50_ms": 300.9031050005433,
+      "p95_ms": 307.3174329005269,
+      "verified_runs": 3
+    },
+    {
+      "label": "Customer Intelligence",
+      "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+      "samples_ms": [
+        302.58007400061615,
+        321.7568210002355,
+        315.5871199996909
+      ],
+      "mean_ms": 313.30800500018086,
+      "p50_ms": 315.5871199996909,
+      "p95_ms": 321.13985090018105,
+      "verified_runs": 3
+    },
+    {
+      "label": "Marketing lead quality",
+      "question": "Why did Americas lead volume rise while FTD conversion fell after June 15?",
+      "samples_ms": [
+        261.6660800003956,
+        256.61463500000536,
+        260.00270700023975
+      ],
+      "mean_ms": 259.4278073335469,
+      "p50_ms": 260.00270700023975,
+      "p95_ms": 261.49974270038,
+      "verified_runs": 3
+    },
+    {
+      "label": "False-correlation guardrail",
+      "question": "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?",
+      "samples_ms": [
+        251.28574699920136,
+        254.12196599972958,
+        247.1871750003629
+      ],
+      "mean_ms": 250.8649626664313,
+      "p50_ms": 251.28574699920136,
+      "p95_ms": 253.83834409967676,
+      "verified_runs": 3
+    }
+  ]
+}

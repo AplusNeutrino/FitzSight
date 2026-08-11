@@ -1,0 +1,281 @@
+{
+  "product": "FitzSight",
+  "artifact": "offline_verified_demo",
+  "scenario_count": 5,
+  "verified_runs": 5,
+  "evidence_records": 67,
+  "backend": "sqlite",
+  "runs": [
+    {
+      "label": "CRM / FTD anomaly",
+      "question": "Why did European FTD conversion deteriorate after July 15?",
+      "intent": "crm_routing_ftd_investigation",
+      "status": "verified",
+      "backend": "sqlite",
+      "verified_claims": 6,
+      "total_claims": 6,
+      "kpis": [
+        {
+          "label": "FTD change",
+          "value": "-7.53 pp"
+        },
+        {
+          "label": "Europe control",
+          "value": "-1.21 pp"
+        },
+        {
+          "label": "Response median",
+          "value": "+29.15 min"
+        },
+        {
+          "label": "Anomaly days",
+          "value": "8"
+        },
+        {
+          "label": "Verified claims",
+          "value": "6/6"
+        }
+      ],
+      "findings": [
+        "Affected Europe Team A+B FTD conversion changed by -7.53 percentage points after 2026-07-15.",
+        "Median response time in the affected cohort changed by 29.15 minutes.",
+        "The European control cohort conversion changed by -1.21 percentage points over the same split.",
+        "A CRM routing change is present in the nearby business-event log and is a supported root-cause candidate, not an automatically proven real-world causal conclusion.",
+        "Team A is the largest negative team-level contributor in the symmetric Europe FTD-rate decomposition (-1.87 pp contribution).",
+        "8 of 27 post-change daily response-time medians exceed the robust pre-change high-anomaly threshold."
+      ],
+      "guardrail": "The evidence supports the CRM routing change as the primary root-cause candidate in this synthetic benchmark; a real deployment should not convert temporal association into a causal claim without additional design/validation.",
+      "evidence_ids": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013"
+      ]
+    },
+    {
+      "label": "Net-deposit anomaly",
+      "question": "Why did European net deposits fall in the week starting August 3?",
+      "intent": "net_deposit_anomaly_investigation",
+      "status": "verified",
+      "backend": "sqlite",
+      "verified_claims": 5,
+      "total_claims": 5,
+      "kpis": [
+        {
+          "label": "Net-deposit change",
+          "value": "-$187,791"
+        },
+        {
+          "label": "Deposit change",
+          "value": "$59,158"
+        },
+        {
+          "label": "Withdrawal change",
+          "value": "$246,949"
+        },
+        {
+          "label": "Top-11 withdrawal share",
+          "value": "91.6%"
+        },
+        {
+          "label": "Verified claims",
+          "value": "5/5"
+        }
+      ],
+      "findings": [
+        "European net deposits changed by $-187,790.90 week over week (2026-07-27–2026-08-02 versus 2026-08-03–2026-08-09).",
+        "Deposits changed by $59,158.18, while withdrawals changed by $246,949.08; the decomposition exactly reconstructs the net-deposit movement.",
+        "The largest 11 European customer withdrawals account for 91.6% of current-week European withdrawals.",
+        "Europe's weekly net-deposit movement per registered customer was $-27.74, versus a median of $9.43 across the other regions.",
+        "A high-value withdrawal-cluster event is present in the nearby operational event log. Together with the measured withdrawal concentration, this is a supported observed driver, not evidence of why individual customers withdrew."
+      ],
+      "guardrail": "The evidence supports concentrated high-value withdrawals as an observed driver of the synthetic net-deposit deterioration. It does not establish why those customers withdrew or justify an investment, compliance, or customer-risk conclusion without additional evidence.",
+      "evidence_ids": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013",
+        "E0014",
+        "E0015",
+        "E0016",
+        "E0017",
+        "E0018",
+        "E0019",
+        "E0020"
+      ]
+    },
+    {
+      "label": "Customer Intelligence",
+      "question": "How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?",
+      "intent": "customer_intelligence_segmentation",
+      "status": "verified",
+      "backend": "sqlite",
+      "verified_claims": 5,
+      "total_claims": 5,
+      "kpis": [
+        {
+          "label": "Customers segmented",
+          "value": "6,770"
+        },
+        {
+          "label": "Coverage",
+          "value": "100%"
+        },
+        {
+          "label": "Value groups",
+          "value": "4"
+        },
+        {
+          "label": "Top deposit segment",
+          "value": "High Value"
+        },
+        {
+          "label": "Top segment deposit share",
+          "value": "53.7%"
+        }
+      ],
+      "findings": [
+        "FitzSight segmented 6,770 European customers into 4 transparent behavioral-value groups with 100% coverage.",
+        "High Value is the largest deposit-value segment, accounting for 53.7% of completed European deposits in the synthetic dataset.",
+        "High Value customers average $10,622.51 in completed deposits, versus $0.00 for Low Activity customers.",
+        "High Value accounts for the largest segment share of completed withdrawals (63.7%); this is descriptive withdrawal pressure, not evidence of customer motive or suspicious behavior.",
+        "The segmentation is a descriptive operational analytics layer and must not be used as an automated credit, AML, suitability, eligibility or adverse-action decision."
+      ],
+      "guardrail": "Behavioral segments are descriptive analytical groupings only. They are not credit, AML, suitability, eligibility, or adverse-action decisions.",
+      "evidence_ids": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009"
+      ]
+    },
+    {
+      "label": "Marketing lead quality",
+      "question": "Why did Americas lead volume rise while FTD conversion fell after June 15?",
+      "intent": "marketing_lead_quality_investigation",
+      "status": "verified",
+      "backend": "sqlite",
+      "verified_claims": 4,
+      "total_claims": 4,
+      "kpis": [
+        {
+          "label": "Lead volume",
+          "value": "+315.0%"
+        },
+        {
+          "label": "FTD conversion",
+          "value": "-10.84 pp"
+        },
+        {
+          "label": "Paid Search mix",
+          "value": "+60.52 pp"
+        },
+        {
+          "label": "Paid Search p",
+          "value": "4.43e-05"
+        },
+        {
+          "label": "Verified claims",
+          "value": "4/4"
+        }
+      ],
+      "findings": [
+        "Americas lead volume increased by 838 leads (+315.0%) in the equal post-campaign window.",
+        "Americas FTD conversion changed by -10.84 percentage points, with a two-proportion p-value of 2.466e-06.",
+        "Paid Search share of Americas leads changed by +60.52 percentage points; Paid Search conversion changed by -16.44 percentage points and had the largest negative within-channel performance effect.",
+        "A paid-media expansion appears in the nearby synthetic operations log and aligns with the measured volume/mix shift; it is treated as a supported candidate context, not a universal causal rule."
+      ],
+      "guardrail": "The synthetic evidence supports a Paid Search acquisition-quality shift as the primary observed driver: lead volume and Paid Search mix rose while conversion deteriorated and Paid Search had the largest negative within-channel performance effect. This benchmark does not justify claims about customer motives or prove that paid media is intrinsically low quality.",
+      "evidence_ids": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012"
+      ]
+    },
+    {
+      "label": "False-correlation guardrail",
+      "question": "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?",
+      "intent": "false_correlation_guardrail_investigation",
+      "status": "verified",
+      "backend": "sqlite",
+      "verified_claims": 4,
+      "total_claims": 4,
+      "kpis": [
+        {
+          "label": "Asia conversion",
+          "value": "-8.13 pp"
+        },
+        {
+          "label": "Affiliate conversion",
+          "value": "-15.81 pp"
+        },
+        {
+          "label": "Affiliate p",
+          "value": "0.00463"
+        },
+        {
+          "label": "Nearby event causal?",
+          "value": "No"
+        },
+        {
+          "label": "Verified claims",
+          "value": "4/4"
+        }
+      ],
+      "findings": [
+        "Asia FTD conversion changed by -8.13 percentage points across the July 20 split.",
+        "Affiliate has the largest negative within-channel performance effect; its conversion rate changed by -15.81 percentage points.",
+        "The Affiliate-specific conversion shift has p=0.004634 under the two-proportion test.",
+        "An office-relocation event appears nearby in time, but its declared scope/effect does not support a lead-conversion explanation; FitzSight therefore rejects that event as the cause in this benchmark."
+      ],
+      "guardrail": "Temporal proximity is not treated as causality. The synthetic data support an Affiliate-specific conversion deterioration as the observed driver, while the nearby office-relocation event is explicitly not supported as the cause. FitzSight does not infer why Affiliate quality changed without additional evidence.",
+      "evidence_ids": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013"
+      ]
+    }
+  ]
+}

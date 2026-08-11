@@ -11,166 +11,66 @@ import pandas as pd
 import streamlit as st
 
 from fitzsight.agent.planner import ConstrainedRulePlanner
+from fitzsight.demo import DEMO_QUESTIONS
 from fitzsight.providers.openai_planner import OpenAIResponsesPlanner
 from fitzsight.runtime import build_agent_runtime
+from fitzsight.ui.presenter import PresentationView, build_presentation
 
 
-CRM_QUESTION = "Why did European FTD conversion deteriorate after July 15?"
-NET_QUESTION = "Why did European net deposits fall in the week starting August 3?"
-SEGMENT_QUESTION = (
-    "How are European customer segments distributed by behavioral value, "
-    "and which segment contributes most to deposits?"
-)
-MARKETING_QUESTION = "Why did Americas lead volume rise while FTD conversion fell after June 15?"
-FALSE_CORRELATION_QUESTION = (
-    "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?"
-)
-
-
-def money(value: float) -> str:
-    sign = "-" if value < 0 else ""
-    return f"{sign}${abs(value):,.0f}"
-
-
-def render_business_kpis(intent: str, metrics: dict, backend: str, verification: dict) -> None:
+def render_business_kpis(view: PresentationView) -> None:
     st.subheader("Business KPIs")
-    if intent == "crm_routing_ftd_investigation":
-        cols = st.columns(5)
-        cols[0].metric("FTD change", f"{metrics['affected']['conversion_change_pp']:.2f} pp")
-        cols[1].metric("Europe control", f"{metrics['control']['conversion_change_pp']:.2f} pp")
-        cols[2].metric("Response median", f"{metrics['affected_response_median_change_minutes']:+.2f} min")
-        cols[3].metric("Anomaly days", metrics['post_change_response_anomalies']['anomaly_count'])
-        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
-    elif intent == "net_deposit_anomaly_investigation":
-        driver = metrics["driver_decomposition"]
-        concentration = metrics["customer_concentration"]
-        cols = st.columns(5)
-        cols[0].metric("Net-deposit change", money(driver["net_change"]))
-        cols[1].metric("Deposit change", money(driver["deposit_change"]))
-        cols[2].metric("Withdrawal change", money(driver["withdrawal_change"]))
-        cols[3].metric("Top-11 withdrawal share", f"{concentration['share_of_current_withdrawals']:.1%}")
-        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
-    elif intent == "customer_intelligence_segmentation":
-        segmentation = metrics["segmentation"]
-        cols = st.columns(5)
-        cols[0].metric("Customers segmented", f"{segmentation['customer_count']:,}")
-        cols[1].metric("Coverage", f"{segmentation['coverage']:.0%}")
-        cols[2].metric("Value groups", segmentation["segment_count"])
-        cols[3].metric("Top deposit segment", segmentation["top_deposit_segment"])
-        cols[4].metric("Top segment deposit share", f"{segmentation['top_deposit_segment_share']:.1%}")
-    elif intent == "marketing_lead_quality_investigation":
-        cols = st.columns(5)
-        cols[0].metric("Lead volume", f"{metrics['lead_volume_change_pct']:+.1f}%")
-        cols[1].metric("FTD conversion", f"{metrics['conversion_change_pp']:+.2f} pp")
-        cols[2].metric("Paid Search mix", f"{metrics['paid_search_share_change_pp']:+.2f} pp")
-        cols[3].metric("Paid Search p", f"{metrics['paid_search_conversion_test']['p_value']:.3g}")
-        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
-    elif intent == "false_correlation_guardrail_investigation":
-        affiliate = metrics["affiliate_conversion_test"]
-        cols = st.columns(5)
-        cols[0].metric("Asia conversion", f"{metrics['conversion_change_pp']:+.2f} pp")
-        cols[1].metric("Affiliate conversion", f"{affiliate['difference_pp_b_minus_a']:+.2f} pp")
-        cols[2].metric("Affiliate p", f"{affiliate['p_value']:.3g}")
-        cols[3].metric("Nearby event causal?", "No")
-        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
-    st.caption(f"Backend: {backend} · all displayed KPIs come from verified investigation output.")
-
-
-def render_charts(intent: str, metrics: dict) -> None:
-    st.subheader("Verified charts")
-    if intent == "crm_routing_ftd_investigation":
-        rows = metrics["team_contribution_analysis"]["segments"]
-        chart = pd.DataFrame(
-            {
-                "team": [row["segment"] for row in rows],
-                "FTD contribution (pp)": [row["total_contribution_pp"] for row in rows],
-            }
-        ).set_index("team")
-        st.bar_chart(chart)
-        st.caption("Symmetric team-level decomposition of the Europe-wide FTD-rate movement.")
-    elif intent == "net_deposit_anomaly_investigation":
-        periods = metrics["periods"]
-        chart = pd.DataFrame(
-            {
-                "Baseline": [
-                    periods["baseline"]["deposits"],
-                    periods["baseline"]["withdrawals"],
-                    periods["baseline"]["net_deposits"],
-                ],
-                "Current": [
-                    periods["current"]["deposits"],
-                    periods["current"]["withdrawals"],
-                    periods["current"]["net_deposits"],
-                ],
-            },
-            index=["Deposits", "Withdrawals", "Net deposits"],
-        )
-        st.bar_chart(chart)
-        st.caption("Baseline vs current weekly money-flow totals from the verified result.")
-    elif intent == "customer_intelligence_segmentation":
-        rows = metrics["segmentation"]["profiles"]
-        chart = pd.DataFrame(
-            {
-                "segment": [row["segment"] for row in rows],
-                "Deposit share": [row["deposit_share"] for row in rows],
-                "Withdrawal share": [row["withdrawal_share"] for row in rows],
-            }
-        ).set_index("segment")
-        st.bar_chart(chart)
-        st.caption("Descriptive segment shares only; not a credit, AML or eligibility score.")
-    elif intent == "marketing_lead_quality_investigation":
-        rows = metrics["channel_contribution_analysis"]["segments"]
-        chart = pd.DataFrame(
-            {
-                "channel": [row["segment"] for row in rows],
-                "Within-channel performance effect (pp)": [row["performance_effect_pp"] for row in rows],
-            }
-        ).set_index("channel")
-        st.bar_chart(chart)
-        st.caption("Paid Search shows the largest negative within-channel performance effect in the synthetic campaign benchmark.")
-    elif intent == "false_correlation_guardrail_investigation":
-        rows = metrics["channel_contribution_analysis"]["segments"]
-        chart = pd.DataFrame(
-            {
-                "channel": [row["segment"] for row in rows],
-                "Conversion-rate change (pp)": [row["rate_change_pp"] for row in rows],
-            }
-        ).set_index("channel")
-        st.bar_chart(chart)
-        st.caption("The nearby office event is displayed as context only; the verified channel pattern drives the analytical conclusion.")
-
-
-def render_trace(plan: dict, verification: dict) -> None:
-    st.subheader("Investigation trace")
-    rows = []
-    for step in plan["steps"]:
-        rows.append(
-            {
-                "Step": step["step_id"],
-                "Action": step["action"],
-                "Purpose": step["purpose"],
-                "Policy": "approved",
-            }
-        )
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    cols = st.columns(len(view.kpis))
+    for column, card in zip(cols, view.kpis, strict=True):
+        column.metric(card.label, card.value)
     st.caption(
-        f"Verifier result: {'PASS' if verification['passed'] else 'FAIL'} · "
-        f"{verification['verified_claims']}/{verification['total_claims']} claims verified."
+        f"Backend: {view.backend} · all displayed KPIs come from verified investigation output."
     )
 
 
-def render_evidence_cards(records: list[dict]) -> None:
+def render_chart(view: PresentationView) -> None:
+    st.subheader("Verified chart")
+    chart = view.chart
+    frame = pd.DataFrame(
+        {series.label: list(series.values) for series in chart.series},
+        index=list(chart.categories),
+    )
+    st.markdown(f"**{chart.title}**")
+    st.bar_chart(frame)
+    st.caption(chart.caption)
+
+
+def render_trace(view: PresentationView) -> None:
+    st.subheader("Investigation trace")
+    frame = pd.DataFrame(
+        [
+            {
+                "Step": row.step,
+                "Action": row.action,
+                "Purpose": row.purpose,
+                "Policy": row.policy,
+            }
+            for row in view.trace
+        ]
+    )
+    st.dataframe(frame, use_container_width=True, hide_index=True)
+    st.caption(
+        f"Verifier result: {'PASS' if view.verification_passed else 'FAIL'} · "
+        f"{view.verified_claims}/{view.total_claims} claims verified."
+    )
+
+
+def render_evidence_cards(view: PresentationView) -> None:
     st.subheader("Evidence cards")
-    st.caption(f"{len(records)} append-only audit records")
-    for record in records:
-        label = f"{record['evidence_id']} · {record['tool_name']} · {record['status']}"
+    st.caption(f"{len(view.evidence_cards)} append-only audit records")
+    for record in view.evidence_cards:
+        label = f"{record.evidence_id} · {record.tool_name} · {record.status}"
         with st.expander(label, expanded=False):
-            st.caption(f"Digest: {record['result_digest']}")
-            if record.get("parameters"):
+            st.caption(f"Digest: {record.result_digest}")
+            if record.parameters:
                 st.markdown("**Parameters**")
-                st.json(record["parameters"])
+                st.json(record.parameters)
             st.markdown("**Result**")
-            st.json(record.get("result"))
+            st.json(record.result)
 
 
 st.set_page_config(page_title="FitzSight", page_icon="FS", layout="wide")
@@ -195,15 +95,16 @@ with st.sidebar:
         "claims remain inside deterministic tools."
     )
 
-preset = st.radio(
-    "Demo question",
-    [CRM_QUESTION, NET_QUESTION, SEGMENT_QUESTION, MARKETING_QUESTION, FALSE_CORRELATION_QUESTION, "Custom"],
+labels = list(DEMO_QUESTIONS)
+preset_label = st.radio(
+    "Demo workflow",
+    labels + ["Custom"],
     horizontal=False,
 )
 question = (
     st.text_area("Question", height=90)
-    if preset == "Custom"
-    else st.text_area("Question", value=preset, height=90)
+    if preset_label == "Custom"
+    else st.text_area("Question", value=DEMO_QUESTIONS[preset_label], height=90)
 )
 
 run = st.button("Investigate", type="primary")
@@ -223,38 +124,33 @@ if run:
         try:
             with st.spinner("Running constrained investigation..."):
                 result = agent.run(question).to_dict()
-            runtime_backend = store.backend
+            view = build_presentation(result, backend=store.backend)
         finally:
             store.close()
     except Exception as exc:
         st.error(f"{type(exc).__name__}: {exc}")
         st.stop()
 
-    final = result["final_answer"]
-    verification = result["verification"]
-    investigation = result["investigation"]
-    intent = result["plan"]["intent"]
-
-    if final["status"] == "verified":
-        st.success(final["headline"])
+    if view.status == "verified":
+        st.success(view.headline)
     else:
-        st.error(final["headline"])
+        st.error(view.headline)
 
-    render_business_kpis(intent, investigation["metrics"], runtime_backend, verification)
-    render_charts(intent, investigation["metrics"])
+    render_business_kpis(view)
+    render_chart(view)
 
     st.subheader("Verified findings")
-    for finding in final["findings"]:
+    for finding in view.findings:
         st.markdown(f"- {finding}")
 
-    if final["guardrail"]:
-        st.info(final["guardrail"])
+    if view.guardrail:
+        st.info(view.guardrail)
 
-    render_trace(result["plan"], verification)
-    render_evidence_cards(result["audit_evidence"])
+    render_trace(view)
+    render_evidence_cards(view)
 
     with st.expander("Raw verified metrics", expanded=False):
-        st.json(investigation["metrics"])
+        st.json(result["investigation"]["metrics"])
 
     st.caption(
         "Decision support only. FitzSight does not provide investment advice, "

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -18,11 +19,28 @@ REQUIRED_FILES = (
     "evaluation/adversarial_cases.json",
     "docs/COMPLIANCE_AND_SAFETY.md",
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
+    "docs/V0.9_BENCHMARK_RESULTS.json",
+    "docs/V0.9_ADVERSARIAL_RESULTS.json",
+    "docs/V0.9_DETERMINISTIC_LATENCY.json",
+    "docs/V0.9_RUNTIME_STATUS.json",
+    "docs/V0.9_VALIDATION.md",
+    "RELEASE_NOTES_v0.9.md",
     "submission/FitzSight_GOAI_Initial_Round.pptx",
     "submission/FitzSight_GOAI_Initial_Round.pdf",
+    "submission/FitzSight_Offline_Demo.html",
+    "submission/FitzSight_Offline_Demo.json",
+    "submission/FitzSight_Offline_Demo_Backup.mp4",
+    "submission/FitzSight_GOAI_Upload_Bundle.zip",
+    "submission/PORTAL_COPY.md",
     "submission/DEMO_RUNBOOK.md",
+    "submission/DEMO_VIDEO_SCRIPT.md",
+    "submission/PITCH_REHEARSAL.md",
     "submission/SUBMISSION_CHECKLIST.md",
     "submission/JUDGE_QA.md",
+    "submission/README.md",
+    "scripts/runtime_doctor.py",
+    "scripts/validate_streamlit_runtime.py",
+    "scripts/validate_openai_runtime.py",
 )
 
 SECRET_PATTERNS = (
@@ -57,8 +75,21 @@ def scan_secrets() -> list[str]:
                     value = token.split("=", 1)[1].strip().strip('"\'') if "=" in token else ""
                     if value in {"", "...", "<model>", "<key>", "<api-key>"}:
                         continue
+                # Documentation/tests may intentionally include obvious test-only fake keys.
+                if "test-secret" in token or "must-not-appear" in token:
+                    continue
                 hits.append(f"{path.relative_to(ROOT)}: {token[:40]}")
     return hits
+
+
+def _zip_ok(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        with zipfile.ZipFile(path) as archive:
+            return archive.testzip() is None
+    except zipfile.BadZipFile:
+        return False
 
 
 def run_preflight() -> dict[str, object]:
@@ -69,23 +100,55 @@ def run_preflight() -> dict[str, object]:
     )
     secrets = scan_secrets()
 
-    pptx = ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx"
-    pdf = ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pdf"
+    asset_paths = (
+        ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx",
+        ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pdf",
+        ROOT / "submission" / "FitzSight_Offline_Demo.html",
+        ROOT / "submission" / "FitzSight_Offline_Demo_Backup.mp4",
+        ROOT / "submission" / "FitzSight_GOAI_Upload_Bundle.zip",
+    )
     assets = {}
-    for path in (pptx, pdf):
+    for path in asset_paths:
         if path.exists():
             assets[path.name] = {
                 "bytes": path.stat().st_size,
                 "sha256": sha256(path),
             }
 
-    passed = not missing and not generated_csv and not secrets and len(assets) == 2
+    offline_demo_ok = False
+    offline_json = ROOT / "submission" / "FitzSight_Offline_Demo.json"
+    if offline_json.exists():
+        try:
+            payload = json.loads(offline_json.read_text(encoding="utf-8"))
+            offline_demo_ok = payload.get("scenario_count") == 5 and payload.get("verified_runs") == 5
+        except (json.JSONDecodeError, OSError):
+            offline_demo_ok = False
+
+    upload_zip = ROOT / "submission" / "FitzSight_GOAI_Upload_Bundle.zip"
+    upload_zip_ok = _zip_ok(upload_zip)
+    passed = (
+        not missing
+        and not generated_csv
+        and not secrets
+        and len(assets) == len(asset_paths)
+        and offline_demo_ok
+        and upload_zip_ok
+    )
     return {
         "passed": passed,
         "missing_required_files": missing,
         "generated_csv_files": generated_csv,
         "secret_hits": secrets,
         "submission_assets": assets,
+        "offline_demo_verified_5_of_5": offline_demo_ok,
+        "upload_bundle_zip_integrity": upload_zip_ok,
+        "external_actions_still_required": [
+            "Confirm portal-specific field/file-size constraints in the actual GOAI upload UI",
+            "Upload the required project introduction and PPT/PDF",
+            "Capture portal/email confirmation evidence",
+            "Run Streamlit live validation on a machine with the UI dependency installed",
+            "Run OpenAI live planner validation only if stable credentials/model access are available",
+        ],
     }
 
 

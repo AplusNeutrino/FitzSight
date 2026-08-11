@@ -1,0 +1,12 @@
+{
+  "product": "FitzSight",
+  "runtime": "openai_responses_planner",
+  "question": "Why did European FTD conversion deteriorate after July 15?",
+  "backend_requested": "auto",
+  "model_configured": false,
+  "api_key_present": false,
+  "api_key_disclosed": false,
+  "passed": false,
+  "status": "not_run_missing_configuration",
+  "message": "Set FITZSIGHT_MODEL (or --model) and OPENAI_API_KEY before live validation."
+}

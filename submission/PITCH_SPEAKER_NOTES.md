@@ -1,5 +1,7 @@
 # FitzSight — 12-Slide Speaker Notes
 
+> Numeric claims in Slides 4-8 are generated from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`.
+
 ## Slide 1 — FitzSight
 
 “FitzSight is an evidence-grounded financial operations Agent. It turns a business question into a bounded, reproducible investigation: question, data, analysis, evidence, decision.”
@@ -14,23 +16,23 @@
 
 ## Slide 4 — CRM / FTD
 
-“The affected European teams dropped 7.53 percentage points versus 1.21 in the control cohort, while median response time rose 29.15 minutes. The result is a supported root-cause candidate, not a causal proof.”
+“The affected European teams changed by -7.53 pp versus -1.21 pp in the control cohort, while median response time changed by +29.15 minutes. The result is a supported root-cause candidate, not a causal proof.”
 
 ## Slide 5 — Net deposits
 
-“Net deposits fell by about 224 thousand dollars even though deposits increased. The driver is concentrated withdrawal pressure: eleven customers account for 92.2% of current withdrawals. FitzSight reports that observation without inventing customer motives.”
+“European net deposits changed by -$187.8k week over week. Deposits changed by +$59.2k, while withdrawals increased by +$246.9k. The largest 11 withdrawals account for 91.6% of current withdrawals. FitzSight reports that concentration without inventing customer motives.”
 
 ## Slide 6 — Customer Intelligence
 
-“Customer segmentation is transparent and descriptive. It uses observable behavior, not hidden benchmark labels. High Value customers are 4.1% of the population but 55.8% of deposits in the synthetic benchmark.”
+“Customer segmentation is transparent and descriptive. It uses observable behavior, not hidden benchmark labels. High Value customers are 3.7% of European customers but contribute 53.7% of deposits in the current synthetic benchmark.”
 
 ## Slide 7 — Acquisition quality
 
-“Lead volume increased 315%, but FTD conversion fell. FitzSight separates volume, channel mix and within-channel performance; Paid Search is the measurable quality failure.”
+“Lead volume increased 315%, while FTD conversion changed by -10.84 pp. FitzSight separates volume, channel mix and within-channel performance; Paid Search conversion changed by -16.44 pp with p=4.43e-05.”
 
 ## Slide 8 — False correlation
 
-“This is a deliberate trap. An office relocation occurs near an Asia conversion decline. But the measurable deterioration is concentrated in Affiliate leads, so FitzSight rejects the office event as a supported cause.”
+“This is a deliberate trap. An office relocation occurs near an Asia conversion decline of -8.13 pp. Affiliate conversion changes by -15.81 pp; the falsification check therefore rejects the nearby office event as a supported cause.”
 
 ## Slide 9 — Technical difference
 
@@ -38,7 +40,7 @@
 
 ## Slide 10 — Evaluation
 
-“The initial benchmark target is five scenarios, all passing in the deterministic synthetic benchmark. The adversarial release gate adds eight failure/safety cases and all eight pass in the current suite.”
+“The benchmark contains 5 deterministic scenarios and 5 pass. Mean evidence coverage is 100%, with 0 verifier violations. The adversarial release gate contains 8 cases and 8 pass.”
 
 ## Slide 11 — Safety and open source
 

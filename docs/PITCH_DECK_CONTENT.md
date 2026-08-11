@@ -1,9 +1,11 @@
 # FitzSight — Initial-Round Pitch Deck Content Draft
 
-This document remains the editable content source for the formal presentation. As of v0.8, the generated and reviewed assets are:
+This document remains the editable content source for the formal presentation. As of v0.9, the generated and reviewed assets are:
 
 - `submission/FitzSight_GOAI_Initial_Round.pptx`
 - `submission/FitzSight_GOAI_Initial_Round.pdf`
+
+Slides 4-8 are generated from fresh verified deterministic Agent runs by `scripts/build_pitch_deck.py`; the values below document the current fixed-seed output rather than independent hardcoded claims.
 
 ## Slide 1 — FitzSight
 
@@ -58,10 +60,10 @@ Question: “Why did European net deposits fall in the week starting August 3?�
 
 Show:
 
-- net deposits **-$223.9k** WoW;
-- deposits **+$24.4k**;
-- withdrawals **+$248.3k**;
-- top 11 = **92.2%** of current withdrawals;
+- net deposits **-$187.8k** WoW;
+- deposits **+$59.2k**;
+- withdrawals **+$246.9k**;
+- top 11 = **91.6%** of current withdrawals;
 - observed withdrawal concentration rather than invented customer motives.
 
 ## Slide 6 — Demo: Customer Intelligence
@@ -72,7 +74,7 @@ Show:
 
 - **6,770** customers, 100% coverage;
 - transparent scoring policy;
-- High Value = **4.1%** customers / **55.8%** deposits;
+- High Value = **3.7%** customers / **53.7%** deposits;
 - descriptive use only: no AML/credit/adverse-action inference.
 
 ## Slide 7 — Demo: Volume ≠ quality

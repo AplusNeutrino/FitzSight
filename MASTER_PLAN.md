@@ -3465,3 +3465,24 @@ The formal initial-round PPTX/PDF summarizes the existing synthetic benchmark an
 ## D-028 — Submission preflight is a release gate, not a portal-submission claim
 
 The local preflight verifies required repository/submission assets, obvious secret leakage, generated-data exclusion, and presentation-file hashes. It cannot prove that the GOAI portal was successfully submitted; portal upload and confirmation evidence remain user-controlled external actions.
+
+
+---
+
+# v0.9 Implementation Decisions (2026-08-11)
+
+## D-029 — UI presentation logic is pure and testable
+
+KPI cards, chart specifications, investigation-trace rows and Evidence cards are derived by a pure presentation layer from the already verified Agent result. Streamlit is only a renderer. The UI must not become a second calculation path.
+
+## D-030 — Competition-facing numbers must come from the current verified runtime
+
+The pitch-deck builder generates demo-slide numeric claims from fresh deterministic Agent runs in a temporary synthetic-data directory. Current README/project-summary/pitch materials must be synchronized to the same fixed-seed runtime. Historical release artifacts may retain their historical numbers, but active submission assets may not rely on stale hardcoded benchmark values.
+
+## D-031 — Offline demo artifacts are resilience assets, not live-runtime evidence
+
+The self-contained HTML demo and MP4 backup are generated only from verified deterministic Agent outputs and provide a no-cloud presentation fallback. Their existence does not mark Streamlit or OpenAI live runtime validation as complete.
+
+## D-032 — Provider telemetry records reproducibility metadata, never secrets or invented cost
+
+A live OpenAI planner validation may record response ID, requested/returned model, token usage and measured planning latency. API keys are never emitted. Provider monetary cost is not hardcoded or estimated without a validated pricing source and actual usage evidence.

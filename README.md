@@ -24,9 +24,9 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.8.0
+## Current release: v0.9.0
 
-v0.8 is the **initial-round submission sprint**. The five-intent Agent, five-scenario benchmark, and adversarial release gate remain the analytical core; this release adds the formal PPT/PDF, one-command demo launcher, submission preflight, demo runbook, and submission checklist.
+v0.9 is the **runtime + submission completion layer**. It keeps the five-intent analytical core unchanged while making the judge-facing path harder to break: UI presentation logic is now pure/testable, competition-facing deck metrics are generated from fresh verified Agent runs, an offline HTML + MP4 backup is generated from verified outputs, runtime diagnostics/live-validation commands are explicit, and provider telemetry records model/token/latency metadata without exposing secrets.
 
 ## Supported workflows
 
@@ -54,10 +54,10 @@ Why did European net deposits fall in the week starting August 3?
 Fixed-seed benchmark:
 
 ```text
-net-deposit change:      -$223,901.70
-deposit change:          +$24,365.52
-withdrawal change:       +$248,267.22
-top-11 withdrawal share:  92.2%
+net-deposit change:      -$187,790.90
+deposit change:          +$59,158.18
+withdrawal change:       +$246,949.08
+top-11 withdrawal share:  91.6%
 verification:             PASS
 ```
 
@@ -76,8 +76,8 @@ Fixed-seed benchmark:
 European customers:          6,770
 coverage:                     100%
 value groups:                 4
-High Value customer share:    4.1%
-High Value deposit share:     55.8%
+High Value customer share:    3.7%
+High Value deposit share:     53.7%
 verification:                 5 / 5 PASS
 ```
 
@@ -234,6 +234,10 @@ Evaluation artifacts:
 - `docs/V0.7_VALIDATION.md`
 - `docs/V0.8_VALIDATION.md`
 - `docs/V0.8_SUBMISSION_PREFLIGHT.json`
+- `docs/V0.9_BENCHMARK_RESULTS.json`
+- `docs/V0.9_ADVERSARIAL_RESULTS.json`
+- `docs/V0.9_DETERMINISTIC_LATENCY.json`
+- `docs/V0.9_RUNTIME_STATUS.json`
 
 ### Adversarial release gate
 
@@ -406,11 +410,21 @@ FitzSight/
 │   ├── run_benchmark.py
 │   ├── run_adversarial_evaluation.py
 │   ├── start_demo.py
+│   ├── runtime_doctor.py
+│   ├── validate_streamlit_runtime.py
+│   ├── validate_openai_runtime.py
+│   ├── build_offline_demo.py
+│   ├── build_offline_demo_video.py
+│   ├── measure_latency.py
+│   ├── build_submission_bundle.py
 │   ├── preflight_submission.py
 │   └── build_pitch_deck.py
 ├── submission/
 │   ├── FitzSight_GOAI_Initial_Round.pptx
 │   ├── FitzSight_GOAI_Initial_Round.pdf
+│   ├── FitzSight_Offline_Demo.html
+│   ├── FitzSight_Offline_Demo_Backup.mp4
+│   ├── FitzSight_GOAI_Upload_Bundle.zip
 │   └── ...
 ├── src/fitzsight/
 │   ├── agent/
@@ -423,7 +437,7 @@ FitzSight/
 └── docs/
 ```
 
-Key v0.7 files:
+Key competition/evaluation files:
 
 - `src/fitzsight/investigation/lead_quality.py`
 - `evaluation/adversarial_cases.json`
@@ -434,24 +448,29 @@ Key v0.7 files:
 - `docs/V0.7_VALIDATION.md`
 - `docs/V0.8_VALIDATION.md`
 - `docs/V0.8_SUBMISSION_PREFLIGHT.json`
+- `docs/V0.9_BENCHMARK_RESULTS.json`
+- `docs/V0.9_ADVERSARIAL_RESULTS.json`
+- `docs/V0.9_DETERMINISTIC_LATENCY.json`
+- `docs/V0.9_RUNTIME_STATUS.json`
 
 ---
 
 ## Validation snapshot
 
-Build sandbox:
+Current v0.9 release-gate state:
 
 ```text
-59 tests collected
-58 passed, 1 skipped
-compileall PASS
-5 / 5 benchmark scenarios PASS
+5 / 5 deterministic benchmark scenarios PASS
 8 / 8 adversarial cases PASS
-submission preflight PASS
-12-slide PPTX/PDF generated and visually reviewed
+mean evidence coverage 100%
+verifier violations 0
+
+offline deterministic demo: 5 / 5 verified workflows
+offline MP4 backup: generated from verified outputs
+submission PPTX/PDF: generated from fresh verified Agent metrics
 ```
 
-The one build skip is the DuckDB-specific test because the sandbox lacks DuckDB; separate deployment evidence has already validated DuckDB.
+Build-environment Streamlit/OpenAI live checks remain explicitly separate from implementation tests. DuckDB was previously validated in the deployment environment; the build sandbox may still skip its integration test when the dependency is absent.
 
 ---
 

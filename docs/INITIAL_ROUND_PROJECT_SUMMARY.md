@@ -74,10 +74,10 @@ Why did European net deposits fall in the week starting August 3?
 
 Synthetic benchmark:
 
-- net-deposit change: **-$223,901.70**
-- deposit change: **+$24,365.52**
-- withdrawal change: **+$248,267.22**
-- top-11 withdrawal share: **92.2%**
+- net-deposit change: **-$187,790.90**
+- deposit change: **+$59,158.18**
+- withdrawal change: **+$246,949.08**
+- top-11 withdrawal share: **91.6%**
 - verification: **PASS**
 
 ### 3. Customer Intelligence / segmentation
@@ -91,8 +91,8 @@ Synthetic benchmark:
 
 - customers segmented: **6,770**
 - coverage: **100%**
-- High Value customer share: **4.1%**
-- High Value deposit share: **55.8%**
+- High Value customer share: **3.7%**
+- High Value deposit share: **53.7%**
 - verification: **5/5 PASS**
 
 ### 4. Marketing lead-quality investigation

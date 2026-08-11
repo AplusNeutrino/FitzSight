@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from typing import Any
 
 from fitzsight.agent.catalog import INTENT_ACTIONS, actions_for_intent, classify_supported_intent
@@ -40,6 +41,7 @@ class OpenAIResponsesPlanner:
                 "No model configured. Set FITZSIGHT_MODEL or pass model=..."
             )
         self._client = client
+        self.last_telemetry: dict[str, Any] | None = None
 
     def _client_or_create(self):
         if self._client is not None:
@@ -100,6 +102,7 @@ class OpenAIResponsesPlanner:
                 "Question is outside the approved FitzSight v0.7 intent catalog."
             ) from exc
         client = self._client_or_create()
+        started = time.perf_counter()
         response = client.responses.create(
             model=self.model,
             instructions=self._instructions(intent),
@@ -115,6 +118,24 @@ class OpenAIResponsesPlanner:
             },
             store=False,
         )
+        elapsed = time.perf_counter() - started
+        usage = getattr(response, "usage", None)
+        def usage_value(name: str) -> int | None:
+            value = getattr(usage, name, None) if usage is not None else None
+            return int(value) if isinstance(value, (int, float)) else None
+        self.last_telemetry = {
+            "provider": "openai",
+            "api": "responses",
+            "response_id": getattr(response, "id", None),
+            "requested_model": self.model,
+            "response_model": getattr(response, "model", None),
+            "planning_seconds": elapsed,
+            "input_tokens": usage_value("input_tokens"),
+            "output_tokens": usage_value("output_tokens"),
+            "total_tokens": usage_value("total_tokens"),
+            "store": False,
+            "intent": intent,
+        }
         raw = getattr(response, "output_text", None)
         if not isinstance(raw, str) or not raw.strip():
             raise OpenAIPlannerConfigurationError(

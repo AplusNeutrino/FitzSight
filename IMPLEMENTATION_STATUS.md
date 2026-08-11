@@ -1,10 +1,12 @@
 # FitzSight Implementation Status
 
-**Version:** v0.8.0  
+**Version:** v0.9.0  
 **Date:** 2026-08-11  
-**Phase:** Initial-round submission sprint — five-intent Agent complete, presentation/demo assets generated
+**Phase:** Runtime + submission completion layer; five-intent analytical core frozen for the initial round
 
-## Supported Agent intents
+## Analytical core
+
+Supported Agent intents remain:
 
 1. `crm_routing_ftd_investigation`
 2. `net_deposit_anomaly_investigation`
@@ -12,77 +14,92 @@
 4. `marketing_lead_quality_investigation`
 5. `false_correlation_guardrail_investigation`
 
-Every intent retains the same trust boundary:
+The trust boundary is unchanged:
 
 ```text
 Question
 → local approved-intent gate
-→ constrained plan
+→ constrained planner
 → deterministic SQL/Python tools
 → Evidence Registry
 → EvidenceClaimVerifier
 → verified / withheld answer
 ```
 
-## v0.8 completed in this delivery
+## v0.9 completed
 
-- [x] v0.7 five-intent Agent, five-scenario benchmark, and adversarial release gate retained;
-- [x] one-command competition launcher `scripts/start_demo.py`;
-- [x] automatic deterministic CLI fallback when Streamlit is unavailable;
-- [x] explicit UI / CLI launcher modes and dry-run support;
-- [x] submission preflight checker `scripts/preflight_submission.py`;
-- [x] formal 12-slide initial-round PPTX;
-- [x] PDF exported from the same deck through LibreOffice;
-- [x] rendered PDF visually reviewed for clipping / overlap;
-- [x] demo runbook;
-- [x] pitch speaker notes;
-- [x] initial-round submission checklist;
-- [x] reproducible pitch-deck build script;
-- [x] release and submission documentation;
-- [x] new launcher / preflight tests.
+- [x] pure presentation layer under `src/fitzsight/ui/` for KPI cards, charts, trace rows and Evidence cards;
+- [x] Streamlit renderer consumes verified presentation data instead of owning business calculations;
+- [x] five-workflow offline HTML demo generated from actual verified Agent runs;
+- [x] deterministic 1280x720 H.264 MP4 backup video generated from verified offline-demo data;
+- [x] runtime doctor for Python/dependency/data/presentation readiness without secret disclosure;
+- [x] explicit Streamlit health-check validation command;
+- [x] explicit OpenAI live-planner validation command;
+- [x] OpenAI Responses planner telemetry for response/model/token/latency metadata with `store=False`;
+- [x] deterministic end-to-end latency measurement across five workflows;
+- [x] initial-round portal-copy and timed rehearsal assets;
+- [x] convenience upload bundle with manifest/checksums;
+- [x] submission preflight expanded for offline demo/video/runtime assets;
+- [x] competition-facing deck metrics generated from fresh verified Agent runs rather than stale constants;
+- [x] current README/project-summary/customer/pitch content synchronized to the current fixed-seed benchmark.
 
-## Core benchmark state
+## Current verified synthetic result snapshot
+
+```text
+CRM / FTD
+  affected:          -7.53 pp
+  control:           -1.21 pp
+  response median:  +29.15 min
+
+Net deposits
+  net change:       -$187.8k
+  deposits:          +$59.2k
+  withdrawals:      +$246.9k
+  top-11 share:       91.6%
+
+Customer Intelligence
+  Europe customers:   6,770
+  High Value users:     3.7%
+  High Value deposits:  53.7%
+
+Marketing quality
+  leads:              +315%
+  FTD:              -10.84 pp
+  Paid Search FTD:  -16.44 pp
+
+False correlation
+  Asia FTD:          -8.13 pp
+  Affiliate FTD:    -15.81 pp
+  nearby office event supported as cause: false
+```
+
+## Evaluation state
 
 ```text
 5 / 5 deterministic scenarios PASS
-scenario pass rate:                   100%
 root-cause scenario accuracy:         100%
 false-correlation rejection accuracy: 100%
 mean evidence coverage:               100%
 verifier violations:                  0
+
+8 / 8 adversarial cases PASS
 ```
 
-Adversarial release gate:
+Build-environment deterministic latency measurement (SQLite, 15 verified runs):
 
 ```text
-8 / 8 PASS
-scope refusal accuracy:              100%
-planner policy catch rate:           100%
-verifier evidence-integrity catch:   100%
-causal-overclaim catch rate:         100%
-ground-truth leak catch rate:        100%
-false-correlation rejection rate:    100%
+overall mean: 292.29 ms
+p50:          300.90 ms
+p95:          343.35 ms
 ```
 
-## Submission assets
-
-```text
-submission/
-├── FitzSight_GOAI_Initial_Round.pptx
-├── FitzSight_GOAI_Initial_Round.pdf
-├── README.md
-├── DEMO_RUNBOOK.md
-├── PITCH_SPEAKER_NOTES.md
-└── SUBMISSION_CHECKLIST.md
-```
-
-The slide deck is a competition-facing summary of already implemented synthetic benchmark evidence. It does not introduce a second analytical path.
+This latency snapshot is environment-specific and excludes live model-provider latency/cost.
 
 ## External runtime state
 
 ### Done
 
-- DuckDB runtime with `data/generated`;
+- DuckDB deployment runtime with `data/generated`;
 - constrained planner on DuckDB;
 - JSON-file planner on DuckDB.
 
@@ -91,11 +108,11 @@ The slide deck is a competition-facing summary of already implemented synthetic 
 - OpenAI Responses API with real credentials/model;
 - Streamlit runtime smoke test on the final demo environment.
 
-## Remaining competition work
+## Remaining user-controlled competition work
 
-1. obtain real Streamlit runtime evidence on the final presentation machine;
-2. validate OpenAI Responses live planner only if model/API access is available and stable;
-3. record the demo video and create offline/local backup copies;
-4. re-check final GOAI portal constraints immediately before submission;
-5. submit and retain confirmation evidence;
-6. rehearse the 5–8 minute pitch and <3 minute demo.
+1. run Streamlit live validation on the final presentation machine;
+2. optionally run the OpenAI live planner if stable credentials/model access are available;
+3. upload the final project introduction + PPT/PDF (+ optional video);
+4. capture portal/email confirmation evidence;
+5. copy live/local/video assets to a second location;
+6. perform a timed 5-8 minute pitch and <3 minute demo rehearsal.

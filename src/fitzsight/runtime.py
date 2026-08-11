@@ -27,7 +27,7 @@ def build_agent_runtime(
     planner: Planner,
     generator_config: GeneratorConfig | None = None,
 ):
-    """Build the audited v0.8 runtime and return ``(store, registry, agent)``."""
+    """Build the audited v0.9 runtime and return ``(store, registry, agent)``."""
 
     data_dir = Path(data_dir)
     required = (
