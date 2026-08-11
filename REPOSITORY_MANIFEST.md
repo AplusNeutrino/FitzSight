@@ -1,23 +1,35 @@
-# FitzSight Repository Manifest — v0.7.0
+# FitzSight Repository Manifest — v0.8.0
 
 ## Core project files
 
-- `README.md` — project overview, quick start, five workflows, evaluation, safety
+- `README.md` — project overview, quick start, five workflows, evaluation, submission assets, safety
 - `MASTER_PLAN.md` — long-term product/competition plan and architecture decisions
 - `IMPLEMENTATION_STATUS.md` — current implementation snapshot
 - `LICENSE` — MIT License
-- `THIRD_PARTY_NOTICES.md` — dependency notice
+- `THIRD_PARTY_NOTICES.md` — dependency/build-tool notice
 - `PROJECT_PROGRESS.md` — pointer to external progress truth source
 - `.env.example` — optional provider/runtime environment variables
-- `pyproject.toml` — package/dependency metadata
+- `pyproject.toml` — package/dependency metadata and optional `submission` extra
 
 ## Runtime and UI
 
 - `streamlit_app.py` — five-workflow verified-output demo UI
 - `scripts/agent_investigate.py` — constrained Agent CLI
+- `scripts/start_demo.py` — one-command auto/UI/CLI competition launcher with deterministic fallback
 - `scripts/generate_data.py` — synthetic data generation
 - `scripts/run_benchmark.py` — five-scenario deterministic benchmark
 - `scripts/run_adversarial_evaluation.py` — adversarial safety/evidence release gate
+
+## Submission / competition assets
+
+- `scripts/build_pitch_deck.py` — reproducible 12-slide PPTX builder + optional LibreOffice PDF export
+- `scripts/preflight_submission.py` — local submission/repository preflight
+- `submission/FitzSight_GOAI_Initial_Round.pptx` — editable formal initial-round deck
+- `submission/FitzSight_GOAI_Initial_Round.pdf` — reviewed PDF exported from the same deck
+- `submission/DEMO_RUNBOOK.md` — <3 minute recommended demo path and fallback route
+- `submission/PITCH_SPEAKER_NOTES.md` — 12-slide speaking notes
+- `submission/JUDGE_QA.md` — judge Q&A preparation
+- `submission/SUBMISSION_CHECKLIST.md` — technical/compliance/portal checklist
 
 ## Agent and tools
 
@@ -32,8 +44,9 @@
 
 - `evaluation/benchmark_catalog.json` — five business scenarios
 - `evaluation/adversarial_cases.json` — eight adversarial cases
-- `docs/V0.7_BENCHMARK_RESULTS.json` — raw benchmark result
-- `docs/V0.7_ADVERSARIAL_RESULTS.json` — raw adversarial result
+- `docs/V0.8_BENCHMARK_RESULTS.json` — v0.8 rebuild of benchmark output on SQLite fallback
+- `docs/V0.8_ADVERSARIAL_RESULTS.json` — v0.8 rebuild of adversarial output
+- `docs/V0.8_SUBMISSION_PREFLIGHT.json` — local submission preflight result
 - `docs/EVALUATION_SUMMARY.md` — judge-friendly evaluation summary
 
 ## Competition / documentation
@@ -43,9 +56,9 @@
 - `docs/COMPLIANCE_AND_SAFETY.md`
 - `docs/BENCHMARK_SCENARIOS.md`
 - `docs/ADVERSARIAL_EVALUATION.md`
-- `docs/V0.7_VALIDATION.md`
+- `docs/V0.8_VALIDATION.md`
 - historical release validation/results remain under `docs/V0.x_*`.
 
 ## Tests
 
-`tests/` covers deterministic data generation, SQL safety, statistics, evidence, planner policy, verifier behavior, five Agent intents, OpenAI provider contract, benchmark catalog, and v0.7 adversarial checks.
+`tests/` covers deterministic data generation, SQL safety, statistics, evidence, planner policy, verifier behavior, five Agent intents, OpenAI provider contract, benchmark catalog, adversarial checks, one-command launcher behavior, submission preflight policy, and PPTX/PDF submission assets.

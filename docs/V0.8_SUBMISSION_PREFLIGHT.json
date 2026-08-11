@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "missing_required_files": [],
+  "generated_csv_files": [],
+  "secret_hits": [],
+  "submission_assets": {
+    "FitzSight_GOAI_Initial_Round.pptx": {
+      "bytes": 56666,
+      "sha256": "25e11a245cc09017e7a6f710f605cf13a59c457711e19dc900773fc8118553f1"
+    },
+    "FitzSight_GOAI_Initial_Round.pdf": {
+      "bytes": 786102,
+      "sha256": "41e58215828281891c6138d18a379926f4ad111efb1b599754db656626f43421"
+    }
+  }
+}

@@ -1,0 +1,882 @@
+{
+  "product": "FitzSight",
+  "benchmark_version": "0.7",
+  "scenario_count": 5,
+  "passed": 5,
+  "failed": 0,
+  "metrics": {
+    "scenario_pass_rate": 1.0,
+    "root_cause_scenario_accuracy": 1.0,
+    "false_correlation_rejection_accuracy": 1.0,
+    "mean_evidence_coverage": 1.0,
+    "total_verifier_violations": 0,
+    "mean_latency_ms": 50.00539380016562
+  },
+  "results": [
+    {
+      "id": "crm_routing_ftd_20260715",
+      "intent": "crm_routing_ftd_investigation",
+      "passed": true,
+      "checks": {
+        "verification_passed": true,
+        "root_cause_status": true,
+        "final_answer_verified": true,
+        "evidence_coverage_complete": true,
+        "verifier_has_no_violations": true,
+        "affected_conversion_change_sign": true,
+        "affected_response_change_sign": true
+      },
+      "verification": {
+        "passed": true,
+        "verified_claims": 6,
+        "total_claims": 6,
+        "checks": [
+          {
+            "check_id": "claim_status:C1",
+            "passed": true,
+            "message": "C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C1",
+            "passed": true,
+            "message": "C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C1:E0003",
+            "passed": true,
+            "message": "C1/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:C1:E0005",
+            "passed": true,
+            "message": "C1/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:C1",
+            "passed": true,
+            "message": "C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:C2",
+            "passed": true,
+            "message": "C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C2",
+            "passed": true,
+            "message": "C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C2:E0003",
+            "passed": true,
+            "message": "C2/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:C2:E0006",
+            "passed": true,
+            "message": "C2/E0006: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:C2",
+            "passed": true,
+            "message": "C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:C3",
+            "passed": true,
+            "message": "C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C3",
+            "passed": true,
+            "message": "C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C3:E0004",
+            "passed": true,
+            "message": "C3/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:C3",
+            "passed": true,
+            "message": "C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:C4",
+            "passed": true,
+            "message": "C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C4",
+            "passed": true,
+            "message": "C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C4:E0011",
+            "passed": true,
+            "message": "C4/E0011: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:C4:E0003",
+            "passed": true,
+            "message": "C4/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:C4:E0005",
+            "passed": true,
+            "message": "C4/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:C4:E0006",
+            "passed": true,
+            "message": "C4/E0006: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:C4",
+            "passed": true,
+            "message": "C4: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:C4",
+            "passed": true,
+            "message": "C4: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:C5",
+            "passed": true,
+            "message": "C5: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C5",
+            "passed": true,
+            "message": "C5: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C5:E0009",
+            "passed": true,
+            "message": "C5/E0009: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:C5",
+            "passed": true,
+            "message": "C5: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:C6",
+            "passed": true,
+            "message": "C6: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:C6",
+            "passed": true,
+            "message": "C6: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:C6:E0010",
+            "passed": true,
+            "message": "C6/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:C6",
+            "passed": true,
+            "message": "C6: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ],
+        "violations": [],
+        "evidence_id": "E0012"
+      },
+      "final_answer_status": "verified",
+      "evidence_coverage": 1.0,
+      "verifier_violation_count": 0,
+      "latency_ms": 82.00041100008093,
+      "backend": "sqlite"
+    },
+    {
+      "id": "europe_net_deposit_20260803",
+      "intent": "net_deposit_anomaly_investigation",
+      "passed": true,
+      "checks": {
+        "verification_passed": true,
+        "root_cause_status": true,
+        "final_answer_verified": true,
+        "evidence_coverage_complete": true,
+        "verifier_has_no_violations": true,
+        "net_deposit_change_sign": true,
+        "withdrawal_change_sign": true,
+        "minimum_top_11_withdrawal_share": true
+      },
+      "verification": {
+        "passed": true,
+        "verified_claims": 5,
+        "total_claims": 5,
+        "checks": [
+          {
+            "check_id": "claim_status:N-C1",
+            "passed": true,
+            "message": "N-C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:N-C1",
+            "passed": true,
+            "message": "N-C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:N-C1:E0006",
+            "passed": true,
+            "message": "N-C1/E0006: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C1:E0007",
+            "passed": true,
+            "message": "N-C1/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C1:E0008",
+            "passed": true,
+            "message": "N-C1/E0008: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C1:E0009",
+            "passed": true,
+            "message": "N-C1/E0009: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C1:E0010",
+            "passed": true,
+            "message": "N-C1/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:N-C1",
+            "passed": true,
+            "message": "N-C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:N-C2",
+            "passed": true,
+            "message": "N-C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:N-C2",
+            "passed": true,
+            "message": "N-C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:N-C2:E0010",
+            "passed": true,
+            "message": "N-C2/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:N-C2",
+            "passed": true,
+            "message": "N-C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:N-C3",
+            "passed": true,
+            "message": "N-C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:N-C3",
+            "passed": true,
+            "message": "N-C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:N-C3:E0011",
+            "passed": true,
+            "message": "N-C3/E0011: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C3:E0012",
+            "passed": true,
+            "message": "N-C3/E0012: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:N-C3",
+            "passed": true,
+            "message": "N-C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:N-C4",
+            "passed": true,
+            "message": "N-C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:N-C4",
+            "passed": true,
+            "message": "N-C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:N-C4:E0013",
+            "passed": true,
+            "message": "N-C4/E0013: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C4:E0014",
+            "passed": true,
+            "message": "N-C4/E0014: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C4:E0015",
+            "passed": true,
+            "message": "N-C4/E0015: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C4:E0016",
+            "passed": true,
+            "message": "N-C4/E0016: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C4:E0017",
+            "passed": true,
+            "message": "N-C4/E0017: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:N-C4",
+            "passed": true,
+            "message": "N-C4: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:N-C5",
+            "passed": true,
+            "message": "N-C5: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:N-C5",
+            "passed": true,
+            "message": "N-C5: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:N-C5:E0018",
+            "passed": true,
+            "message": "N-C5/E0018: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C5:E0012",
+            "passed": true,
+            "message": "N-C5/E0012: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:N-C5:E0010",
+            "passed": true,
+            "message": "N-C5/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:N-C5",
+            "passed": true,
+            "message": "N-C5: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:N-C5",
+            "passed": true,
+            "message": "N-C5: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ],
+        "violations": [],
+        "evidence_id": "E0019"
+      },
+      "final_answer_status": "verified",
+      "evidence_coverage": 1.0,
+      "verifier_violation_count": 0,
+      "latency_ms": 65.0041600001714,
+      "backend": "sqlite"
+    },
+    {
+      "id": "europe_customer_value_segmentation",
+      "intent": "customer_intelligence_segmentation",
+      "passed": true,
+      "checks": {
+        "verification_passed": true,
+        "root_cause_status": true,
+        "final_answer_verified": true,
+        "evidence_coverage_complete": true,
+        "verifier_has_no_violations": true,
+        "segmentation_method": true,
+        "minimum_coverage": true,
+        "minimum_segment_count": true,
+        "expected_top_deposit_segment": true,
+        "high_value_avg_deposits_exceeds_low_activity": true
+      },
+      "verification": {
+        "passed": true,
+        "verified_claims": 5,
+        "total_claims": 5,
+        "checks": [
+          {
+            "check_id": "claim_status:S-C1",
+            "passed": true,
+            "message": "S-C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C1",
+            "passed": true,
+            "message": "S-C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0002",
+            "passed": true,
+            "message": "S-C1/E0002: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0003",
+            "passed": true,
+            "message": "S-C1/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0004",
+            "passed": true,
+            "message": "S-C1/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0005",
+            "passed": true,
+            "message": "S-C1/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:S-C1:E0007",
+            "passed": true,
+            "message": "S-C1/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C1",
+            "passed": true,
+            "message": "S-C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C2",
+            "passed": true,
+            "message": "S-C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C2",
+            "passed": true,
+            "message": "S-C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C2:E0007",
+            "passed": true,
+            "message": "S-C2/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C2",
+            "passed": true,
+            "message": "S-C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C3",
+            "passed": true,
+            "message": "S-C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C3",
+            "passed": true,
+            "message": "S-C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C3:E0007",
+            "passed": true,
+            "message": "S-C3/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:S-C3",
+            "passed": true,
+            "message": "S-C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C4",
+            "passed": true,
+            "message": "S-C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C4",
+            "passed": true,
+            "message": "S-C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C4:E0007",
+            "passed": true,
+            "message": "S-C4/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:S-C4",
+            "passed": true,
+            "message": "S-C4: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:S-C4",
+            "passed": true,
+            "message": "S-C4: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:S-C5",
+            "passed": true,
+            "message": "S-C5: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:S-C5",
+            "passed": true,
+            "message": "S-C5: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:S-C5:E0007",
+            "passed": true,
+            "message": "S-C5/E0007: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:S-C5",
+            "passed": true,
+            "message": "S-C5: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:S-C5",
+            "passed": true,
+            "message": "S-C5: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ],
+        "violations": [],
+        "evidence_id": "E0008"
+      },
+      "final_answer_status": "verified",
+      "evidence_coverage": 1.0,
+      "verifier_violation_count": 0,
+      "latency_ms": 71.24008500068157,
+      "backend": "sqlite"
+    },
+    {
+      "id": "americas_paid_media_quality_20260615",
+      "intent": "marketing_lead_quality_investigation",
+      "passed": true,
+      "checks": {
+        "verification_passed": true,
+        "root_cause_status": true,
+        "final_answer_verified": true,
+        "evidence_coverage_complete": true,
+        "verifier_has_no_violations": true,
+        "lead_volume_change_sign": true,
+        "conversion_change_sign": true,
+        "paid_search_share_change_sign": true,
+        "top_negative_performance_channel": true,
+        "paid_search_shift_significant": true
+      },
+      "verification": {
+        "passed": true,
+        "verified_claims": 4,
+        "total_claims": 4,
+        "checks": [
+          {
+            "check_id": "claim_status:M-C1",
+            "passed": true,
+            "message": "M-C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:M-C1",
+            "passed": true,
+            "message": "M-C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:M-C1:E0003",
+            "passed": true,
+            "message": "M-C1/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C1:E0004",
+            "passed": true,
+            "message": "M-C1/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:M-C1",
+            "passed": true,
+            "message": "M-C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:M-C2",
+            "passed": true,
+            "message": "M-C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:M-C2",
+            "passed": true,
+            "message": "M-C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:M-C2:E0003",
+            "passed": true,
+            "message": "M-C2/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C2:E0004",
+            "passed": true,
+            "message": "M-C2/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C2:E0005",
+            "passed": true,
+            "message": "M-C2/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:M-C2",
+            "passed": true,
+            "message": "M-C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:M-C3",
+            "passed": true,
+            "message": "M-C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:M-C3",
+            "passed": true,
+            "message": "M-C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:M-C3:E0008",
+            "passed": true,
+            "message": "M-C3/E0008: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C3:E0009",
+            "passed": true,
+            "message": "M-C3/E0009: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:M-C3",
+            "passed": true,
+            "message": "M-C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:M-C4",
+            "passed": true,
+            "message": "M-C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:M-C4",
+            "passed": true,
+            "message": "M-C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:M-C4:E0010",
+            "passed": true,
+            "message": "M-C4/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C4:E0008",
+            "passed": true,
+            "message": "M-C4/E0008: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:M-C4:E0005",
+            "passed": true,
+            "message": "M-C4/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:M-C4",
+            "passed": true,
+            "message": "M-C4: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:M-C4",
+            "passed": true,
+            "message": "M-C4: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ],
+        "violations": [],
+        "evidence_id": "E0011"
+      },
+      "final_answer_status": "verified",
+      "evidence_coverage": 1.0,
+      "verifier_violation_count": 0,
+      "latency_ms": 19.75786899947707,
+      "backend": "sqlite"
+    },
+    {
+      "id": "asia_false_correlation_20260720",
+      "intent": "false_correlation_guardrail_investigation",
+      "passed": true,
+      "checks": {
+        "verification_passed": true,
+        "root_cause_status": true,
+        "final_answer_verified": true,
+        "evidence_coverage_complete": true,
+        "verifier_has_no_violations": true,
+        "conversion_change_sign": true,
+        "top_negative_performance_channel": true,
+        "affiliate_shift_significant": true,
+        "nearby_event_cause_supported": true,
+        "false_correlation_rejected": true
+      },
+      "verification": {
+        "passed": true,
+        "verified_claims": 4,
+        "total_claims": 4,
+        "checks": [
+          {
+            "check_id": "claim_status:F-C1",
+            "passed": true,
+            "message": "F-C1: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:F-C1",
+            "passed": true,
+            "message": "F-C1: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:F-C1:E0003",
+            "passed": true,
+            "message": "F-C1/E0003: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:F-C1:E0004",
+            "passed": true,
+            "message": "F-C1/E0004: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:F-C1:E0005",
+            "passed": true,
+            "message": "F-C1/E0005: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:F-C1",
+            "passed": true,
+            "message": "F-C1: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:F-C2",
+            "passed": true,
+            "message": "F-C2: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:F-C2",
+            "passed": true,
+            "message": "F-C2: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:F-C2:E0008",
+            "passed": true,
+            "message": "F-C2/E0008: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:F-C2:E0009",
+            "passed": true,
+            "message": "F-C2/E0009: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:F-C2",
+            "passed": true,
+            "message": "F-C2: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:F-C3",
+            "passed": true,
+            "message": "F-C3: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:F-C3",
+            "passed": true,
+            "message": "F-C3: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:F-C3:E0009",
+            "passed": true,
+            "message": "F-C3/E0009: evidence integrity OK"
+          },
+          {
+            "check_id": "causal_overclaim:F-C3",
+            "passed": true,
+            "message": "F-C3: causal wording within policy"
+          },
+          {
+            "check_id": "claim_status:F-C4",
+            "passed": true,
+            "message": "F-C4: claim status allowed"
+          },
+          {
+            "check_id": "claim_evidence:F-C4",
+            "passed": true,
+            "message": "F-C4: evidence references exist"
+          },
+          {
+            "check_id": "evidence_integrity:F-C4:E0010",
+            "passed": true,
+            "message": "F-C4/E0010: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:F-C4:E0011",
+            "passed": true,
+            "message": "F-C4/E0011: evidence integrity OK"
+          },
+          {
+            "check_id": "evidence_integrity:F-C4:E0008",
+            "passed": true,
+            "message": "F-C4/E0008: evidence integrity OK"
+          },
+          {
+            "check_id": "guardrail:F-C4",
+            "passed": true,
+            "message": "F-C4: causal-language guardrail present"
+          },
+          {
+            "check_id": "causal_overclaim:F-C4",
+            "passed": true,
+            "message": "F-C4: causal wording within policy"
+          },
+          {
+            "check_id": "evaluation_boundary",
+            "passed": true,
+            "message": "No evaluation-only *_gt columns were queried"
+          },
+          {
+            "check_id": "nonempty_evidence_graph",
+            "passed": true,
+            "message": "Claims reference tool evidence"
+          }
+        ],
+        "violations": [],
+        "evidence_id": "E0012"
+      },
+      "final_answer_status": "verified",
+      "evidence_coverage": 1.0,
+      "verifier_violation_count": 0,
+      "latency_ms": 12.024444000417134,
+      "backend": "sqlite"
+    }
+  ]
+}

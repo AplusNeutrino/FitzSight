@@ -3445,3 +3445,23 @@ Release validation now includes scope-refusal, planner-policy, evidence-integrit
 ## D-024 — Five scenarios complete the initial benchmark target
 
 The initial five-scenario benchmark target is now complete: CRM routing, net-deposit withdrawal concentration, customer intelligence, marketing acquisition quality, and false-correlation falsification. Additional scenarios remain useful, but competition work should now prioritize demo/runtime validation and submission assets over expanding the catalog without a clear evaluation benefit.
+
+---
+
+# v0.8 Implementation Decisions (2026-08-11)
+
+## D-025 — Stop expanding the benchmark catalog for the initial round
+
+The five-scenario target is sufficient for the initial submission sprint. v0.8 prioritizes judge-facing clarity, runnable demo paths, reproducible submission assets, and submission preflight rather than adding more scenarios without a specific evaluation gap.
+
+## D-026 — Competition presentation assets are generated from the verified project state
+
+The formal initial-round PPTX/PDF summarizes the existing synthetic benchmark and safety evidence. Presentation files must not introduce new analytical claims that are not supported by repository evidence. The PDF is exported from the same PPTX and visually reviewed after rendering.
+
+## D-027 — One-command startup must retain a deterministic fallback
+
+`scripts/start_demo.py` selects Streamlit when the UI dependency is present, but automatically falls back to the deterministic CLI when it is not. A presentation environment must therefore remain usable without a cloud model or optional UI runtime.
+
+## D-028 — Submission preflight is a release gate, not a portal-submission claim
+
+The local preflight verifies required repository/submission assets, obvious secret leakage, generated-data exclusion, and presentation-file hashes. It cannot prove that the GOAI portal was successfully submitted; portal upload and confirmation evidence remain user-controlled external actions.

@@ -1,8 +1,8 @@
 # FitzSight Implementation Status
 
-**Version:** v0.7.0  
+**Version:** v0.8.0  
 **Date:** 2026-08-11  
-**Phase:** Five-intent Agent + five-scenario benchmark + adversarial evaluation
+**Phase:** Initial-round submission sprint — five-intent Agent complete, presentation/demo assets generated
 
 ## Supported Agent intents
 
@@ -12,7 +12,7 @@
 4. `marketing_lead_quality_investigation`
 5. `false_correlation_guardrail_investigation`
 
-Every intent uses the same trust boundary:
+Every intent retains the same trust boundary:
 
 ```text
 Question
@@ -24,75 +24,38 @@ Question
 → verified / withheld answer
 ```
 
-## v0.7 completed
+## v0.8 completed in this delivery
 
-- [x] Americas paid-media / lead-quality benchmark;
-- [x] Asia false-correlation benchmark;
-- [x] fourth and fifth approved Agent intents;
-- [x] channel performance-vs-composition diagnostics;
-- [x] explicit falsification check for nearby-event attribution;
-- [x] five-scenario deterministic benchmark catalog;
-- [x] false-correlation rejection accuracy metric;
-- [x] eight-case adversarial safety/evidence suite;
-- [x] unsupported trade / AML scope-refusal checks;
-- [x] planner SQL / high-impact action rejection checks;
-- [x] missing-evidence, causal-overclaim and `_gt` leakage checks;
-- [x] UI code expanded to five preset workflows;
-- [x] benchmark and compliance documentation;
-- [x] v0.7 release documentation and tests.
+- [x] v0.7 five-intent Agent, five-scenario benchmark, and adversarial release gate retained;
+- [x] one-command competition launcher `scripts/start_demo.py`;
+- [x] automatic deterministic CLI fallback when Streamlit is unavailable;
+- [x] explicit UI / CLI launcher modes and dry-run support;
+- [x] submission preflight checker `scripts/preflight_submission.py`;
+- [x] formal 12-slide initial-round PPTX;
+- [x] PDF exported from the same deck through LibreOffice;
+- [x] rendered PDF visually reviewed for clipping / overlap;
+- [x] demo runbook;
+- [x] pitch speaker notes;
+- [x] initial-round submission checklist;
+- [x] reproducible pitch-deck build script;
+- [x] release and submission documentation;
+- [x] new launcher / preflight tests.
 
-## Build validation
-
-The full suite is executed in groups because the sandbox has a strict single-process time ceiling.
+## Core benchmark state
 
 ```text
-Group 1: 25 passed
-Group 2: 25 passed, 1 skipped
-Aggregate: 50 passed, 1 skipped
-compileall: PASS
+5 / 5 deterministic scenarios PASS
+scenario pass rate:                   100%
+root-cause scenario accuracy:         100%
+false-correlation rejection accuracy: 100%
+mean evidence coverage:               100%
+verifier violations:                  0
 ```
 
-The single build skip is the DuckDB-specific integration test. DuckDB itself has already been validated separately in the deployment environment on 2026-08-11.
-
-## Five-scenario benchmark
-
-```text
-5 passed / 0 failed
-scenario pass rate:                  100%
-root-cause scenario accuracy:        100%
-false-correlation rejection accuracy:100%
-mean evidence coverage:              100%
-verifier violations:                 0
-```
-
-New scenario 4 — Americas acquisition quality:
-
-```text
-lead volume:            +838 (+315.0%)
-FTD conversion:         -10.84 pp
-Paid Search mix:        +60.52 pp
-Paid Search conversion: -16.44 pp
-Paid Search p-value:    4.43e-05
-verification:           4/4 PASS
-```
-
-New scenario 5 — false correlation:
-
-```text
-Asia conversion:        -8.13 pp
-Affiliate conversion:  -15.81 pp
-Affiliate p-value:      0.00463
-top negative performance channel: Affiliate
-nearby office event causal support: false
-false correlation rejected: true
-verification:           4/4 PASS
-```
-
-## Adversarial evaluation
+Adversarial release gate:
 
 ```text
 8 / 8 PASS
-overall adversarial pass rate:       100%
 scope refusal accuracy:              100%
 planner policy catch rate:           100%
 verifier evidence-integrity catch:   100%
@@ -100,6 +63,20 @@ causal-overclaim catch rate:         100%
 ground-truth leak catch rate:        100%
 false-correlation rejection rate:    100%
 ```
+
+## Submission assets
+
+```text
+submission/
+├── FitzSight_GOAI_Initial_Round.pptx
+├── FitzSight_GOAI_Initial_Round.pdf
+├── README.md
+├── DEMO_RUNBOOK.md
+├── PITCH_SPEAKER_NOTES.md
+└── SUBMISSION_CHECKLIST.md
+```
+
+The slide deck is a competition-facing summary of already implemented synthetic benchmark evidence. It does not introduce a second analytical path.
 
 ## External runtime state
 
@@ -112,13 +89,13 @@ false-correlation rejection rate:    100%
 ### Still pending live evidence
 
 - OpenAI Responses API with real credentials/model;
-- Streamlit runtime smoke test.
+- Streamlit runtime smoke test on the final demo environment.
 
-## Next implementation priority
+## Remaining competition work
 
-1. validate Streamlit runtime and refine the actual rendered demo;
-2. validate the live OpenAI planner if model/API access is available;
-3. turn the completed pitch-deck content source into the final PPT/PDF artifact;
-4. record a short demo video and prepare initial-round submission assets;
-5. add one-command startup / local-demo backup;
-6. continue latency/cost measurement once a live model provider is validated.
+1. obtain real Streamlit runtime evidence on the final presentation machine;
+2. validate OpenAI Responses live planner only if model/API access is available and stable;
+3. record the demo video and create offline/local backup copies;
+4. re-check final GOAI portal constraints immediately before submission;
+5. submit and retain confirmation evidence;
+6. rehearse the 5–8 minute pitch and <3 minute demo.

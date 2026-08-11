@@ -1,6 +1,9 @@
 # FitzSight — Initial-Round Pitch Deck Content Draft
 
-This document is the content source for the formal PPT/PDF artifact. The slide file itself is tracked separately and is not marked complete until generated and reviewed.
+This document remains the editable content source for the formal presentation. As of v0.8, the generated and reviewed assets are:
+
+- `submission/FitzSight_GOAI_Initial_Round.pptx`
+- `submission/FitzSight_GOAI_Initial_Round.pdf`
 
 ## Slide 1 — FitzSight
 

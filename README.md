@@ -24,9 +24,9 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.7.0
+## Current release: v0.8.0
 
-v0.7 completes the first five-scenario benchmark target and adds an explicit adversarial evaluation suite. The two new workflows test acquisition-quality analysis and false-correlation resistance.
+v0.8 is the **initial-round submission sprint**. The five-intent Agent, five-scenario benchmark, and adversarial release gate remain the analytical core; this release adds the formal PPT/PDF, one-command demo launcher, submission preflight, demo runbook, and submission checklist.
 
 ## Supported workflows
 
@@ -151,7 +151,20 @@ pip install -e ".[dev]"
 python scripts/generate_data.py
 ```
 
-Run any supported workflow:
+One-command competition demo:
+
+```bash
+python scripts/start_demo.py
+```
+
+`auto` mode launches Streamlit when the optional UI dependency is installed and otherwise falls back to the deterministic CLI. Explicit modes are also available:
+
+```bash
+python scripts/start_demo.py --mode ui --backend duckdb
+python scripts/start_demo.py --mode cli --backend duckdb
+```
+
+Run any supported workflow directly:
 
 ```bash
 python scripts/agent_investigate.py \
@@ -193,7 +206,7 @@ pytest -q
 
 ## Benchmark and evaluation
 
-v0.7 contains five deterministic business scenarios.
+The current benchmark catalog contains five deterministic business scenarios.
 
 Current SQLite build result:
 
@@ -219,10 +232,12 @@ Evaluation artifacts:
 - `docs/V0.7_BENCHMARK_RESULTS.json`
 - `docs/V0.7_ADVERSARIAL_RESULTS.json`
 - `docs/V0.7_VALIDATION.md`
+- `docs/V0.8_VALIDATION.md`
+- `docs/V0.8_SUBMISSION_PREFLIGHT.json`
 
 ### Adversarial release gate
 
-The eight-case v0.7 suite checks:
+The eight-case adversarial suite checks:
 
 - unsupported trading actions are refused;
 - unsupported AML/account-freeze requests are refused;
@@ -296,6 +311,33 @@ answer = withheld
 
 ---
 
+## Initial-round submission assets
+
+The repository now contains a reproducible competition-facing asset bundle:
+
+```text
+submission/
+├── FitzSight_GOAI_Initial_Round.pptx
+├── FitzSight_GOAI_Initial_Round.pdf
+├── DEMO_RUNBOOK.md
+├── PITCH_SPEAKER_NOTES.md
+├── SUBMISSION_CHECKLIST.md
+└── README.md
+```
+
+Regenerate the deck with:
+
+```bash
+pip install -e ".[submission]"
+python scripts/build_pitch_deck.py
+```
+
+Run repository/submission preflight with:
+
+```bash
+python scripts/preflight_submission.py
+```
+
 ## Runtime validation status
 
 ### DuckDB — validated
@@ -321,7 +363,7 @@ pip install -e ".[ui]"
 streamlit run streamlit_app.py
 ```
 
-v0.7 UI code contains five preset workflows, verified KPI cards, intent-specific charts, plan trace, evidence cards, and raw verified metrics. The UI renders verified Agent output and does not create a second analytical path.
+The current UI code contains five preset workflows, verified KPI cards, intent-specific charts, plan trace, evidence cards, and raw verified metrics. The UI renders verified Agent output and does not create a second analytical path.
 
 ---
 
@@ -362,7 +404,14 @@ FitzSight/
 │   ├── generate_data.py
 │   ├── agent_investigate.py
 │   ├── run_benchmark.py
-│   └── run_adversarial_evaluation.py
+│   ├── run_adversarial_evaluation.py
+│   ├── start_demo.py
+│   ├── preflight_submission.py
+│   └── build_pitch_deck.py
+├── submission/
+│   ├── FitzSight_GOAI_Initial_Round.pptx
+│   ├── FitzSight_GOAI_Initial_Round.pdf
+│   └── ...
 ├── src/fitzsight/
 │   ├── agent/
 │   ├── data/
@@ -383,6 +432,8 @@ Key v0.7 files:
 - `docs/ADVERSARIAL_EVALUATION.md`
 - `docs/COMPLIANCE_AND_SAFETY.md`
 - `docs/V0.7_VALIDATION.md`
+- `docs/V0.8_VALIDATION.md`
+- `docs/V0.8_SUBMISSION_PREFLIGHT.json`
 
 ---
 
@@ -391,10 +442,13 @@ Key v0.7 files:
 Build sandbox:
 
 ```text
-50 passed, 1 skipped
+59 tests collected
+58 passed, 1 skipped
 compileall PASS
 5 / 5 benchmark scenarios PASS
 8 / 8 adversarial cases PASS
+submission preflight PASS
+12-slide PPTX/PDF generated and visually reviewed
 ```
 
 The one build skip is the DuckDB-specific test because the sandbox lacks DuckDB; separate deployment evidence has already validated DuckDB.
