@@ -1,5 +1,5 @@
 {
-  "catalog_version": "0.6",
+  "catalog_version": "0.7",
   "scenarios": [
     {
       "id": "crm_routing_ftd_20260715",
@@ -36,6 +36,34 @@
         "minimum_segment_count": 4,
         "expected_top_deposit_segment": "High Value",
         "high_value_avg_deposits_exceeds_low_activity": true
+      }
+    },
+    {
+      "id": "americas_paid_media_quality_20260615",
+      "intent": "marketing_lead_quality_investigation",
+      "question": "Why did Americas lead volume rise while FTD conversion fell after June 15?",
+      "expected": {
+        "verification_passed": true,
+        "root_cause_status": "supported_candidate",
+        "lead_volume_change_sign": "positive",
+        "conversion_change_sign": "negative",
+        "paid_search_share_change_sign": "positive",
+        "top_negative_performance_channel": "Paid Search",
+        "paid_search_shift_significant": true
+      }
+    },
+    {
+      "id": "asia_false_correlation_20260720",
+      "intent": "false_correlation_guardrail_investigation",
+      "question": "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?",
+      "expected": {
+        "verification_passed": true,
+        "root_cause_status": "supported_candidate",
+        "conversion_change_sign": "negative",
+        "top_negative_performance_channel": "Affiliate",
+        "affiliate_shift_significant": true,
+        "nearby_event_cause_supported": false,
+        "false_correlation_rejected": true
       }
     }
   ]

@@ -1,4 +1,4 @@
-# FitzSight v0.6 Streamlit Demo
+# FitzSight v0.7 Streamlit Demo
 
 `streamlit_app.py` is a presentation layer over the verified Agent result.
 
@@ -7,17 +7,19 @@
 1. CRM / FTD investigation
 2. Net-deposit investigation
 3. Customer Intelligence / segmentation
+4. Americas marketing lead quality
+5. Asia false-correlation guardrail
 
 A custom text box is also exposed, but the local intent gate rejects questions outside the approved catalog.
 
-## v0.6 presentation components
+## Presentation components
 
 - backend selector;
 - deterministic/OpenAI planner selector;
 - question input;
 - verified headline;
 - business KPI cards;
-- intent-specific bar charts;
+- intent-specific charts;
 - verified findings;
 - guardrail text;
 - investigation-plan trace table;
@@ -30,9 +32,7 @@ The UI does not independently compute KPI definitions, statistical tests, contri
 
 ## Runtime state
 
-Code and compile validation are complete. A real Streamlit runtime smoke test remains required under the project External Runtime Evidence rule before the tracker task can be marked fully done.
-
-Run after installing the optional UI dependency:
+Code and compile validation are complete. A real Streamlit runtime smoke test remains required under the External Runtime Evidence rule before UI runtime tasks can be marked fully done.
 
 ```bash
 pip install -e ".[ui]"

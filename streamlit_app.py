@@ -21,6 +21,10 @@ SEGMENT_QUESTION = (
     "How are European customer segments distributed by behavioral value, "
     "and which segment contributes most to deposits?"
 )
+MARKETING_QUESTION = "Why did Americas lead volume rise while FTD conversion fell after June 15?"
+FALSE_CORRELATION_QUESTION = (
+    "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?"
+)
 
 
 def money(value: float) -> str:
@@ -54,6 +58,21 @@ def render_business_kpis(intent: str, metrics: dict, backend: str, verification:
         cols[2].metric("Value groups", segmentation["segment_count"])
         cols[3].metric("Top deposit segment", segmentation["top_deposit_segment"])
         cols[4].metric("Top segment deposit share", f"{segmentation['top_deposit_segment_share']:.1%}")
+    elif intent == "marketing_lead_quality_investigation":
+        cols = st.columns(5)
+        cols[0].metric("Lead volume", f"{metrics['lead_volume_change_pct']:+.1f}%")
+        cols[1].metric("FTD conversion", f"{metrics['conversion_change_pp']:+.2f} pp")
+        cols[2].metric("Paid Search mix", f"{metrics['paid_search_share_change_pp']:+.2f} pp")
+        cols[3].metric("Paid Search p", f"{metrics['paid_search_conversion_test']['p_value']:.3g}")
+        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
+    elif intent == "false_correlation_guardrail_investigation":
+        affiliate = metrics["affiliate_conversion_test"]
+        cols = st.columns(5)
+        cols[0].metric("Asia conversion", f"{metrics['conversion_change_pp']:+.2f} pp")
+        cols[1].metric("Affiliate conversion", f"{affiliate['difference_pp_b_minus_a']:+.2f} pp")
+        cols[2].metric("Affiliate p", f"{affiliate['p_value']:.3g}")
+        cols[3].metric("Nearby event causal?", "No")
+        cols[4].metric("Verified claims", f"{verification['verified_claims']}/{verification['total_claims']}")
     st.caption(f"Backend: {backend} · all displayed KPIs come from verified investigation output.")
 
 
@@ -99,6 +118,26 @@ def render_charts(intent: str, metrics: dict) -> None:
         ).set_index("segment")
         st.bar_chart(chart)
         st.caption("Descriptive segment shares only; not a credit, AML or eligibility score.")
+    elif intent == "marketing_lead_quality_investigation":
+        rows = metrics["channel_contribution_analysis"]["segments"]
+        chart = pd.DataFrame(
+            {
+                "channel": [row["segment"] for row in rows],
+                "Within-channel performance effect (pp)": [row["performance_effect_pp"] for row in rows],
+            }
+        ).set_index("channel")
+        st.bar_chart(chart)
+        st.caption("Paid Search shows the largest negative within-channel performance effect in the synthetic campaign benchmark.")
+    elif intent == "false_correlation_guardrail_investigation":
+        rows = metrics["channel_contribution_analysis"]["segments"]
+        chart = pd.DataFrame(
+            {
+                "channel": [row["segment"] for row in rows],
+                "Conversion-rate change (pp)": [row["rate_change_pp"] for row in rows],
+            }
+        ).set_index("channel")
+        st.bar_chart(chart)
+        st.caption("The nearby office event is displayed as context only; the verified channel pattern drives the analytical conclusion.")
 
 
 def render_trace(plan: dict, verification: dict) -> None:
@@ -158,7 +197,7 @@ with st.sidebar:
 
 preset = st.radio(
     "Demo question",
-    [CRM_QUESTION, NET_QUESTION, SEGMENT_QUESTION, "Custom"],
+    [CRM_QUESTION, NET_QUESTION, SEGMENT_QUESTION, MARKETING_QUESTION, FALSE_CORRELATION_QUESTION, "Custom"],
     horizontal=False,
 )
 question = (

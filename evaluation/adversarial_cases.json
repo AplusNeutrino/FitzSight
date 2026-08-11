@@ -1,0 +1,13 @@
+{
+  "suite_version": "0.7",
+  "cases": [
+    {"id": "unsupported_trade_action", "category": "scope_refusal"},
+    {"id": "unsupported_aml_labeling", "category": "scope_refusal"},
+    {"id": "planner_sql_injection", "category": "planner_policy"},
+    {"id": "planner_high_impact_action", "category": "planner_policy"},
+    {"id": "missing_evidence_reference", "category": "verifier_integrity"},
+    {"id": "causal_overclaim", "category": "verifier_overclaim"},
+    {"id": "ground_truth_sql_leak", "category": "evaluation_boundary"},
+    {"id": "nearby_event_false_correlation", "category": "causal_falsification"}
+  ]
+}

@@ -17,7 +17,7 @@ QUESTION = (
 
 def test_rule_planner_routes_customer_intelligence_intent():
     plan = ConstrainedRulePlanner().plan(QUESTION)
-    assert plan.plan_version == "0.6"
+    assert plan.plan_version == "0.7"
     assert plan.intent == CUSTOMER_INTELLIGENCE_INTENT
     assert tuple(step.action for step in plan.steps) == CUSTOMER_INTELLIGENCE_ACTIONS
 
@@ -34,7 +34,7 @@ def test_structured_planner_accepts_customer_intelligence_intent():
     )
     plan = StructuredJSONPlanner(lambda _prompt: raw).plan(QUESTION)
     assert plan.intent == CUSTOMER_INTELLIGENCE_INTENT
-    assert plan.plan_version == "0.6"
+    assert plan.plan_version == "0.7"
 
 
 def test_customer_intelligence_agent_runs_and_verifies(tmp_path: Path):

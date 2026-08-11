@@ -6,7 +6,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .scenarios import CRM_ROUTING_SCENARIO, NET_DEPOSIT_SCENARIO
+from .scenarios import (
+    CRM_ROUTING_SCENARIO,
+    NET_DEPOSIT_SCENARIO,
+    MARKETING_LEAD_QUALITY_SCENARIO,
+    FALSE_CORRELATION_SCENARIO,
+)
 
 
 REGIONS = ("Europe", "Asia", "Middle East", "Americas", "Oceania")
@@ -48,6 +53,42 @@ def generate_salespeople(cfg, rng):
     )
 
 
+def _inject_marketing_lead_shift(customers: pd.DataFrame) -> pd.DataFrame:
+    """Create a lead-volume/mix shock without changing total customer count or RNG state.
+
+    A deterministic subset of Americas customers originally registered outside the
+    benchmark windows is moved into the campaign window and assigned to Paid Search.
+    This preserves Europe benchmark random streams while producing a measurable
+    current-period lead-volume and channel-mix shift.
+    """
+
+    scenario = MARKETING_LEAD_QUALITY_SCENARIO
+    data = customers.copy()
+    dates = pd.to_datetime(data["registration_date"])
+    outside_window = (
+        (dates.dt.date < scenario.baseline_start)
+        | (dates.dt.date > scenario.current_end)
+    )
+    candidates = data.index[data["region"].eq(scenario.region) & outside_window].tolist()
+    chosen = sorted(candidates, key=lambda idx: str(data.at[idx, "customer_id"]))[: scenario.reassigned_leads]
+
+    if chosen:
+        span_days = (scenario.current_end - scenario.current_start).days + 1
+        for rank, idx in enumerate(chosen):
+            day_offset = rank % span_days
+            minute_offset = (rank * 17) % (24 * 60)
+            data.at[idx, "registration_date"] = (
+                pd.Timestamp(scenario.current_start)
+                + pd.Timedelta(days=day_offset, minutes=minute_offset)
+            )
+            data.at[idx, "acquisition_channel"] = scenario.acquisition_channel
+
+    data["marketing_lead_shift_gt"] = False
+    if chosen:
+        data.loc[chosen, "marketing_lead_shift_gt"] = True
+    return data
+
+
 def generate_customers(cfg, rng, sp):
     reg_dates = _dates(
         rng, cfg.n_customers, pd.Timestamp(cfg.start_date), pd.Timestamp(cfg.end_date)
@@ -74,7 +115,7 @@ def generate_customers(cfg, rng, sp):
         labels=["Low", "Core", "Growth", "High Value"],
     ).astype(str)
 
-    return pd.DataFrame(
+    customers = pd.DataFrame(
         {
             "customer_id": [f"C{i:06d}" for i in range(1, cfg.n_customers + 1)],
             "registration_date": reg_dates,
@@ -86,6 +127,7 @@ def generate_customers(cfg, rng, sp):
             "customer_segment_gt": segment,
         }
     )
+    return _inject_marketing_lead_shift(customers)
 
 
 def generate_sales_activity(cfg, rng, customers):
@@ -98,6 +140,7 @@ def generate_sales_activity(cfg, rng, customers):
             "assigned_salesperson",
             "assigned_team",
             "acquisition_channel",
+            "marketing_lead_shift_gt",
         ]
     ].copy()
     data["lead_created_at"] = data.registration_date
@@ -124,12 +167,32 @@ def generate_sales_activity(cfg, rng, customers):
     probability = np.clip(0.24 + bonus - penalty, 0.04, 0.48)
     probability[affected.to_numpy()] *= scenario.conversion_probability_multiplier
 
+    marketing = MARKETING_LEAD_QUALITY_SCENARIO
+    marketing_affected = (
+        data.region.eq(marketing.region)
+        & data.acquisition_channel.eq(marketing.acquisition_channel)
+        & (data.registration_date.dt.date >= marketing.current_start)
+        & (data.registration_date.dt.date <= marketing.current_end)
+    )
+    probability[marketing_affected.to_numpy()] *= marketing.conversion_probability_multiplier
+
+    false_corr = FALSE_CORRELATION_SCENARIO
+    affiliate_quality_affected = (
+        data.region.eq(false_corr.region)
+        & data.acquisition_channel.eq(false_corr.driver_channel)
+        & (data.registration_date.dt.date >= false_corr.current_start)
+        & (data.registration_date.dt.date <= false_corr.current_end)
+    )
+    probability[affiliate_quality_affected.to_numpy()] *= false_corr.conversion_probability_multiplier
+
     data["converted_ftd"] = rng.random(len(data)) < probability
     data["contacted"] = rng.random(len(data)) < np.clip(
         0.93 - data.response_time_minutes.to_numpy() / 1500, 0.65, 0.95
     )
     data["qualified"] = data.contacted & (rng.random(len(data)) < 0.58)
     data["affected_by_crm_change_gt"] = affected
+    data["affected_by_marketing_shift_gt"] = marketing_affected
+    data["affected_by_affiliate_quality_gt"] = affiliate_quality_affected
     data["activity_id"] = [f"A{i:06d}" for i in range(1, len(data) + 1)]
 
     return data[
@@ -146,6 +209,8 @@ def generate_sales_activity(cfg, rng, customers):
             "qualified",
             "converted_ftd",
             "affected_by_crm_change_gt",
+            "affected_by_marketing_shift_gt",
+            "affected_by_affiliate_quality_gt",
         ]
     ]
 
@@ -316,6 +381,8 @@ def generate_trades(cfg, rng, customers, activity):
 def generate_business_events():
     crm = CRM_ROUTING_SCENARIO
     net = NET_DEPOSIT_SCENARIO
+    marketing = MARKETING_LEAD_QUALITY_SCENARIO
+    false_corr = FALSE_CORRELATION_SCENARIO
     return pd.DataFrame(
         [
             {
@@ -347,6 +414,26 @@ def generate_business_events():
                 "description": net.description,
                 "expected_effect": "withdrawals_up;net_deposit_down;customer_concentration_up",
                 "ground_truth_tag": "observed_driver",
+            },
+            {
+                "event_id": marketing.event_id,
+                "date": pd.Timestamp(marketing.event_date),
+                "event_type": marketing.event_type,
+                "region": marketing.region,
+                "affected_team": "Growth Marketing",
+                "description": marketing.description,
+                "expected_effect": "lead_volume_up;paid_search_share_up;ftd_conversion_down",
+                "ground_truth_tag": "root_cause",
+            },
+            {
+                "event_id": false_corr.event_id,
+                "date": pd.Timestamp(false_corr.event_date),
+                "event_type": false_corr.event_type,
+                "region": false_corr.region,
+                "affected_team": "Facilities",
+                "description": false_corr.description,
+                "expected_effect": "no_expected_effect_on_lead_conversion",
+                "ground_truth_tag": "background_event",
             },
         ]
     )

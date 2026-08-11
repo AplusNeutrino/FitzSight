@@ -1,6 +1,6 @@
 # FitzSight Agent Layer
 
-Version: v0.6.0
+Version: v0.7.0
 
 ## Contract
 
@@ -35,6 +35,8 @@ Optional provider integration. The local classifier fixes the approved intent be
 - `crm_routing_ftd_investigation`
 - `net_deposit_anomaly_investigation`
 - `customer_intelligence_segmentation`
+- `marketing_lead_quality_investigation`
+- `false_correlation_guardrail_investigation`
 
 See `docs/MULTI_INTENT.md` for exact action sequences.
 
@@ -53,6 +55,22 @@ See `docs/MULTI_INTENT.md` for exact action sequences.
 
 If any verification condition fails, the final renderer fails closed.
 
+## v0.7 falsification boundary
+
+The false-correlation workflow deliberately separates:
+
+```text
+nearby event exists
+```
+
+from:
+
+```text
+data support that event as a cause
+```
+
+A nearby event is not promoted to a causal explanation merely because it occurs near the KPI change.
+
 ## Customer Intelligence boundary
 
-The new segmentation workflow is descriptive. The Agent may discuss observed value and withdrawal concentration but cannot turn the segments into credit, AML, suitability, eligibility, customer-contact, restriction, or adverse-action decisions.
+Segmentation remains descriptive. The Agent may discuss observed value and withdrawal concentration but cannot turn the segments into credit, AML, suitability, eligibility, customer-contact, restriction, or adverse-action decisions.

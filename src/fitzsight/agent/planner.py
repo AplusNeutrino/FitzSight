@@ -8,11 +8,15 @@ from .catalog import (
     ACTION_PURPOSES,
     CRM_ACTIONS,
     CRM_INTENT,
-    INTENT_ACTIONS,
-    NET_DEPOSIT_ACTIONS,
-    NET_DEPOSIT_INTENT,
     CUSTOMER_INTELLIGENCE_ACTIONS,
     CUSTOMER_INTELLIGENCE_INTENT,
+    FALSE_CORRELATION_ACTIONS,
+    FALSE_CORRELATION_INTENT,
+    INTENT_ACTIONS,
+    MARKETING_LEAD_QUALITY_ACTIONS,
+    MARKETING_LEAD_QUALITY_INTENT,
+    NET_DEPOSIT_ACTIONS,
+    NET_DEPOSIT_INTENT,
     actions_for_intent,
     classify_supported_intent,
 )
@@ -42,20 +46,20 @@ def _classify(question: str) -> str:
         return classify_supported_intent(question)
     except ValueError as exc:
         raise UnsupportedIntentError(
-            "Question is outside the approved FitzSight v0.6 intent catalog."
+            "Question is outside the approved FitzSight v0.7 intent catalog."
         ) from exc
 
 
 def validate_plan(plan: AgentPlan) -> AgentPlan:
-    """Validate planner output against the v0.6 multi-intent policy.
+    """Validate planner output against the v0.7 multi-intent policy.
 
     Planner/model output is untrusted. It may select only one approved intent and
     the exact published high-level action sequence for that intent. It may not
     emit SQL, table names, arbitrary tool parameters, or high-impact actions.
     """
 
-    if plan.plan_version != "0.6":
-        raise PlanValidationError("Unsupported plan_version; expected '0.6'")
+    if plan.plan_version != "0.7":
+        raise PlanValidationError("Unsupported plan_version; expected '0.7'")
     if plan.intent not in INTENT_ACTIONS:
         raise UnsupportedIntentError(f"Unsupported intent: {plan.intent}")
     if not plan.question.strip():
@@ -122,7 +126,7 @@ class ConstrainedRulePlanner:
         intent = _classify(question)
         actions = actions_for_intent(intent)
         plan = AgentPlan(
-            plan_version="0.6",
+            plan_version="0.7",
             intent=intent,
             question=question,
             planner_mode=self.mode,
@@ -205,7 +209,7 @@ class StructuredJSONPlanner:
 
         return validate_plan(
             AgentPlan(
-                plan_version="0.6",
+                plan_version="0.7",
                 intent=payload["intent"],
                 question=question,
                 planner_mode=planner_mode,

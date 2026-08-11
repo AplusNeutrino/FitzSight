@@ -1,0 +1,12 @@
+{
+  "intent": "false_correlation_guardrail_investigation",
+  "steps": [
+    {"action": "inspect_schema", "purpose": "Confirm the required lead/channel/conversion fields."},
+    {"action": "measure_conversion_shift", "purpose": "Measure the Asia conversion change around July 20."},
+    {"action": "channel_decomposition", "purpose": "Locate the channel-specific deterioration pattern."},
+    {"action": "statistical_validation", "purpose": "Validate the overall and Affiliate-specific shifts."},
+    {"action": "nearby_event_check", "purpose": "Inspect nearby events without presuming causality."},
+    {"action": "falsification_check", "purpose": "Compare event scope with the measured channel pattern."},
+    {"action": "evidence_boundary", "purpose": "Reject unsupported event attribution and preserve only evidence-backed language."}
+  ]
+}

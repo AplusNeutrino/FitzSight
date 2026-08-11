@@ -1,14 +1,12 @@
 # FitzSight — Initial-Round Pitch Deck Content Draft
 
-This document is the source content for the first formal PPT/PDF. It is not yet the final slide artifact.
+This document is the content source for the formal PPT/PDF artifact. The slide file itself is tracked separately and is not marked complete until generated and reviewed.
 
 ## Slide 1 — FitzSight
 
 **Evidence-grounded Financial Operations Intelligence Agent**
 
 GOAI 2026 · Boundless Agents · AI+金融
-
-Tagline:
 
 > Question → Data → Analysis → Evidence → Decision
 
@@ -38,43 +36,72 @@ Question
 
 The model plans. SQL/Python calculate. The verifier controls what can be presented.
 
-## Slide 4 — Demo workflow 1: FTD deterioration
+## Slide 4 — Demo: FTD deterioration
 
 Question: “Why did European FTD conversion deteriorate after July 15?”
 
 Show:
 
-- affected -7.53 pp vs control -1.21 pp;
-- +29.15 min response median;
+- affected **-7.53 pp** vs control **-1.21 pp**;
+- response median **+29.15 min**;
 - statistical validation;
 - Team A / Team B contribution decomposition;
 - event evidence;
 - causal guardrail.
 
-## Slide 5 — Demo workflow 2: Net deposits
+## Slide 5 — Demo: Net deposits
 
 Question: “Why did European net deposits fall in the week starting August 3?”
 
 Show:
 
-- net deposits -$223.9k WoW;
-- deposits +$24.4k;
-- withdrawals +$248.3k;
-- top 11 = 92.2% of current withdrawals;
-- “observed withdrawal concentration” rather than invented customer motives.
+- net deposits **-$223.9k** WoW;
+- deposits **+$24.4k**;
+- withdrawals **+$248.3k**;
+- top 11 = **92.2%** of current withdrawals;
+- observed withdrawal concentration rather than invented customer motives.
 
-## Slide 6 — Demo workflow 3: Customer Intelligence
+## Slide 6 — Demo: Customer Intelligence
 
 Question: “How are European customers segmented by behavioral value?”
 
 Show:
 
-- 6,770 customers, 100% coverage;
+- **6,770** customers, 100% coverage;
 - transparent scoring policy;
-- High Value = 4.1% customers / 55.8% deposits;
+- High Value = **4.1%** customers / **55.8%** deposits;
 - descriptive use only: no AML/credit/adverse-action inference.
 
-## Slide 7 — Why it is technically different
+## Slide 7 — Demo: Volume ≠ quality
+
+Question: “Why did Americas lead volume rise while FTD conversion fell?”
+
+Show:
+
+- leads **+315%**;
+- aggregate FTD **-10.84 pp**;
+- Paid Search mix **+60.52 pp**;
+- Paid Search FTD **-16.44 pp**;
+- Paid Search statistical test **p = 4.43e-05**.
+
+Message: FitzSight separates volume, mix and within-channel performance.
+
+## Slide 8 — The false-correlation test
+
+Question: “Asia conversion fell after July 20. Did the nearby office relocation cause it?”
+
+Show:
+
+- Asia FTD **-8.13 pp**;
+- Affiliate FTD **-15.81 pp**;
+- Affiliate **p = 0.00463**;
+- nearby office event detected;
+- event causal support = **false**;
+- FitzSight rejects the tempting causal story.
+
+Message: **The system is evaluated on explanations it refuses to make, not only answers it produces.**
+
+## Slide 9 — Why it is technically different
 
 Four boundaries:
 
@@ -85,35 +112,43 @@ Four boundaries:
 
 If verification fails, FitzSight withholds the analytical answer.
 
-## Slide 8 — Evaluation and reproducibility
-
-Current deterministic catalog:
+## Slide 10 — Evaluation and reproducibility
 
 ```text
-3 scenarios
-3 passed
+5 benchmark scenarios / 5 PASS
+100% root-cause scenario accuracy
+100% false-correlation rejection accuracy
 100% evidence coverage
 0 verifier violations
 ```
 
-Show public repository structure, benchmark catalog, tests, and deterministic fallback.
+Adversarial release gate:
 
-## Slide 9 — Safety / compliance / open source
+```text
+8 cases / 8 PASS
+100% scope refusal
+100% planner-policy catch
+100% causal-overclaim catch
+100% ground-truth-leak catch
+```
+
+Show public repository, benchmark catalog, test suite, and deterministic fallback.
+
+## Slide 11 — Safety / compliance / open source
 
 - synthetic data only;
 - no real customer PII or employer data;
 - no investment advice;
 - no trading/account actions;
 - no automated AML, credit, or suitability decisions;
+- `_gt` fields prohibited in normal Agent SQL;
 - MIT License;
-- DuckDB/local fallback makes demo reproducible without a cloud model.
+- DuckDB/local fallback keeps core demo reproducible without a cloud model.
 
-## Slide 10 — Why FitzSight matters
+## Slide 12 — Why FitzSight matters
 
 Existing BI answers **what** happened.
 
 FitzSight investigates **why the measurable evidence changed**, while preserving an audit boundary between evidence and speculation.
 
-Closing line:
-
-> Not “chat with your CSV.” A reproducible financial investigation you can inspect, verify, and challenge.
+> Not “chat with your CSV.” A reproducible financial investigation you can inspect, verify, challenge—and sometimes refuse.

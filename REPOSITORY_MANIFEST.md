@@ -1,51 +1,51 @@
-# FitzSight Repository Manifest
+# FitzSight Repository Manifest — v0.7.0
 
-**Version:** v0.6.0  
-**Date:** 2026-08-11  
-**Verified source baseline:** `AplusNeutrino/FitzSight` main commit `c8e751b2e7afe68f7d96837bbeffbebd4e957fd2` (`Release FitzSight v0.5.0`)
+## Core project files
 
-This manifest records the v0.6.0 delivery snapshot. Generated synthetic benchmark CSV files are intentionally excluded; only `data/generated/.gitkeep` is shipped. The application regenerates deterministic synthetic data when required.
+- `README.md` — project overview, quick start, five workflows, evaluation, safety
+- `MASTER_PLAN.md` — long-term product/competition plan and architecture decisions
+- `IMPLEMENTATION_STATUS.md` — current implementation snapshot
+- `LICENSE` — MIT License
+- `THIRD_PARTY_NOTICES.md` — dependency notice
+- `PROJECT_PROGRESS.md` — pointer to external progress truth source
+- `.env.example` — optional provider/runtime environment variables
+- `pyproject.toml` — package/dependency metadata
 
-## Key v0.6 additions
+## Runtime and UI
 
-- `src/fitzsight/tools/segmentation.py` — transparent behavioral-value Customer Segmentation Tool
-- `src/fitzsight/investigation/customer_intelligence.py` — third deterministic investigation engine
-- `src/fitzsight/agent/catalog.py` — three approved Agent intents
-- `src/fitzsight/investigation/router.py` — three-intent deterministic router
-- `src/fitzsight/tools/sql.py` — compact evidence preview/digest mode for large bounded queries
-- `streamlit_app.py` — three demo presets + KPI cards + verified charts + plan trace + Evidence cards
-- `evaluation/benchmark_catalog.json` — three-scenario benchmark catalog
-- `scripts/run_benchmark.py` — scenario pass / root-cause / evidence / verifier / latency metrics
-- `examples/valid_customer_intelligence_plan.json` — third structured-plan example
-- `docs/CUSTOMER_INTELLIGENCE.md`
+- `streamlit_app.py` — five-workflow verified-output demo UI
+- `scripts/agent_investigate.py` — constrained Agent CLI
+- `scripts/generate_data.py` — synthetic data generation
+- `scripts/run_benchmark.py` — five-scenario deterministic benchmark
+- `scripts/run_adversarial_evaluation.py` — adversarial safety/evidence release gate
+
+## Agent and tools
+
+- `src/fitzsight/agent/` — intent catalog, planner, orchestrator, verifier, renderer
+- `src/fitzsight/investigation/` — five deterministic investigation workflows
+- `src/fitzsight/tools/` — schema, read-only SQL, KPI, statistics, contribution, anomaly, segmentation
+- `src/fitzsight/evidence/` — append-only evidence registry
+- `src/fitzsight/data/` — synthetic generator, scenarios, local analytical store
+- `src/fitzsight/providers/` — optional model-provider adapter
+
+## Evaluation
+
+- `evaluation/benchmark_catalog.json` — five business scenarios
+- `evaluation/adversarial_cases.json` — eight adversarial cases
+- `docs/V0.7_BENCHMARK_RESULTS.json` — raw benchmark result
+- `docs/V0.7_ADVERSARIAL_RESULTS.json` — raw adversarial result
+- `docs/EVALUATION_SUMMARY.md` — judge-friendly evaluation summary
+
+## Competition / documentation
+
 - `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`
 - `docs/PITCH_DECK_CONTENT.md`
-- `docs/V0.6_VALIDATION.md`
-- `docs/V0.6_BENCHMARK_RESULTS.json`
-- `docs/V0.6_SAMPLE_CUSTOMER_INTELLIGENCE.json`
-- `LICENSE` — MIT
-- `THIRD_PARTY_NOTICES.md`
-- v0.6 automated tests
+- `docs/COMPLIANCE_AND_SAFETY.md`
+- `docs/BENCHMARK_SCENARIOS.md`
+- `docs/ADVERSARIAL_EVALUATION.md`
+- `docs/V0.7_VALIDATION.md`
+- historical release validation/results remain under `docs/V0.x_*`.
 
-## Validation evidence
+## Tests
 
-```text
-Test group 1: 25 passed
-Test group 2: 21 passed, 1 skipped
-Aggregate:    46 passed, 1 skipped
-compileall:   PASS
-benchmark:    3 / 3 PASS
-```
-
-The single build-environment skip is the DuckDB-specific test because the build sandbox lacks DuckDB. Separate deployment evidence has already validated the DuckDB runtime using `data/generated`, with both the default constrained planner and JSON-file planner reaching final status `verified`.
-
-## External runtime state
-
-Still requiring separate real runtime evidence:
-
-- OpenAI Responses live API planner
-- Streamlit runtime smoke test
-
-## Delivery integrity
-
-`SHA256SUMS.txt` contains a SHA-256 checksum for every shipped repository file except itself.
+`tests/` covers deterministic data generation, SQL safety, statistics, evidence, planner policy, verifier behavior, five Agent intents, OpenAI provider contract, benchmark catalog, and v0.7 adversarial checks.

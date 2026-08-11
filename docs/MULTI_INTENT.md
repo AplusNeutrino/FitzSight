@@ -1,12 +1,10 @@
-# FitzSight v0.6 Multi-Intent Contract
+# FitzSight v0.7 Multi-Intent Contract
 
 FitzSight expands by **approved business intents**, not unrestricted tool autonomy.
 
-## Approved intents
+## 1. `crm_routing_ftd_investigation`
 
-### `crm_routing_ftd_investigation`
-
-Question family: European FTD/conversion deterioration around the synthetic 2026-07-15 CRM routing change.
+Question family: European FTD deterioration around 2026-07-15.
 
 Required actions:
 
@@ -19,9 +17,9 @@ Required actions:
 7. `event_check`
 8. `evidence_boundary`
 
-### `net_deposit_anomaly_investigation`
+## 2. `net_deposit_anomaly_investigation`
 
-Question family: European weekly net-deposit deterioration around the synthetic 2026-08-03 period.
+Question family: European weekly net-deposit deterioration around 2026-08-03.
 
 Required actions:
 
@@ -33,9 +31,9 @@ Required actions:
 6. `event_check`
 7. `evidence_boundary`
 
-### `customer_intelligence_segmentation`
+## 3. `customer_intelligence_segmentation`
 
-Question family: European customer behavioral-value segmentation and deposit contribution.
+Question family: European behavioral-value segmentation and deposit contribution.
 
 Required actions:
 
@@ -46,11 +44,39 @@ Required actions:
 5. `compare_withdrawal_pressure`
 6. `evidence_boundary`
 
+## 4. `marketing_lead_quality_investigation`
+
+Question family: Americas lead-volume growth with conversion deterioration after 2026-06-15.
+
+Required actions:
+
+1. `inspect_schema`
+2. `measure_lead_volume`
+3. `measure_conversion`
+4. `channel_mix_decomposition`
+5. `statistical_validation`
+6. `event_check`
+7. `evidence_boundary`
+
+## 5. `false_correlation_guardrail_investigation`
+
+Question family: Asia conversion deterioration after 2026-07-20 with a tempting nearby office-relocation event.
+
+Required actions:
+
+1. `inspect_schema`
+2. `measure_conversion_shift`
+3. `channel_decomposition`
+4. `statistical_validation`
+5. `nearby_event_check`
+6. `falsification_check`
+7. `evidence_boundary`
+
 ## Policy
 
 A planner/model may not:
 
-- invent a fourth intent;
+- invent a sixth intent;
 - omit or reorder required actions;
 - emit SQL;
 - provide arbitrary tool arguments;

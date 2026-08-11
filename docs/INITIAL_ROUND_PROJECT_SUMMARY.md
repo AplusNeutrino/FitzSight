@@ -8,19 +8,13 @@ Track: **GOAI 2026 · Boundless Agents · AI+金融**
 
 ## One-sentence definition
 
-FitzSight is an evidence-grounded financial-operations Agent that turns a manager's business question into a reproducible investigation: it plans a bounded workflow, executes read-only SQL/Python analytical tools, performs statistical or driver analysis, links important findings to evidence IDs, and verifies claims before presenting a decision-support answer.
+FitzSight is an evidence-grounded financial-operations Agent that turns a manager's business question into a reproducible investigation: it plans a bounded workflow, executes read-only SQL/Python analytical tools, performs statistical or driver analysis, links important findings to Evidence IDs, and verifies claims before presenting a decision-support answer.
 
 ## Problem
 
-Financial teams already have dashboards, SQL, and BI tools, yet questions such as:
+Financial teams already have dashboards, SQL, and BI tools, yet “why did this KPI change?” still requires analysts to move manually across multiple tables, comparison periods, statistical tests, contribution analysis, customer segments, and business-event records.
 
-- “Why did FTD conversion deteriorate?”
-- “Why did net deposits fall this week?”
-- “Which customer segments contribute most to deposit value?”
-
-still require analysts to move manually across multiple tables, comparison periods, statistical tests, and business-event records.
-
-A generic LLM can make this problem worse if it produces a plausible explanation without actually calculating the numbers or preserving an audit trail.
+A generic LLM can produce an explanation quickly, but a plausible explanation is not the same as a reproducible, auditable investigation.
 
 ## Target users
 
@@ -36,7 +30,7 @@ FitzSight is **not** an investment adviser, trading system, AML enforcement engi
 ```text
 Question
   ↓
-Local intent gate
+Local approved-intent gate
   ↓
 Constrained planner
   ↓
@@ -44,7 +38,7 @@ Approved action sequence
   ↓
 Read-only SQL / Python tools
   ↓
-Statistics / decomposition / segmentation
+Statistics / decomposition / segmentation / falsification
   ↓
 Evidence Registry
   ↓
@@ -61,13 +55,9 @@ The system does not send a CSV to a model and ask for an answer. A planner is al
 
 ### 1. CRM / FTD anomaly investigation
 
-Question:
-
 ```text
 Why did European FTD conversion deteriorate after July 15?
 ```
-
-FitzSight compares affected and control cohorts, measures response-time change, performs statistical validation, decomposes team contributions, detects response-time anomalies, checks nearby operational events, and applies causal-language guardrails.
 
 Synthetic benchmark:
 
@@ -78,13 +68,9 @@ Synthetic benchmark:
 
 ### 2. Net-deposit anomaly investigation
 
-Question:
-
 ```text
 Why did European net deposits fall in the week starting August 3?
 ```
-
-FitzSight measures baseline/current deposits and withdrawals, reconstructs the net-deposit movement, measures top-customer withdrawal concentration, compares Europe with regional controls, and explicitly refuses to infer customer motives.
 
 Synthetic benchmark:
 
@@ -96,22 +82,54 @@ Synthetic benchmark:
 
 ### 3. Customer Intelligence / segmentation
 
-Question:
-
 ```text
-How are European customer segments distributed by behavioral value, and which segment contributes most to deposits?
+How are European customer segments distributed by behavioral value,
+and which segment contributes most to deposits?
 ```
-
-FitzSight builds observable customer behavior features, applies a transparent deterministic value score, profiles segment deposits/withdrawals/trading behavior, and enforces a boundary against credit/AML/adverse-action use.
 
 Synthetic benchmark:
 
 - customers segmented: **6,770**
 - coverage: **100%**
-- value groups: **4**
 - High Value customer share: **4.1%**
 - High Value deposit share: **55.8%**
-- verification: **5/5 claims PASS**
+- verification: **5/5 PASS**
+
+### 4. Marketing lead-quality investigation
+
+```text
+Why did Americas lead volume rise while FTD conversion fell after June 15?
+```
+
+Synthetic benchmark:
+
+- lead-volume change: **+838 / +315.0%**
+- aggregate FTD change: **-10.84 pp**
+- Paid Search mix change: **+60.52 pp**
+- Paid Search FTD change: **-16.44 pp**
+- Paid Search p-value: **4.43e-05**
+- verification: **4/4 PASS**
+
+This workflow separates **volume**, **mix**, and **within-channel performance** rather than equating more leads with better commercial performance.
+
+### 5. False-correlation guardrail investigation
+
+```text
+Why did Asia FTD conversion fall after July 20,
+and is the nearby office relocation the cause?
+```
+
+Synthetic benchmark:
+
+- Asia FTD change: **-8.13 pp**
+- Affiliate FTD change: **-15.81 pp**
+- Affiliate p-value: **0.00463**
+- top negative within-channel performance effect: **Affiliate**
+- nearby office-event causal support: **false**
+- false correlation rejected: **true**
+- verification: **4/4 PASS**
+
+This is a deliberate falsification benchmark: a nearby event exists, but FitzSight must refuse to turn temporal proximity into causal attribution.
 
 ## Technical architecture
 
@@ -128,22 +146,27 @@ Planner/model output is untrusted. It cannot generate SQL, arbitrary table acces
 
 ## Evaluation
 
-The v0.6 benchmark catalog contains three independent workflows and measures:
-
-- scenario pass rate;
-- root-cause scenario accuracy for anomaly scenarios;
-- evidence coverage;
-- verifier violations / overclaim failures;
-- deterministic end-to-end latency.
-
-Current SQLite build benchmark:
+The v0.7 benchmark catalog contains **five** independent workflows.
 
 ```text
-3 / 3 scenarios PASS
-scenario pass rate:       100%
-root-cause scenario acc.: 100%
-mean evidence coverage:   100%
-verifier violations:      0
+5 / 5 scenarios PASS
+scenario pass rate:                    100%
+root-cause scenario accuracy:          100%
+false-correlation rejection accuracy:  100%
+mean evidence coverage:                100%
+verifier violations:                   0
+```
+
+The adversarial release gate contains eight cases:
+
+```text
+8 / 8 PASS
+scope refusal accuracy:             100%
+planner policy catch rate:          100%
+verifier integrity catch rate:      100%
+causal-overclaim catch rate:        100%
+ground-truth leak catch rate:       100%
+false-correlation rejection rate:   100%
 ```
 
 ## Data and compliance
@@ -173,5 +196,6 @@ What changed?
 Where did it change?
 Which measurable drivers explain the movement?
 What evidence supports each claim?
+Which tempting explanations fail the evidence test?
 What are we not justified in claiming?
 ```

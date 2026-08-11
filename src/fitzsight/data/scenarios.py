@@ -24,13 +24,7 @@ class CrmRoutingScenario:
 
 @dataclass(frozen=True)
 class NetDepositShockScenario:
-    """Second synthetic benchmark: a concentrated high-value withdrawal shock.
-
-    The benchmark is intentionally designed as an *observed financial-operations
-    driver*, not a claim about why the customers withdrew. FitzSight should be
-    able to decompose the net-deposit movement and identify the concentration
-    without inventing customer motives.
-    """
+    """Synthetic benchmark: concentrated high-value withdrawal pressure."""
 
     event_id: str = "EVT_EU_HIGH_VALUE_WITHDRAWAL_20260805"
     event_type: str = "HIGH_VALUE_WITHDRAWAL_CLUSTER"
@@ -53,5 +47,63 @@ class NetDepositShockScenario:
         )
 
 
+@dataclass(frozen=True)
+class MarketingLeadQualityScenario:
+    """Synthetic benchmark: more Americas leads but lower acquisition quality."""
+
+    event_id: str = "EVT_AM_PAID_MEDIA_EXPANSION_20260615"
+    event_type: str = "PAID_MEDIA_EXPANSION"
+    event_date: date = date(2026, 6, 15)
+    region: str = "Americas"
+    acquisition_channel: str = "Paid Search"
+    baseline_start: date = date(2026, 6, 1)
+    baseline_end: date = date(2026, 6, 14)
+    current_start: date = date(2026, 6, 15)
+    current_end: date = date(2026, 6, 28)
+    reassigned_leads: int = 850
+    conversion_probability_multiplier: float = 0.48
+
+    @property
+    def description(self) -> str:
+        return (
+            "A synthetic paid-media expansion increases Americas Paid Search lead volume "
+            "during 2026-06-15 to 2026-06-28, while the incoming cohort has materially "
+            "lower FTD conversion quality."
+        )
+
+
+@dataclass(frozen=True)
+class FalseCorrelationScenario:
+    """Synthetic benchmark designed to punish post-hoc event attribution.
+
+    An unrelated office relocation appears near an Asia conversion deterioration.
+    The measurable deterioration is concentrated in Affiliate leads; FitzSight should
+    surface that observed driver and explicitly withhold causal attribution to the
+    nearby office event.
+    """
+
+    event_id: str = "EVT_ASIA_OFFICE_RELOCATION_20260720"
+    event_type: str = "OFFICE_RELOCATION"
+    event_date: date = date(2026, 7, 20)
+    region: str = "Asia"
+    driver_channel: str = "Affiliate"
+    baseline_start: date = date(2026, 7, 6)
+    baseline_end: date = date(2026, 7, 19)
+    current_start: date = date(2026, 7, 20)
+    current_end: date = date(2026, 8, 2)
+    conversion_probability_multiplier: float = 0.38
+
+    @property
+    def description(self) -> str:
+        return (
+            "A synthetic Asia office relocation is logged on 2026-07-20 but is not "
+            "configured to affect lead conversion. In the same period, Affiliate lead "
+            "conversion quality deteriorates. The benchmark tests whether FitzSight "
+            "rejects a nearby-but-unrelated event as a causal explanation."
+        )
+
+
 CRM_ROUTING_SCENARIO = CrmRoutingScenario()
 NET_DEPOSIT_SCENARIO = NetDepositShockScenario()
+MARKETING_LEAD_QUALITY_SCENARIO = MarketingLeadQualityScenario()
+FALSE_CORRELATION_SCENARIO = FalseCorrelationScenario()

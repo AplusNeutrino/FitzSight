@@ -40,7 +40,11 @@ def render_verified_answer(
     analysis_type = result.diagnosis.get("analysis_type")
     if analysis_type == "customer_intelligence_segmentation":
         headline = "A verified customer-value segmentation profile was generated."
-    elif root_status == "supported_candidate" and driver_type == "observed_withdrawal_concentration":
+    elif root_status == "supported_candidate" and driver_type in {
+        "observed_withdrawal_concentration",
+        "observed_acquisition_quality_shift",
+        "observed_channel_specific_quality_deterioration",
+    }:
         headline = "A supported financial-operations driver was identified."
     elif root_status == "supported_candidate":
         headline = "A supported root-cause candidate was identified."

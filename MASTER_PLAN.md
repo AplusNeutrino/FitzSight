@@ -3425,3 +3425,23 @@ The public implementation repository uses the MIT License for the project-owned 
 ## D-020 — UI charts and KPI cards are presentation-only
 
 v0.6 UI code renders business KPI cards, intent-specific charts, plan trace and evidence cards from the verified Agent result. The UI is not allowed to recompute KPI logic or create a second, unverified analytical path.
+
+---
+
+# v0.7 Implementation Decisions (2026-08-11)
+
+## D-021 — Acquisition analysis must separate volume, mix, and within-channel performance
+
+The marketing-quality benchmark is not considered solved by observing that lead count increased while conversion fell. FitzSight must separately measure lead volume, acquisition-channel mix, and within-channel conversion performance so that “more leads” is not confused with “better business performance.”
+
+## D-022 — Nearby events require falsification before causal attribution
+
+A business event appearing near a KPI movement is context, not proof. v0.7 adds a deliberate false-correlation benchmark in which an office relocation occurs near an Asia FTD decline while the measurable deterioration is concentrated in Affiliate leads. The Agent must reject the office event as a supported cause.
+
+## D-023 — Adversarial evidence/safety checks are a release gate
+
+Release validation now includes scope-refusal, planner-policy, evidence-integrity, causal-overclaim, evaluation-boundary, and false-correlation cases. A benchmark headline is insufficient if the Agent can bypass the intended trust boundary.
+
+## D-024 — Five scenarios complete the initial benchmark target
+
+The initial five-scenario benchmark target is now complete: CRM routing, net-deposit withdrawal concentration, customer intelligence, marketing acquisition quality, and false-correlation falsification. Additional scenarios remain useful, but competition work should now prioritize demo/runtime validation and submission assets over expanding the catalog without a clear evaluation benefit.

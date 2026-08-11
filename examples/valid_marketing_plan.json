@@ -1,0 +1,12 @@
+{
+  "intent": "marketing_lead_quality_investigation",
+  "steps": [
+    {"action": "inspect_schema", "purpose": "Confirm required lead, channel and conversion fields."},
+    {"action": "measure_lead_volume", "purpose": "Compare equal pre/post campaign lead-volume windows."},
+    {"action": "measure_conversion", "purpose": "Measure FTD conversion across the campaign split."},
+    {"action": "channel_mix_decomposition", "purpose": "Separate acquisition-channel mix and performance effects."},
+    {"action": "statistical_validation", "purpose": "Validate the conversion movement statistically."},
+    {"action": "event_check", "purpose": "Inspect the nearby campaign event for context."},
+    {"action": "evidence_boundary", "purpose": "Keep claims within the measured acquisition-quality evidence."}
+  ]
+}

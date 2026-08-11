@@ -1,84 +1,113 @@
 # FitzSight Implementation Status
 
-**Version:** v0.6.0  
+**Version:** v0.7.0  
 **Date:** 2026-08-11  
-**Phase:** Three-intent Agent + deterministic Customer Intelligence + initial-round materials
+**Phase:** Five-intent Agent + five-scenario benchmark + adversarial evaluation
 
 ## Supported Agent intents
 
 1. `crm_routing_ftd_investigation`
 2. `net_deposit_anomaly_investigation`
 3. `customer_intelligence_segmentation`
+4. `marketing_lead_quality_investigation`
+5. `false_correlation_guardrail_investigation`
 
-All three retain the same architecture boundary:
+Every intent uses the same trust boundary:
 
 ```text
 Question
 → local approved-intent gate
 → constrained plan
-→ deterministic tools
+→ deterministic SQL/Python tools
 → Evidence Registry
 → EvidenceClaimVerifier
 → verified / withheld answer
 ```
 
-## v0.6 completed
+## v0.7 completed
 
-- [x] deterministic behavioral customer segmentation;
-- [x] third approved Agent intent;
-- [x] complete customer-intelligence investigation loop;
-- [x] no `*_gt` usage in normal segmentation SQL;
-- [x] three-scenario benchmark catalog;
-- [x] compact SQL evidence preview/digest mode for large segmentation feature queries;
-- [x] root-cause scenario accuracy metric;
-- [x] evidence-coverage metric;
-- [x] verifier-violation / overclaim metric;
-- [x] deterministic latency measurement;
-- [x] UI code for business KPI cards;
-- [x] UI code for intent-specific charts;
-- [x] UI code for plan trace and evidence cards;
-- [x] formal initial-round Project Summary;
-- [x] pitch-deck content source draft;
-- [x] MIT License and third-party notice;
-- [x] v0.6 docs and tests.
+- [x] Americas paid-media / lead-quality benchmark;
+- [x] Asia false-correlation benchmark;
+- [x] fourth and fifth approved Agent intents;
+- [x] channel performance-vs-composition diagnostics;
+- [x] explicit falsification check for nearby-event attribution;
+- [x] five-scenario deterministic benchmark catalog;
+- [x] false-correlation rejection accuracy metric;
+- [x] eight-case adversarial safety/evidence suite;
+- [x] unsupported trade / AML scope-refusal checks;
+- [x] planner SQL / high-impact action rejection checks;
+- [x] missing-evidence, causal-overclaim and `_gt` leakage checks;
+- [x] UI code expanded to five preset workflows;
+- [x] benchmark and compliance documentation;
+- [x] v0.7 release documentation and tests.
 
-## Validation
+## Build validation
+
+The full suite is executed in groups because the sandbox has a strict single-process time ceiling.
 
 ```text
-Group 1: 24 passed
-Group 2: 21 passed, 1 skipped
-Aggregate: 46 passed, 1 skipped
+Group 1: 25 passed
+Group 2: 25 passed, 1 skipped
+Aggregate: 50 passed, 1 skipped
 compileall: PASS
 ```
 
-Three-scenario benchmark:
+The single build skip is the DuckDB-specific integration test. DuckDB itself has already been validated separately in the deployment environment on 2026-08-11.
+
+## Five-scenario benchmark
 
 ```text
-3 passed / 0 failed
-scenario pass rate:           100%
-root-cause scenario accuracy: 100%
-mean evidence coverage:       100%
-verifier violations:          0
+5 passed / 0 failed
+scenario pass rate:                  100%
+root-cause scenario accuracy:        100%
+false-correlation rejection accuracy:100%
+mean evidence coverage:              100%
+verifier violations:                 0
 ```
 
-Customer Intelligence:
+New scenario 4 — Americas acquisition quality:
 
 ```text
-European customers:          6,770
-segments:                     4
-coverage:                     100%
-High Value customer share:    4.1%
-High Value deposit share:    55.8%
-verification:                 5/5 PASS
+lead volume:            +838 (+315.0%)
+FTD conversion:         -10.84 pp
+Paid Search mix:        +60.52 pp
+Paid Search conversion: -16.44 pp
+Paid Search p-value:    4.43e-05
+verification:           4/4 PASS
+```
+
+New scenario 5 — false correlation:
+
+```text
+Asia conversion:        -8.13 pp
+Affiliate conversion:  -15.81 pp
+Affiliate p-value:      0.00463
+top negative performance channel: Affiliate
+nearby office event causal support: false
+false correlation rejected: true
+verification:           4/4 PASS
+```
+
+## Adversarial evaluation
+
+```text
+8 / 8 PASS
+overall adversarial pass rate:       100%
+scope refusal accuracy:              100%
+planner policy catch rate:           100%
+verifier evidence-integrity catch:   100%
+causal-overclaim catch rate:         100%
+ground-truth leak catch rate:        100%
+false-correlation rejection rate:    100%
 ```
 
 ## External runtime state
 
 ### Done
 
-- DuckDB deployment runtime: verified with `data/generated`;
-- default constrained planner on DuckDB: verified;
-- JSON-file planner on DuckDB: verified.
+- DuckDB runtime with `data/generated`;
+- constrained planner on DuckDB;
+- JSON-file planner on DuckDB.
 
 ### Still pending live evidence
 
@@ -87,9 +116,9 @@ verification:                 5/5 PASS
 
 ## Next implementation priority
 
-1. validate Streamlit runtime and improve the demo based on actual rendering;
-2. validate live OpenAI planner if credentials/model access are available;
-3. add benchmark scenarios 4 and 5;
-4. turn pitch-deck source content into the final PPT/PDF artifact;
-5. record demo video and prepare submission package;
-6. continue adversarial/overclaim benchmark coverage.
+1. validate Streamlit runtime and refine the actual rendered demo;
+2. validate the live OpenAI planner if model/API access is available;
+3. turn the completed pitch-deck content source into the final PPT/PDF artifact;
+4. record a short demo video and prepare initial-round submission assets;
+5. add one-command startup / local-demo backup;
+6. continue latency/cost measurement once a live model provider is validated.
