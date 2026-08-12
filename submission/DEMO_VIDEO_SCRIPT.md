@@ -51,7 +51,7 @@ Briefly show the false-correlation scenario or adversarial result and state:
 
 Show the architecture line:
 
-**Question → Data → Analysis → Evidence → Decision**
+**Question → Data → Analysis → Evidence → Decision Support → Human Decision**
 
 Mention the five-scenario benchmark and MIT open-source repository.
 

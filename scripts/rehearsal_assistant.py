@@ -28,7 +28,7 @@ def evaluate(mode: str, elapsed_seconds: float) -> dict[str, object]:
         passed = passed and elapsed_seconds <= float(maximum)
     return {
         "product": "FitzSight",
-        "version": "0.11.0",
+        "version": "0.12.0",
         "mode": mode,
         "elapsed_seconds": round(float(elapsed_seconds), 2),
         "target_min_seconds": minimum,
@@ -57,7 +57,7 @@ def main() -> int:
     if args.dry_run:
         payload = {
             "product": "FitzSight",
-            "version": "0.11.0",
+            "version": "0.12.0",
             "mode": args.mode,
             "status": "dry_run",
             "plan": load_plan()["modes"][args.mode],

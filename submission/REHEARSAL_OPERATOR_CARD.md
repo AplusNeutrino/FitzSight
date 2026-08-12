@@ -19,7 +19,7 @@
 - Show the plan/trace briefly, not every line.
 - Show the verified finding, Evidence IDs and guardrail.
 - Show either net deposits or false correlation as the second proof point.
-- Close on “Question → Data → Analysis → Evidence → Decision.”
+- Close on “Question → Data → Analysis → Evidence → Decision Support → Human Decision.”
 
 ## Failure rule
 

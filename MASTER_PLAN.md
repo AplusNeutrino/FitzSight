@@ -174,9 +174,14 @@ Verified Answer
 
 > **金融经纪 / FinTech / 支付 / 交易平台类企业的经营分析与异常诊断。**
 
-目标不是做面向消费者的“投资建议机器人”，而是做：
+目标不是做面向消费者的“投资建议机器人”，而是先建立一个明确 beachhead：
 
-> **企业内部 Business Analyst / Sales Manager / Operations Manager / Risk Analyst 的智能分析助手。**
+> **Primary：Brokerage / FinTech Operations Analyst。**  
+> **Secondary：Regional Operations Manager / Sales Operations Manager。**
+
+主业务链聚焦：
+
+> **acquisition → FTD conversion → client-fund flows**
 
 ---
 
@@ -595,7 +600,7 @@ Returns evidence-backed conclusion
 
 ## 5.1 Primary User
 
-### Financial Business Analyst
+### Brokerage / FinTech Operations Analyst
 
 需求：
 
@@ -613,7 +618,7 @@ Returns evidence-backed conclusion
 
 ## 5.2 Secondary Users
 
-### Sales Manager
+### Sales Operations Manager
 
 关心：
 
@@ -624,7 +629,7 @@ Returns evidence-backed conclusion
 - 客户跟进；
 - 高潜客户。
 
-### Operations Manager
+### Regional Operations Manager
 
 关心：
 
@@ -634,7 +639,7 @@ Returns evidence-backed conclusion
 - 地区差异；
 - 运营影响因素。
 
-### Risk / Compliance Analyst
+### Risk / Compliance Analyst — output consumer, not primary persona
 
 MVP 中只做：
 
@@ -2294,7 +2299,8 @@ human-in-the-loop boundaries
 Question
 → Investigation
 → Evidence
-→ Decision
+→ Decision Support
+→ Human Decision
 ```
 
 ---
@@ -2532,25 +2538,25 @@ Agentic Financial Operations Intelligence
 
 Excel + SQL + Python + BI + Manual report。
 
-### Slide 4 — Our Solution
+### Slide 4 — Hero Agent Journey
 
-Question → Investigation → Evidence → Decision。
+Question → bounded investigation → Evidence → Verifier → Decision Support → Human Decision。
 
-### Slide 5 — User Scenario
+### Slide 5 — Hero Evidence
 
-“Why did net deposits fall?”
+“Why did European FTD conversion deteriorate after July 15?”
 
-### Slide 6 — Agent Workflow
+### Slide 6 — Failure Branch
 
-真实工具调用。
+工具失败 / evidence 不足时 fail closed。
 
 ### Slide 7 — Architecture
 
 Agent + Tools + Data。
 
-### Slide 8 — Synthetic Benchmark
+### Slide 8 — 1+1 Story / Breadth
 
-Ground Truth anomalies。
+CRM hero + false-correlation refusal；其余 workflow 作为 breadth。
 
 ### Slide 9 — Demo / Prototype
 
@@ -3321,13 +3327,13 @@ CRM Routing Change
 
 # Appendix A — 项目一句话版本
 
-> **FitzSight is an evidence-grounded financial operations intelligence agent that autonomously investigates business anomalies by querying enterprise-style data, performing statistical validation, and producing traceable, decision-ready insights.**
+> **FitzSight is an evidence-grounded financial operations intelligence agent for Brokerage / FinTech Operations Analysts. It autonomously investigates approved operational anomalies across acquisition, FTD conversion and client-fund flows, then produces traceable decision support for a human operator.**
 
 ---
 
 # Appendix B — 30 秒英文 Pitch
 
-> Financial teams already have dashboards, SQL and BI tools, but answering a simple question such as “Why did net deposits fall this week?” can still require hours of manual investigation. FitzSight is an agentic financial operations analyst. It plans the investigation, queries the relevant data, drills into regions, sales teams and customer segments, performs statistical validation, and links every important claim back to executable evidence. Instead of chatting with a CSV, FitzSight turns a business question into a reproducible investigation and an auditable decision brief.
+> Brokerage and FinTech operations teams already have dashboards, SQL and BI tools, but answering “Why did FTD conversion deteriorate?” can still require hours of manual investigation. FitzSight is an agentic financial operations analyst: it plans inside a bounded action catalog, queries read-only operational data, lets observed evidence control approved drilldowns, performs statistical validation, and links important claims to auditable Evidence IDs. Instead of chatting with a CSV, FitzSight turns an operational question into a reproducible investigation and a decision-support brief. Autonomous investigation. Human decision.
 
 ---
 
@@ -3514,3 +3520,33 @@ A machine can be locally demo-ready while GOAI portal submission remains incompl
 ## D-037 — Human rehearsal evidence must be human-performed
 
 FitzSight may provide timing targets, operator cards, and a local timing recorder, but code presence or a synthetic timing value is not proof that the user performed a real pitch/demo/Q&A rehearsal. The corresponding roadmap tasks remain open until real user-provided rehearsal evidence exists.
+
+# v0.12 Implementation Decisions (2026-08-12)
+
+## D-038 — Freeze the primary competition persona
+
+Primary persona is **Brokerage / FinTech Operations Analyst**. Regional Operations Manager / Sales Operations Manager remain secondary. The beachhead chain is acquisition → FTD conversion → client-fund flows.
+
+## D-039 — One hero journey, one refusal story
+
+The CRM / FTD investigation is the judge-facing hero. The false-correlation workflow is the strongest safety/refusal story. Net deposits, customer intelligence and marketing quality remain breadth evidence rather than equal-weight hero demos.
+
+## D-040 — Bounded adaptivity, not unrestricted autonomy
+
+Tool results may select the next action only from the published CRM action catalog. Planner/model output cannot emit SQL, arbitrary table/file access, arbitrary tool arguments, or high-impact financial actions.
+
+## D-041 — Lightweight source-addressable document evidence
+
+v0.12 uses a small fixed synthetic operational-document corpus with stable source/paragraph IDs. It intentionally does not claim a production RAG or enterprise knowledge platform.
+
+## D-042 — Evaluation v2 must include holdout and architecture ablation
+
+Unseen synthetic seeds/question paraphrases test routing/support robustness. A controlled no-verifier-gate ablation measures the safety contribution of the evidence/verifier output gate. Neither test is presented as real-client or Generic LLM performance.
+
+## D-043 — Decision-support wording is mandatory
+
+Competition-facing language should use **Autonomous investigation. Human decision.** and explicitly separate analytical decision support from automated high-impact financial decisions.
+
+## D-044 — Enterprise controls are blueprint-only unless implemented
+
+SSO, RBAC/ABAC, row/field authorization, PII masking, tenant isolation, retention and production observability are deployment-blueprint requirements, not current PoC implementation claims.

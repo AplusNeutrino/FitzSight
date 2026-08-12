@@ -108,7 +108,7 @@ def main() -> int:
     frames: list[tuple[str, str, list[str], str]] = [
         (
             "Evidence-grounded Financial Operations Intelligence Agent",
-            "Question → Data → Analysis → Evidence → Decision",
+            "Question → Data → Analysis → Evidence → Decision Support → Human Decision",
             [
                 "Five approved financial-operations workflows",
                 "Read-only SQL and deterministic Python own the business calculations",

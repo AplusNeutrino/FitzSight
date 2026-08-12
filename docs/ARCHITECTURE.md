@@ -103,3 +103,29 @@ Synthetic generator fields ending in `_gt` are benchmark-only. Normal Agent SQL 
 ## UI boundary
 
 Streamlit is a presentation layer. KPI cards, charts, trace, and evidence cards are constructed from verified result objects. The UI must not become an independent analytics path.
+
+## v0.12 bounded-adaptive hero extension
+
+The CRM / FTD hero remains inside the approved intent boundary, but execution is no longer presented as an unconditional fixed pipeline. The deterministic executor records branch decisions after contribution/statistical evidence and may execute or skip the next approved action:
+
+```text
+contribution/statistics
+  ├─ trigger met → anomaly_scan
+  │                 ├─ latency/statistical trigger met → event_check
+  │                 │                                └─ matching event → document_evidence_check
+  │                 └─ trigger not met → attribution withheld
+  └─ trigger not met → attribution withheld
+```
+
+Every branch decision is registered as `agent.branch_decision` evidence. The document layer is a fixed synthetic source/paragraph catalog; it does not permit arbitrary paths or network retrieval.
+
+The output boundary is:
+
+```text
+Autonomous investigation
+→ EvidenceClaimVerifier
+→ analytical decision support
+→ authorized human decision outside FitzSight
+```
+
+Production identity/RBAC/PII/audit-retention controls are explicitly separated into `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md` and are not claimed as current PoC implementation.

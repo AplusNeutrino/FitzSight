@@ -20,7 +20,7 @@
 | 4:30–5:15 | Trust boundary | “Planner output is untrusted; SQL is read-only; verifier fails closed.” |
 | 5:15–5:50 | Evaluation | “Five scenarios pass 5/5; eight adversarial cases pass 8/8.” |
 | 5:50–6:20 | Open-source / reproducibility | “Synthetic generator, tools, evidence layer, tests and evaluation harness are reusable.” |
-| 6:20–6:30 | Close | “Question → Data → Analysis → Evidence → Decision.” |
+| 6:20–6:30 | Close | “Question → Data → Analysis → Evidence → Decision Support → Human Decision.” |
 
 ## 2:20 live/local demo timing
 

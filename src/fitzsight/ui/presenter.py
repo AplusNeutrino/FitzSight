@@ -30,6 +30,9 @@ class TraceRow:
     action: str
     purpose: str
     policy: str = "approved"
+    status: str = "planned"
+    reason: str = ""
+    evidence_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -229,14 +232,31 @@ def build_presentation(result: dict[str, Any], *, backend: str) -> PresentationV
         raise ValueError(f"Unsupported presentation intent: {intent}")
 
     kpis, chart = _PRESENTERS[intent](investigation["metrics"], verification)
-    trace = tuple(
-        TraceRow(
-            step=str(step["step_id"]),
-            action=str(step["action"]),
-            purpose=str(step["purpose"]),
+    planned_by_action = {
+        str(step["action"]): step for step in result["plan"]["steps"]
+    }
+    execution_trace = investigation.get("execution_trace") or []
+    if execution_trace:
+        trace = tuple(
+            TraceRow(
+                step=str(row["step_id"]),
+                action=str(row["action"]),
+                purpose=str(planned_by_action.get(str(row["action"]), {}).get("purpose", row.get("reason", ""))),
+                status=str(row.get("status", "executed")),
+                reason=str(row.get("reason", "")),
+                evidence_ids=tuple(str(eid) for eid in row.get("evidence_ids", ())),
+            )
+            for row in execution_trace
         )
-        for step in result["plan"]["steps"]
-    )
+    else:
+        trace = tuple(
+            TraceRow(
+                step=str(step["step_id"]),
+                action=str(step["action"]),
+                purpose=str(step["purpose"]),
+            )
+            for step in result["plan"]["steps"]
+        )
     evidence_cards = tuple(
         EvidenceCard(
             evidence_id=str(record["evidence_id"]),

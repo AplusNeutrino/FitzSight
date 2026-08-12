@@ -38,3 +38,21 @@ Code and compile validation are complete. A real Streamlit runtime smoke test re
 pip install -e ".[ui]"
 streamlit run streamlit_app.py
 ```
+
+## v0.12 hero process evidence
+
+The CRM/FTD presentation trace now renders execution status, branch rationale and Evidence IDs when `investigation.execution_trace` is present. This makes the product process visible rather than showing only the final KPI answer.
+
+For a deterministic judge-facing product-process screen that does not depend on live Streamlit availability, run:
+
+```bash
+python scripts/build_hero_evidence.py
+```
+
+Outputs:
+
+- `docs/V0.12_HERO_RUN.json`
+- `submission/FitzSight_Hero_Run_Evidence.html`
+- `submission/FitzSight_Hero_Run_Evidence.png`
+
+The PNG is rendered from the actual verified runtime JSON, not a manually authored analytical mock.

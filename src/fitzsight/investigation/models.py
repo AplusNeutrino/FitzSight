@@ -31,6 +31,23 @@ class Claim:
 
 
 @dataclass(frozen=True)
+class ExecutionTraceStep:
+    """Auditable execution outcome for one approved investigation action.
+
+    The planner still publishes a bounded action catalog. The deterministic
+    executor may execute or skip conditional actions based only on already
+    observed tool results. No arbitrary SQL or free-form tool arguments are
+    introduced by this trace.
+    """
+
+    step_id: str
+    action: str
+    status: str
+    reason: str
+    evidence_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class InvestigationResult:
     product: str
     mode: str
@@ -40,6 +57,7 @@ class InvestigationResult:
     metrics: dict[str, Any]
     diagnosis: dict[str, Any]
     evidence: tuple[dict[str, Any], ...]
+    execution_trace: tuple[ExecutionTraceStep, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

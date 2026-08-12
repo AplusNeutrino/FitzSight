@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "missing_required_files": [],
+  "generated_csv_files": [],
+  "secret_hits": [],
+  "submission_assets": {
+    "FitzSight_GOAI_Initial_Round.pptx": {
+      "bytes": 56667,
+      "sha256": "d37349c51ff115d7d890a8b49a8596cb058df7e88d517a1559ec392de112378c"
+    },
+    "FitzSight_GOAI_Initial_Round.pdf": {
+      "bytes": 777262,
+      "sha256": "90628f14c36ceb73de6b50bebea1efe5e0097593a7d5c51a38bc3e4390d3f6b4"
+    },
+    "FitzSight_Offline_Demo.html": {
+      "bytes": 31068,
+      "sha256": "7c707f4e1765c6c07ae904bf268efd7984352401bda3211e30e105302832f9c0"
+    },
+    "FitzSight_Offline_Demo_Backup.mp4": {
+      "bytes": 474385,
+      "sha256": "471400ad9f63a6c5793cd9730e91d54c3183c9e7cc3c5d3e3ba6be349ee6e52b"
+    },
+    "FitzSight_GOAI_Upload_Bundle.zip": {
+      "bytes": 950169,
+      "sha256": "033be65cc6dbe914c0534ad651a8074ebf1358a3864278d44043cc7a2b70c6c6"
+    },
+    "FitzSight_Manual_Handoff.zip": {
+      "bytes": 953917,
+      "sha256": "30e503d99277a9b59b113fd499a553cbc063b979335e8818efd3170fb19547e3"
+    },
+    "FitzSight_Final_Machine_Kit.zip": {
+      "bytes": 3675230,
+      "sha256": "1c491b1adc2b1cc82d7851af4bf2ca1fef5a668e0dd26f89ed4e4d7b0623fb3c"
+    }
+  },
+  "offline_demo_verified_5_of_5": true,
+  "upload_bundle_zip_integrity": true,
+  "manual_handoff_zip_integrity": true,
+  "final_machine_kit_integrity": true,
+  "manual_submission_boundary": {
+    "mode": "user_manual_only",
+    "external_write_actions_performed": false,
+    "portal_upload_or_submit_by_automation": false,
+    "gmail_or_email_access_by_automation": false
+  },
+  "external_actions_still_required": [
+    "USER MANUAL: confirm portal-specific field/file-size constraints in the actual GOAI upload UI",
+    "USER MANUAL: upload the required project introduction and PPT/PDF",
+    "USER MANUAL: capture portal/email confirmation evidence",
+    "USER MANUAL: run scripts/final_machine_check.py on the final presentation machine",
+    "Run Streamlit live validation on a machine with the UI dependency installed",
+    "Run OpenAI live planner validation only if stable credentials/model access are available"
+  ]
+}

@@ -6,6 +6,12 @@ FitzSight is a GOAI 2026 · Boundless Agents · AI+金融 project focused on a p
 
 > **Why did this financial-operations metric change?**
 
+**Primary persona:** Brokerage / FinTech Operations Analyst  
+**Secondary persona:** Regional Operations Manager / Sales Operations Manager  
+**Beachhead chain:** acquisition → FTD conversion → client-fund flows
+
+> **Autonomous investigation. Human decision.**
+
 The project does not ask an LLM to invent an explanation. It separates planning from calculation and verification:
 
 ```text
@@ -24,9 +30,11 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.11.0
+## Current release: v0.12.0
 
-v0.11 is the **final-machine operations layer**. It keeps the five-intent analytical core and the user-manual submission boundary unchanged, while adding a portable presentation-machine kit, one-command final-machine readiness check, explicit opt-in live-provider validation, Windows/POSIX launchers, and local rehearsal timing records. The goal is that the user can take over on a presentation machine without needing new analytical implementation work.
+v0.12 is the **GOAI alignment + bounded-adaptive hero + evaluation-v2 layer**. It preserves the five approved business intents and v0.11 final-machine/operator boundary, while making the CRM/FTD workflow the primary judge-facing journey. Tool results can now decide whether the next *approved* CRM action should execute; the action catalog remains closed and planner/model output still cannot generate SQL, table names, filesystem paths, arbitrary tool arguments, or high-impact financial actions.
+
+The release also adds fixed synthetic operational-document evidence with stable source/paragraph IDs, a runtime-derived hero process view, unseen-seed/question-paraphrase evaluation, a controlled verifier/evidence-gate ablation, and an explicit enterprise deployment boundary separating implemented PoC controls from production requirements.
 
 
 ## Final-machine operator path
@@ -56,7 +64,7 @@ Actual portal upload/final submit/confirmation remains user-manual only.
 
 ## Supported workflows
 
-### 1. CRM / FTD deterioration
+### 1. Hero — CRM / FTD deterioration
 
 ```text
 Why did European FTD conversion deteriorate after July 15?
@@ -70,6 +78,22 @@ control FTD change:       -1.21 pp
 response median change:  +29.15 min
 verification:             PASS
 ```
+
+v0.12 hero execution is bounded-adaptive:
+
+```text
+affected/control measurement
+→ statistical validation
+→ contribution decomposition
+→ conditional latency anomaly drilldown
+→ conditional operational-event check
+→ approved document paragraph evidence
+→ verifier
+→ decision-support answer
+→ approved follow-up
+```
+
+If the required evidence is absent or the event dependency fails, FitzSight records the branch and returns `insufficient_evidence` rather than manufacturing attribution.
 
 ### 2. Net-deposit deterioration
 

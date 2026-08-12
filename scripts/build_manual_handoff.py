@@ -94,7 +94,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manual_actions = {
             "product": "FitzSight",
-            "version": "0.11.0",
+            "version": "0.12.0",
             "execution_policy": "external_submission_user_manual_only",
             "automation_boundary": {
                 "local_prepare_validate_package": True,
@@ -132,7 +132,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manifest = {
             "product": "FitzSight",
-            "version": "0.11.0",
+            "version": "0.12.0",
             "purpose": "user_manual_submission_handoff",
             "network_actions_performed": False,
             "external_submission_performed": False,
@@ -173,7 +173,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
     return {
         "product": "FitzSight",
-        "version": "0.11.0",
+        "version": "0.12.0",
         "output": str(output),
         "bytes": output.stat().st_size,
         "sha256": sha256(output),

@@ -51,3 +51,15 @@ Project-owned code is released under the MIT License. Third-party packages remai
 ## Human review
 
 Any real-world high-impact decision must occur outside FitzSight and requires authorized human review under the deploying organization's policies and applicable law.
+
+## v0.12 decision-support and document boundary
+
+Competition-facing wording is standardized as:
+
+> **Autonomous investigation. Human decision.**
+
+The CRM hero may choose the next approved analytical step from observed tool results, but it cannot expand its own action catalog. Tool/dependency failure produces an auditable failure record and insufficient-evidence branch rather than an invented explanation.
+
+The v0.12 document-evidence feature is intentionally narrow: three synthetic operational paragraphs are addressed by stable document/paragraph IDs. It performs no arbitrary filesystem access, internet retrieval, vector search, or production RAG. These documents are synthetic competition fixtures and contain no customer/employer data.
+
+Enterprise SSO, RBAC/ABAC, row/field authorization, PII masking, tenant isolation, retention and production observability remain blueprint requirements, not current implementation claims. See `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md`.

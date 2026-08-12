@@ -48,6 +48,9 @@ def render_trace(view: PresentationView) -> None:
                 "Action": row.action,
                 "Purpose": row.purpose,
                 "Policy": row.policy,
+                "Status": row.status,
+                "Why this branch": row.reason,
+                "Evidence": ", ".join(row.evidence_ids),
             }
             for row in view.trace
         ]

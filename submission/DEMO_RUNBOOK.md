@@ -101,3 +101,18 @@ If the UI is unavailable but Python is working, use the deterministic CLI output
 - Do not enter real customer data.
 - Do not enable a live model provider unless it has already been runtime-validated on the presentation machine.
 - Do not describe synthetic benchmark accuracy as production accuracy.
+
+## v0.12 primary judge-facing product-process view
+
+The primary demo story is now the CRM / FTD hero. Before relying on live Streamlit, the operator can show `FitzSight_Hero_Run_Evidence.png` or open `FitzSight_Hero_Run_Evidence.html`. Both are derived from the real verified hero run in `docs/V0.12_HERO_RUN.json` and show:
+
+1. user question;
+2. bounded adaptive trace;
+3. branch rationale;
+4. Evidence IDs;
+5. source-paragraph document evidence;
+6. verifier PASS;
+7. guarded final answer;
+8. approved follow-up.
+
+Then use the Asia office-relocation case as the single strongest refusal/falsification story. Other workflows are breadth/Q&A, not equal-weight main-demo sections.

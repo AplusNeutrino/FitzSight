@@ -15,6 +15,7 @@ CRM_ACTIONS = (
     "contribution_decomposition",
     "anomaly_scan",
     "event_check",
+    "document_evidence_check",
     "evidence_boundary",
 )
 
@@ -89,6 +90,7 @@ ACTION_PURPOSES = {
     "nearby_event_check": "Inspect nearby operational events without assuming temporal proximity implies causality.",
     "falsification_check": "Compare the observed data pattern against the nearby event's declared scope/effect before any causal attribution.",
     "event_check": "Inspect nearby operational events for context without converting association into unsupported causality.",
+    "document_evidence_check": "Retrieve an approved synthetic operational-document paragraph that can corroborate the event context with a source/paragraph ID.",
     "evidence_boundary": "Separate directly supported findings from hypotheses, causal overclaims or prohibited decision use.",
 }
 
@@ -98,7 +100,7 @@ class UnsupportedIntentCatalogError(ValueError):
 
 
 def classify_supported_intent(question: str) -> str:
-    """Classify only explicitly approved FitzSight v0.7 intents.
+    """Classify only explicitly approved FitzSight v0.12 intents.
 
     This local classifier is a security/scope boundary. A model cannot expand
     FitzSight into arbitrary financial actions or invent a new workflow.
@@ -112,7 +114,7 @@ def classify_supported_intent(question: str) -> str:
     crm = (
         europe
         and any(token in q for token in ("ftd", "conversion", "转化"))
-        and any(token in q for token in ("july", "07-15", "7月15", "7 月 15", "july 15", "after july 15"))
+        and any(token in q for token in ("july", "07-15", "7月15", "7 月 15", "july 15", "after july 15", "2026-07-15"))
     )
     if crm:
         return CRM_INTENT
@@ -151,7 +153,7 @@ def classify_supported_intent(question: str) -> str:
         return FALSE_CORRELATION_INTENT
 
     raise UnsupportedIntentCatalogError(
-        "Question is outside the approved FitzSight v0.7 intent catalog."
+        "Question is outside the approved FitzSight v0.12 intent catalog."
     )
 
 

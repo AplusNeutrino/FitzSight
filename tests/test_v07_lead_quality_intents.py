@@ -17,10 +17,10 @@ def test_v07_rule_planner_routes_new_intents():
     planner = ConstrainedRulePlanner()
     marketing = planner.plan(MARKETING_Q)
     false_corr = planner.plan(FALSE_Q)
-    assert marketing.plan_version == "0.7"
+    assert marketing.plan_version == "0.12"
     assert marketing.intent == MARKETING_LEAD_QUALITY_INTENT
     assert tuple(step.action for step in marketing.steps) == MARKETING_LEAD_QUALITY_ACTIONS
-    assert false_corr.plan_version == "0.7"
+    assert false_corr.plan_version == "0.12"
     assert false_corr.intent == FALSE_CORRELATION_INTENT
     assert tuple(step.action for step in false_corr.steps) == FALSE_CORRELATION_ACTIONS
 

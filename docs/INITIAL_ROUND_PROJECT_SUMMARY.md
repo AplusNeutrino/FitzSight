@@ -8,7 +8,7 @@ Track: **GOAI 2026 · Boundless Agents · AI+金融**
 
 ## One-sentence definition
 
-FitzSight is an evidence-grounded financial-operations Agent that turns a manager's business question into a reproducible investigation: it plans a bounded workflow, executes read-only SQL/Python analytical tools, performs statistical or driver analysis, links important findings to Evidence IDs, and verifies claims before presenting a decision-support answer.
+FitzSight is an evidence-grounded financial-operations Agent for **Brokerage / FinTech Operations Analysts**. It turns an operational question into a reproducible investigation: it plans inside a bounded action catalog, executes read-only SQL/Python analytical tools, lets observed tool results control the next approved drilldown, links important findings to Evidence IDs and synthetic source-paragraph evidence, then verifies claims before presenting decision support to a human operator.
 
 ## Problem
 
@@ -18,10 +18,16 @@ A generic LLM can produce an explanation quickly, but a plausible explanation is
 
 ## Target users
 
-- Financial Business Analysts
-- Operations Managers
-- Sales Managers
-- Risk / Management Information analysts using the system for analytical support
+**Primary:** Brokerage / FinTech Operations Analyst  
+**Secondary:** Regional Operations Manager / Sales Operations Manager
+
+The initial beachhead chain is:
+
+```text
+acquisition → FTD conversion → client-fund flows
+```
+
+Risk / Management Information teams may consume the evidence-linked analytical output, but the current PoC is not positioned as an autonomous risk/compliance decision engine.
 
 FitzSight is **not** an investment adviser, trading system, AML enforcement engine, credit-decision system, or automated compliance decision-maker.
 
@@ -34,7 +40,7 @@ Local approved-intent gate
   ↓
 Constrained planner
   ↓
-Approved action sequence
+Approved action graph / sequence
   ↓
 Read-only SQL / Python tools
   ↓
@@ -45,15 +51,19 @@ Evidence Registry
 EvidenceClaimVerifier
   ↓
 Verified decision-support answer
+  ↓
+Authorized human decision
 ```
 
 ## Why this is an Agent rather than “chat with CSV”
 
-The system does not send a CSV to a model and ask for an answer. A planner is allowed only to select an approved high-level workflow. Numerical work remains in deterministic tools. Every supported factual claim has traceable Evidence IDs, and the final answer fails closed if verification does not pass.
+The system does not send a CSV to a model and ask for an answer. A planner is allowed only to select an approved high-level workflow. In the CRM/FTD hero, deterministic tool results can select the next action only from the pre-approved branch catalog. Numerical work remains in deterministic tools. Every supported factual claim has traceable Evidence IDs, and the final answer fails closed if verification does not pass.
+
+> **Autonomous investigation. Human decision.**
 
 ## Current supported workflows
 
-### 1. CRM / FTD anomaly investigation
+### 1. Hero — CRM / FTD anomaly investigation
 
 ```text
 Why did European FTD conversion deteriorate after July 15?
@@ -65,6 +75,8 @@ Synthetic benchmark:
 - European control: **-1.21 pp**
 - affected response median: **+29.15 min**
 - verification: **PASS**
+
+The v0.12 hero adds bounded conditional latency/event drilldown, stable document source `CRM-CHANGE-2026-0715#p1`, a fail-closed event-tool failure branch, and approved evidence-only follow-up questions.
 
 ### 2. Net-deposit anomaly investigation
 
@@ -199,3 +211,16 @@ What evidence supports each claim?
 Which tempting explanations fail the evidence test?
 What are we not justified in claiming?
 ```
+
+## v0.12 robustness and architecture evidence
+
+The fixed five-scenario benchmark remains the deterministic showcase/release regression set. v0.12 adds two complementary evaluations:
+
+- **Holdout seeds + question paraphrases:** 8 runs, 100% routing stability, 100% verifier pass, 100% evidence coverage, 100% false-correlation refusal correctness; one holdout CRM seed returns `insufficient_evidence`, producing a 75% supported-candidate rate rather than an inflated universal-recovery claim.
+- **Controlled no-verifier-gate ablation:** Full FitzSight refuses all four adversarial fixtures and emits no unsafe adversarial answer; the no-verifier-gate ablation emits all four unsafe cases. This is an architecture ablation, not a Generic LLM benchmark.
+
+Evidence: `docs/V0.12_HOLDOUT_RESULTS.json`, `docs/V0.12_ABLATION_RESULTS.json`, `docs/V0.12_EVALUATION.md`.
+
+## Production boundary
+
+Current competition evidence covers synthetic data, bounded planning/execution, read-only deterministic tools, append-only evidence, fail-closed verification, and source-addressable synthetic document evidence. Enterprise SSO/RBAC, row/field authorization, PII masking, tenant isolation, retention and production observability are deployment-blueprint requirements, not current PoC implementation claims. See `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md`.

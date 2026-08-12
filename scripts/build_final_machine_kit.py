@@ -85,7 +85,7 @@ def build_kit(output: Path) -> dict[str, object]:
             )
         manifest = {
             "product": "FitzSight",
-            "version": "0.11.0",
+            "version": "0.12.0",
             "purpose": "portable_final_presentation_machine_kit",
             "source_scope": "full_local_repository_snapshot_excluding_caches_generated_csv_and_self_archive",
             "external_submission_performed": False,
@@ -132,7 +132,7 @@ def build_kit(output: Path) -> dict[str, object]:
 
     return {
         "product": "FitzSight",
-        "version": "0.11.0",
+        "version": "0.12.0",
         "output": str(output),
         "bytes": output.stat().st_size,
         "sha256": sha256(output),

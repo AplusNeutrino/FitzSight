@@ -99,7 +99,7 @@ class OpenAIResponsesPlanner:
             intent = classify_supported_intent(question)
         except ValueError as exc:
             raise UnsupportedIntentError(
-                "Question is outside the approved FitzSight v0.7 intent catalog."
+                "Question is outside the approved FitzSight v0.12 intent catalog."
             ) from exc
         client = self._client_or_create()
         started = time.perf_counter()

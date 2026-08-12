@@ -15,7 +15,7 @@ from .net_deposit import NetDepositInvestigationEngine
 
 
 class MultiIntentInvestigationEngine:
-    """Routes only approved v0.7 intents to deterministic executors."""
+    """Routes only approved v0.12 intents to deterministic executors."""
 
     def __init__(
         self,

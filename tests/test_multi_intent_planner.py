@@ -18,7 +18,7 @@ NET_QUESTION = "Why did European net deposits fall in the week starting August 3
 
 def test_rule_planner_routes_second_business_intent():
     plan = ConstrainedRulePlanner().plan(NET_QUESTION)
-    assert plan.plan_version == "0.7"
+    assert plan.plan_version == "0.12"
     assert plan.intent == NET_DEPOSIT_INTENT
     assert tuple(step.action for step in plan.steps) == NET_DEPOSIT_ACTIONS
 
@@ -35,7 +35,7 @@ def test_structured_planner_accepts_second_intent_exact_sequence():
     )
     plan = StructuredJSONPlanner(lambda _prompt: raw).plan(NET_QUESTION)
     assert plan.intent == NET_DEPOSIT_INTENT
-    assert plan.plan_version == "0.7"
+    assert plan.plan_version == "0.12"
 
 
 def test_model_cannot_relabel_crm_question_as_net_deposit_intent():

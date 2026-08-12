@@ -56,6 +56,18 @@ class FinalAnswer:
 
 
 @dataclass(frozen=True)
+class FollowUpAnswer:
+    status: str
+    question: str
+    answer: str
+    evidence_ids: tuple[str, ...]
+    evidence_record_id: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class AgentRunResult:
     product: str
     mode: str

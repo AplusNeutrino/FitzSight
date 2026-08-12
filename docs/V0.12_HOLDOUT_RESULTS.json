@@ -1,0 +1,122 @@
+{
+  "product": "FitzSight",
+  "evaluation_version": "0.12",
+  "evaluation_type": "holdout_seed_and_question_paraphrase",
+  "construction": {
+    "training_or_showcase_seed_excluded": 20260811,
+    "holdout_seeds": [
+      20260821,
+      20260831
+    ],
+    "cases_per_seed": 4,
+    "n_customers_per_seed": 10000,
+    "backend": "sqlite",
+    "scope": "CRM/FTD hero plus false-correlation refusal only; synthetic benchmark generalization check, not real-client performance."
+  },
+  "metrics": {
+    "case_runs": 8,
+    "intent_routing_stability": 1.0,
+    "verification_pass_rate": 1.0,
+    "supported_candidate_rate": 0.75,
+    "mean_evidence_coverage": 1.0,
+    "false_correlation_refusal_correctness": 1.0
+  },
+  "results": [
+    {
+      "seed": 20260821,
+      "case_id": "crm_paraphrase_a",
+      "question": "Investigate the drop in Europe FTD conversion after July 15 and tell me what the evidence supports.",
+      "expected_intent": "crm_routing_ftd_investigation",
+      "actual_intent": "crm_routing_ftd_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": null
+    },
+    {
+      "seed": 20260821,
+      "case_id": "crm_paraphrase_b",
+      "question": "For Europe, what explains the FTD conversion deterioration after 2026-07-15?",
+      "expected_intent": "crm_routing_ftd_investigation",
+      "actual_intent": "crm_routing_ftd_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": null
+    },
+    {
+      "seed": 20260821,
+      "case_id": "false_corr_paraphrase_a",
+      "question": "Asia FTD conversion fell after July 20. Does evidence support the nearby office relocation as the cause?",
+      "expected_intent": "false_correlation_guardrail_investigation",
+      "actual_intent": "false_correlation_guardrail_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": true
+    },
+    {
+      "seed": 20260821,
+      "case_id": "false_corr_paraphrase_b",
+      "question": "Investigate Asia conversion after 2026-07-20; should we attribute it to the office relocation?",
+      "expected_intent": "false_correlation_guardrail_investigation",
+      "actual_intent": "false_correlation_guardrail_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": true
+    },
+    {
+      "seed": 20260831,
+      "case_id": "crm_paraphrase_a",
+      "question": "Investigate the drop in Europe FTD conversion after July 15 and tell me what the evidence supports.",
+      "expected_intent": "crm_routing_ftd_investigation",
+      "actual_intent": "crm_routing_ftd_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "insufficient_evidence",
+      "evidence_coverage": 1.0,
+      "refusal_correct": null
+    },
+    {
+      "seed": 20260831,
+      "case_id": "crm_paraphrase_b",
+      "question": "For Europe, what explains the FTD conversion deterioration after 2026-07-15?",
+      "expected_intent": "crm_routing_ftd_investigation",
+      "actual_intent": "crm_routing_ftd_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "insufficient_evidence",
+      "evidence_coverage": 1.0,
+      "refusal_correct": null
+    },
+    {
+      "seed": 20260831,
+      "case_id": "false_corr_paraphrase_a",
+      "question": "Asia FTD conversion fell after July 20. Does evidence support the nearby office relocation as the cause?",
+      "expected_intent": "false_correlation_guardrail_investigation",
+      "actual_intent": "false_correlation_guardrail_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": true
+    },
+    {
+      "seed": 20260831,
+      "case_id": "false_corr_paraphrase_b",
+      "question": "Investigate Asia conversion after 2026-07-20; should we attribute it to the office relocation?",
+      "expected_intent": "false_correlation_guardrail_investigation",
+      "actual_intent": "false_correlation_guardrail_investigation",
+      "intent_routing_stable": true,
+      "verification_passed": true,
+      "root_cause_status": "supported_candidate",
+      "evidence_coverage": 1.0,
+      "refusal_correct": true
+    }
+  ]
+}
