@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fitzsight"
-version = "0.9.0"
-description = "Evidence-grounded financial operations intelligence with five constrained Agent intents, auditable verification, offline demo fallbacks, and submission-ready assets"
+version = "0.10.0"
+description = "Evidence-grounded financial operations intelligence with five constrained Agent intents, auditable verification, offline fallbacks, and a user-manual competition handoff packet"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

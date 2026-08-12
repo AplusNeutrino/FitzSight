@@ -24,9 +24,9 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.9.0
+## Current release: v0.10.0
 
-v0.9 is the **runtime + submission completion layer**. It keeps the five-intent analytical core unchanged while making the judge-facing path harder to break: UI presentation logic is now pure/testable, competition-facing deck metrics are generated from fresh verified Agent runs, an offline HTML + MP4 backup is generated from verified outputs, runtime diagnostics/live-validation commands are explicit, and provider telemetry records model/token/latency metadata without exposing secrets.
+v0.10 is the **operator handoff layer**. It keeps the five-intent analytical core unchanged and makes the boundary explicit: FitzSight automation prepares, validates, hashes, and packages all local competition assets, while the actual GOAI portal submission and confirmation workflow is user-manual only. A portable handoff ZIP, field map, manual checklist, runtime checklist, and machine-readable readiness report are generated so the user can take over without additional code work.
 
 ## Supported workflows
 
@@ -234,10 +234,14 @@ Evaluation artifacts:
 - `docs/V0.7_VALIDATION.md`
 - `docs/V0.8_VALIDATION.md`
 - `docs/V0.8_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.9_BENCHMARK_RESULTS.json`
-- `docs/V0.9_ADVERSARIAL_RESULTS.json`
+- `docs/V0.10_BENCHMARK_RESULTS.json`
+- `docs/V0.10_ADVERSARIAL_RESULTS.json`
 - `docs/V0.9_DETERMINISTIC_LATENCY.json`
 - `docs/V0.9_RUNTIME_STATUS.json`
+- `docs/OPERATOR_BOUNDARY.md`
+- `docs/V0.10_HANDOFF_READINESS.json`
+- `docs/V0.10_SUBMISSION_PREFLIGHT.json`
+- `docs/V0.10_VALIDATION.md`
 
 ### Adversarial release gate
 
@@ -342,6 +346,19 @@ Run repository/submission preflight with:
 python scripts/preflight_submission.py
 ```
 
+Build the manual handoff packet with:
+
+```bash
+python scripts/build_manual_handoff.py
+python scripts/handoff_readiness.py
+```
+
+The generated `submission/FitzSight_Manual_Handoff.zip` contains the copy-ready portal text, PPT/PDF, offline demo/video, compliance/evaluation summaries, and manual operator instructions. It performs **no network action and no external submission**.
+
+### Manual submission boundary
+
+By default, FitzSight/ChatGPT project automation does not open or submit the GOAI portal, access Gmail, send email, or modify external accounts. Those submission actions are explicitly user-controlled. See `docs/OPERATOR_BOUNDARY.md` and `submission/START_HERE_MANUAL.md`.
+
 ## Runtime validation status
 
 ### DuckDB — validated
@@ -417,6 +434,8 @@ FitzSight/
 │   ├── build_offline_demo_video.py
 │   ├── measure_latency.py
 │   ├── build_submission_bundle.py
+│   ├── build_manual_handoff.py
+│   ├── handoff_readiness.py
 │   ├── preflight_submission.py
 │   └── build_pitch_deck.py
 ├── submission/
@@ -425,6 +444,10 @@ FitzSight/
 │   ├── FitzSight_Offline_Demo.html
 │   ├── FitzSight_Offline_Demo_Backup.mp4
 │   ├── FitzSight_GOAI_Upload_Bundle.zip
+│   ├── FitzSight_Manual_Handoff.zip
+│   ├── START_HERE_MANUAL.md
+│   ├── MANUAL_SUBMISSION_CHECKLIST.md
+│   ├── RUNTIME_VALIDATION_FOR_USER.md
 │   └── ...
 ├── src/fitzsight/
 │   ├── agent/
@@ -448,10 +471,14 @@ Key competition/evaluation files:
 - `docs/V0.7_VALIDATION.md`
 - `docs/V0.8_VALIDATION.md`
 - `docs/V0.8_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.9_BENCHMARK_RESULTS.json`
-- `docs/V0.9_ADVERSARIAL_RESULTS.json`
+- `docs/V0.10_BENCHMARK_RESULTS.json`
+- `docs/V0.10_ADVERSARIAL_RESULTS.json`
 - `docs/V0.9_DETERMINISTIC_LATENCY.json`
 - `docs/V0.9_RUNTIME_STATUS.json`
+- `docs/OPERATOR_BOUNDARY.md`
+- `docs/V0.10_HANDOFF_READINESS.json`
+- `docs/V0.10_SUBMISSION_PREFLIGHT.json`
+- `docs/V0.10_VALIDATION.md`
 
 ---
 

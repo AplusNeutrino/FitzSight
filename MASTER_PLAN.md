@@ -3486,3 +3486,15 @@ The self-contained HTML demo and MP4 backup are generated only from verified det
 ## D-032 — Provider telemetry records reproducibility metadata, never secrets or invented cost
 
 A live OpenAI planner validation may record response ID, requested/returned model, token usage and measured planning latency. API keys are never emitted. Provider monetary cost is not hardcoded or estimated without a validated pricing source and actual usage evidence.
+
+---
+
+# v0.10 Implementation Decisions (2026-08-11)
+
+## D-033 — Competition submission is user-manual only by default
+
+FitzSight automation prepares, validates, hashes, renders, and packages local competition artifacts. It does not open or submit the GOAI portal, upload files, access Gmail for confirmation, send email, or perform other external account writes unless the user separately and explicitly requests a specific action. Repository evidence cannot be used as proof that portal submission occurred.
+
+## D-034 — Final handoff must be self-contained and operator-oriented
+
+The user should be able to take over with a single portable handoff packet containing the copy-ready portal text, PPT/PDF, offline demo/video, compliance/evaluation summaries, manual field map, runtime instructions, and submission checklist. Remaining external/runtime/rehearsal tasks must be clearly separated from completed local implementation work.

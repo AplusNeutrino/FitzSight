@@ -1,10 +1,10 @@
-# FitzSight Repository Manifest — v0.9.0
+# FitzSight Repository Manifest — v0.10.0
 
 ## Core project files
 
-- `README.md` — product overview, five workflows, validation and submission path
-- `MASTER_PLAN.md` — product/competition plan plus implementation decisions through v0.9
-- `IMPLEMENTATION_STATUS.md` — current implementation/runtime snapshot
+- `README.md` — product overview, five workflows, validation and handoff path
+- `MASTER_PLAN.md` — product/competition plan plus implementation decisions through v0.10
+- `IMPLEMENTATION_STATUS.md` — current implementation/runtime/handoff snapshot
 - `LICENSE` — MIT License
 - `THIRD_PARTY_NOTICES.md` — dependency/build-tool notices
 - `PROJECT_PROGRESS.md` — pointer to the external project-progress truth source
@@ -22,13 +22,18 @@
 - `scripts/validate_streamlit_runtime.py` — real Streamlit health-check validator
 - `scripts/validate_openai_runtime.py` — real OpenAI planner → tools → verifier validator
 
-## Offline demo and submission assets
+## Operator handoff and submission assets
 
-- `scripts/build_offline_demo.py` — five verified Agent runs → self-contained HTML/JSON
-- `scripts/build_offline_demo_video.py` — verified offline-demo JSON → H.264 MP4 backup
-- `scripts/build_pitch_deck.py` — 12-slide PPTX/PDF builder using fresh verified runtime metrics
-- `scripts/build_submission_bundle.py` — initial-round upload convenience bundle with manifest/hashes
-- `scripts/preflight_submission.py` — local release/submission preflight
+- `docs/OPERATOR_BOUNDARY.md` — explicit local-automation vs user-manual external-action boundary
+- `scripts/build_manual_handoff.py` — local-only portable handoff packet builder
+- `scripts/handoff_readiness.py` — machine-readable user-takeover readiness report
+- `scripts/build_submission_bundle.py` — upload convenience bundle builder; performs no external submission
+- `scripts/preflight_submission.py` — local release/submission preflight with manual-boundary assertions
+- `submission/START_HERE_MANUAL.md`
+- `submission/MANUAL_SUBMISSION_CHECKLIST.md`
+- `submission/RUNTIME_VALIDATION_FOR_USER.md`
+- `submission/GOAI_FIELD_MAP.md`
+- `submission/FitzSight_Manual_Handoff.zip`
 - `submission/FitzSight_GOAI_Initial_Round.pptx`
 - `submission/FitzSight_GOAI_Initial_Round.pdf`
 - `submission/FitzSight_Offline_Demo.html`
@@ -37,7 +42,6 @@
 - `submission/FitzSight_GOAI_Upload_Bundle.zip`
 - `submission/PORTAL_COPY.md`
 - `submission/DEMO_RUNBOOK.md`
-- `submission/DEMO_VIDEO_SCRIPT.md`
 - `submission/PITCH_REHEARSAL.md`
 - `submission/PITCH_SPEAKER_NOTES.md`
 - `submission/JUDGE_QA.md`
@@ -59,24 +63,13 @@
 - `scripts/run_benchmark.py` — scenario/evidence/verifier evaluation
 - `scripts/run_adversarial_evaluation.py` — safety/evidence release gate
 - `scripts/measure_latency.py` — deterministic full-Agent latency measurement
-- `docs/V0.9_BENCHMARK_RESULTS.json`
-- `docs/V0.9_ADVERSARIAL_RESULTS.json`
-- `docs/V0.9_DETERMINISTIC_LATENCY.json`
-- `docs/V0.9_RUNTIME_STATUS.json`
-- `docs/V0.9_STREAMLIT_RUNTIME_CHECK.json`
-- `docs/V0.9_OPENAI_RUNTIME_CHECK.json`
-- `docs/EVALUATION_SUMMARY.md`
-
-## Competition documentation
-
-- `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`
-- `docs/PITCH_DECK_CONTENT.md`
-- `docs/COMPLIANCE_AND_SAFETY.md`
-- `docs/BENCHMARK_SCENARIOS.md`
-- `docs/ADVERSARIAL_EVALUATION.md`
-- `docs/V0.9_VALIDATION.md`
-- historical `docs/V0.x_*` files remain as release evidence.
+- `docs/V0.10_BENCHMARK_RESULTS.json`
+- `docs/V0.10_ADVERSARIAL_RESULTS.json`
+- `docs/V0.10_HANDOFF_READINESS.json`
+- `docs/V0.10_SUBMISSION_PREFLIGHT.json`
+- `docs/V0.10_VALIDATION.md`
+- historical `docs/V0.x_*` files remain as release evidence
 
 ## Tests
 
-`tests/` covers data generation, read-only SQL safety, statistics, evidence integrity, planner policy, verifier behavior, all five Agent workflows, UI presentation logic, OpenAI provider contract/telemetry, one-command launcher, benchmark/adversarial release gates, submission preflight, offline demo/video/upload assets, and dynamic pitch-deck metric synchronization.
+`tests/` covers data generation, read-only SQL safety, statistics, evidence integrity, planner policy, verifier behavior, all five Agent workflows, UI presentation logic, OpenAI provider contract/telemetry, launch/runtime assets, benchmark/adversarial release gates, submission preflight, dynamic pitch-deck metrics, and v0.10 manual-handoff / no-external-write guarantees.

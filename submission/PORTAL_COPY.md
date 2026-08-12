@@ -1,6 +1,6 @@
 # FitzSight — Initial-Round Portal Copy
 
-> Prepared 2026-08-11. The public Boundless Agents track page currently lists the preliminary deliverables as **project introduction + proposal PPT/PDF + optional prototype/video**. It does not publicly state a Boundless-specific character limit or file-size cap on that page, so the actual portal fields must still be checked immediately before submission.
+> Prepared for user-manual submission. The user should verify the actual portal fields/limits immediately before upload. FitzSight automation prepares this copy but does not open, edit, or submit the portal.
 >
 > Official track page: https://www.goaihz.com/tracks?track=apps
 

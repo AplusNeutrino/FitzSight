@@ -1,4 +1,4 @@
-# FitzSight — GOAI Initial-Round Submission Checklist
+# FitzSight — GOAI Initial-Round Readiness Checklist
 
 ## Package identity
 
@@ -46,9 +46,9 @@
 - [ ] Live Streamlit screen recording completed on the final demo machine.
 - [ ] Offline/local/video assets copied to a second location.
 
-## Portal submission — user action
+## Portal submission — user-manual only
 
-These items require the actual GOAI portal / email workflow and must not be marked complete from repository evidence alone.
+These items require the actual GOAI portal / confirmation workflow. Repository scripts stop before all external writes and do not access Gmail. Use `MANUAL_SUBMISSION_CHECKLIST.md` as the execution checklist.
 
 - [ ] Re-check the latest official portal fields and any portal-specific file-size/character limits immediately before upload.
 - [ ] Upload project introduction.

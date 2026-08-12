@@ -21,6 +21,11 @@ DEFAULT_FILES = (
     "submission/DEMO_RUNBOOK.md",
     "submission/PITCH_REHEARSAL.md",
     "submission/SUBMISSION_CHECKLIST.md",
+    "submission/START_HERE_MANUAL.md",
+    "submission/MANUAL_SUBMISSION_CHECKLIST.md",
+    "submission/RUNTIME_VALIDATION_FOR_USER.md",
+    "submission/GOAI_FIELD_MAP.md",
+    "docs/OPERATOR_BOUNDARY.md",
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
     "docs/EVALUATION_SUMMARY.md",
     "docs/COMPLIANCE_AND_SAFETY.md",
@@ -86,8 +91,10 @@ def main() -> int:
         manifest = {
             "product": "FitzSight",
             "competition": "GOAI 2026 · Boundless Agents · AI+Finance",
-            "purpose": "initial_round_upload_convenience_bundle",
-            "note": "The official portal may require individual uploads. This ZIP is a local handoff convenience package, not evidence of portal submission.",
+            "purpose": "initial_round_manual_upload_convenience_bundle",
+            "note": "The official portal may require individual uploads. This ZIP is a local handoff convenience package. Portal/email actions are user-manual only and this script performs no external submission.",
+            "external_submission_performed": False,
+            "network_actions_performed": False,
             "files": files_meta,
         }
         manifest_path = stage / "UPLOAD_MANIFEST.json"

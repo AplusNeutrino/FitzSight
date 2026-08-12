@@ -19,12 +19,14 @@ REQUIRED_FILES = (
     "evaluation/adversarial_cases.json",
     "docs/COMPLIANCE_AND_SAFETY.md",
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
-    "docs/V0.9_BENCHMARK_RESULTS.json",
-    "docs/V0.9_ADVERSARIAL_RESULTS.json",
+    "docs/V0.10_BENCHMARK_RESULTS.json",
+    "docs/V0.10_ADVERSARIAL_RESULTS.json",
     "docs/V0.9_DETERMINISTIC_LATENCY.json",
     "docs/V0.9_RUNTIME_STATUS.json",
+    "docs/V0.10_HANDOFF_READINESS.json",
     "docs/V0.9_VALIDATION.md",
-    "RELEASE_NOTES_v0.9.md",
+    "docs/V0.10_VALIDATION.md",
+    "RELEASE_NOTES_v0.10.md",
     "submission/FitzSight_GOAI_Initial_Round.pptx",
     "submission/FitzSight_GOAI_Initial_Round.pdf",
     "submission/FitzSight_Offline_Demo.html",
@@ -38,6 +40,14 @@ REQUIRED_FILES = (
     "submission/SUBMISSION_CHECKLIST.md",
     "submission/JUDGE_QA.md",
     "submission/README.md",
+    "submission/START_HERE_MANUAL.md",
+    "submission/MANUAL_SUBMISSION_CHECKLIST.md",
+    "submission/RUNTIME_VALIDATION_FOR_USER.md",
+    "submission/GOAI_FIELD_MAP.md",
+    "submission/FitzSight_Manual_Handoff.zip",
+    "docs/OPERATOR_BOUNDARY.md",
+    "scripts/build_manual_handoff.py",
+    "scripts/handoff_readiness.py",
     "scripts/runtime_doctor.py",
     "scripts/validate_streamlit_runtime.py",
     "scripts/validate_openai_runtime.py",
@@ -106,6 +116,7 @@ def run_preflight() -> dict[str, object]:
         ROOT / "submission" / "FitzSight_Offline_Demo.html",
         ROOT / "submission" / "FitzSight_Offline_Demo_Backup.mp4",
         ROOT / "submission" / "FitzSight_GOAI_Upload_Bundle.zip",
+        ROOT / "submission" / "FitzSight_Manual_Handoff.zip",
     )
     assets = {}
     for path in asset_paths:
@@ -126,6 +137,8 @@ def run_preflight() -> dict[str, object]:
 
     upload_zip = ROOT / "submission" / "FitzSight_GOAI_Upload_Bundle.zip"
     upload_zip_ok = _zip_ok(upload_zip)
+    manual_handoff_zip = ROOT / "submission" / "FitzSight_Manual_Handoff.zip"
+    manual_handoff_zip_ok = _zip_ok(manual_handoff_zip)
     passed = (
         not missing
         and not generated_csv
@@ -133,6 +146,7 @@ def run_preflight() -> dict[str, object]:
         and len(assets) == len(asset_paths)
         and offline_demo_ok
         and upload_zip_ok
+        and manual_handoff_zip_ok
     )
     return {
         "passed": passed,
@@ -142,10 +156,17 @@ def run_preflight() -> dict[str, object]:
         "submission_assets": assets,
         "offline_demo_verified_5_of_5": offline_demo_ok,
         "upload_bundle_zip_integrity": upload_zip_ok,
+        "manual_handoff_zip_integrity": manual_handoff_zip_ok,
+        "manual_submission_boundary": {
+            "mode": "user_manual_only",
+            "external_write_actions_performed": False,
+            "portal_upload_or_submit_by_automation": False,
+            "gmail_or_email_access_by_automation": False,
+        },
         "external_actions_still_required": [
-            "Confirm portal-specific field/file-size constraints in the actual GOAI upload UI",
-            "Upload the required project introduction and PPT/PDF",
-            "Capture portal/email confirmation evidence",
+            "USER MANUAL: confirm portal-specific field/file-size constraints in the actual GOAI upload UI",
+            "USER MANUAL: upload the required project introduction and PPT/PDF",
+            "USER MANUAL: capture portal/email confirmation evidence",
             "Run Streamlit live validation on a machine with the UI dependency installed",
             "Run OpenAI live planner validation only if stable credentials/model access are available",
         ],

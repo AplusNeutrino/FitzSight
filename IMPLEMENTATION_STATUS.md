@@ -1,8 +1,8 @@
 # FitzSight Implementation Status
 
-**Version:** v0.9.0  
+**Version:** v0.10.0  
 **Date:** 2026-08-11  
-**Phase:** Runtime + submission completion layer; five-intent analytical core frozen for the initial round
+**Phase:** Operator handoff + manual-submission boundary; five-intent analytical core frozen
 
 ## Analytical core
 
@@ -26,54 +26,53 @@ Question
 → verified / withheld answer
 ```
 
-## v0.9 completed
+## v0.10 completed
 
-- [x] pure presentation layer under `src/fitzsight/ui/` for KPI cards, charts, trace rows and Evidence cards;
-- [x] Streamlit renderer consumes verified presentation data instead of owning business calculations;
-- [x] five-workflow offline HTML demo generated from actual verified Agent runs;
-- [x] deterministic 1280x720 H.264 MP4 backup video generated from verified offline-demo data;
-- [x] runtime doctor for Python/dependency/data/presentation readiness without secret disclosure;
-- [x] explicit Streamlit health-check validation command;
-- [x] explicit OpenAI live-planner validation command;
-- [x] OpenAI Responses planner telemetry for response/model/token/latency metadata with `store=False`;
-- [x] deterministic end-to-end latency measurement across five workflows;
-- [x] initial-round portal-copy and timed rehearsal assets;
-- [x] convenience upload bundle with manifest/checksums;
-- [x] submission preflight expanded for offline demo/video/runtime assets;
-- [x] competition-facing deck metrics generated from fresh verified Agent runs rather than stale constants;
-- [x] current README/project-summary/customer/pitch content synchronized to the current fixed-seed benchmark.
+- [x] explicit operator boundary: local preparation/validation/package only by default;
+- [x] actual competition portal upload/submission/confirmation marked user-manual only;
+- [x] no default Gmail/email access for submission confirmation;
+- [x] `submission/START_HERE_MANUAL.md` single takeover entry point;
+- [x] `submission/MANUAL_SUBMISSION_CHECKLIST.md`;
+- [x] `submission/RUNTIME_VALIDATION_FOR_USER.md`;
+- [x] `submission/GOAI_FIELD_MAP.md`;
+- [x] `docs/OPERATOR_BOUNDARY.md`;
+- [x] `scripts/build_manual_handoff.py`;
+- [x] `scripts/handoff_readiness.py`;
+- [x] portable `submission/FitzSight_Manual_Handoff.zip`;
+- [x] submission preflight expanded to verify the manual handoff packet and external-write boundary;
+- [x] upload convenience bundle expanded with manual operator documents;
+- [x] user takeover readiness represented in machine-readable output;
+- [x] release documentation/tests updated.
 
-## Current verified synthetic result snapshot
+## Competition handoff state
+
+Automation prepares everything it can locally:
 
 ```text
-CRM / FTD
-  affected:          -7.53 pp
-  control:           -1.21 pp
-  response median:  +29.15 min
-
-Net deposits
-  net change:       -$187.8k
-  deposits:          +$59.2k
-  withdrawals:      +$246.9k
-  top-11 share:       91.6%
-
-Customer Intelligence
-  Europe customers:   6,770
-  High Value users:     3.7%
-  High Value deposits:  53.7%
-
-Marketing quality
-  leads:              +315%
-  FTD:              -10.84 pp
-  Paid Search FTD:  -16.44 pp
-
-False correlation
-  Asia FTD:          -8.13 pp
-  Affiliate FTD:    -15.81 pp
-  nearby office event supported as cause: false
+code + benchmark + safety checks
+PPTX / PDF
+portal copy
+offline HTML
+H.264 backup video
+runtime validators
+checksums / manifests
+manual handoff ZIP
 ```
 
-## Evaluation state
+The user performs the remaining external actions:
+
+```text
+open actual GOAI portal
+verify current fields/limits
+upload/paste assets
+review final portal state
+click final submit
+save confirmation screenshot/email/receipt
+```
+
+Repository evidence must not be interpreted as proof that the external submission occurred.
+
+## Verified analytical/evaluation state retained
 
 ```text
 5 / 5 deterministic scenarios PASS
@@ -81,19 +80,8 @@ root-cause scenario accuracy:         100%
 false-correlation rejection accuracy: 100%
 mean evidence coverage:               100%
 verifier violations:                  0
-
 8 / 8 adversarial cases PASS
 ```
-
-Build-environment deterministic latency measurement (SQLite, 15 verified runs):
-
-```text
-overall mean: 292.29 ms
-p50:          300.90 ms
-p95:          343.35 ms
-```
-
-This latency snapshot is environment-specific and excludes live model-provider latency/cost.
 
 ## External runtime state
 
@@ -103,16 +91,9 @@ This latency snapshot is environment-specific and excludes live model-provider l
 - constrained planner on DuckDB;
 - JSON-file planner on DuckDB.
 
-### Still pending live evidence
+### Still pending real environment evidence
 
-- OpenAI Responses API with real credentials/model;
-- Streamlit runtime smoke test on the final demo environment.
+- Streamlit health-check on the final presentation machine;
+- optional OpenAI Responses live planner with deliberately configured stable credentials/model.
 
-## Remaining user-controlled competition work
-
-1. run Streamlit live validation on the final presentation machine;
-2. optionally run the OpenAI live planner if stable credentials/model access are available;
-3. upload the final project introduction + PPT/PDF (+ optional video);
-4. capture portal/email confirmation evidence;
-5. copy live/local/video assets to a second location;
-6. perform a timed 5-8 minute pitch and <3 minute demo rehearsal.
+These external runtime checks do not change the manual-only submission policy.

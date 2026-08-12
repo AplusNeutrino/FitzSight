@@ -24,6 +24,16 @@ This directory contains the current competition-facing assets generated from the
 - `JUDGE_QA.md` — judge-facing Q&A preparation.
 - `FitzSight_GOAI_Upload_Bundle.zip` — convenience bundle; the actual portal may still require individual uploads.
 
+## v0.10 manual handoff boundary
+
+- `START_HERE_MANUAL.md` — single entry point for the user taking over the external submission.
+- `MANUAL_SUBMISSION_CHECKLIST.md` — actual portal/upload/confirmation steps; **user-manual only**.
+- `RUNTIME_VALIDATION_FOR_USER.md` — final-machine Streamlit and optional OpenAI validation commands.
+- `GOAI_FIELD_MAP.md` — prepared-source-to-portal-field map.
+- `FitzSight_Manual_Handoff.zip` — portable packet containing the prepared submission assets and manual instructions.
+
+Project automation stops at local preparation, validation, hashing, packaging, and instructions. It does not submit to GOAI, access Gmail, send email, or modify external accounts by default.
+
 ## Evidence boundary
 
 Slides 4-8 are built from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`; current submission assets do not rely on stale benchmark constants. The offline HTML/MP4 are resilience artifacts, not evidence that Streamlit or OpenAI live runtime has been validated. Those external runtimes remain separately tracked until actual deployment output exists.
