@@ -1,0 +1,116 @@
+{
+  "product": "FitzSight",
+  "version": "0.11.0",
+  "purpose": "final_machine_local_readiness",
+  "local_core_ready": true,
+  "deterministic_agent_smoke": {
+    "passed": true,
+    "return_code": 0,
+    "final_status": "verified",
+    "verification_passed": true,
+    "planner_mode": "deterministic_fallback",
+    "intent": "crm_routing_ftd_investigation"
+  },
+  "runtime_doctor": {
+    "product": "FitzSight",
+    "runtime_doctor_version": "0.11",
+    "checks": {
+      "python": {
+        "ok": true,
+        "detail": "3.13.5"
+      },
+      "fitzsight_source": {
+        "ok": true,
+        "detail": "/mnt/data/work_v11/src/fitzsight"
+      },
+      "duckdb": {
+        "ok": false,
+        "detail": "not installed in this environment"
+      },
+      "streamlit": {
+        "ok": false,
+        "detail": "install with pip install -e \".[ui]\""
+      },
+      "openai_sdk": {
+        "ok": false,
+        "detail": "install with pip install -e \".[openai]\""
+      },
+      "openai_api_key": {
+        "ok": false,
+        "detail": "not configured"
+      },
+      "fitzsight_model": {
+        "ok": false,
+        "detail": "not configured"
+      },
+      "data_directory": {
+        "ok": true,
+        "detail": "/mnt/data/work_v11/data/generated"
+      },
+      "generated_dataset": {
+        "ok": false,
+        "detail": "will be generated automatically by the runtime"
+      },
+      "presentation_assets": {
+        "ok": true,
+        "detail": "PPTX/PDF present"
+      }
+    },
+    "core_demo_ready": true,
+    "streamlit_live_ready": false,
+    "openai_live_ready": false,
+    "secrets_disclosed": false
+  },
+  "submission_preflight": {
+    "passed": true,
+    "missing_required_files": [],
+    "secret_hits": [],
+    "generated_csv_files": []
+  },
+  "handoff_readiness": {
+    "ready_for_user_takeover": true,
+    "manual_handoff_zip_integrity": true,
+    "final_machine_kit_integrity": true
+  },
+  "streamlit_live": {
+    "product": "FitzSight",
+    "runtime": "streamlit",
+    "port": 48893,
+    "command": [
+      "/opt/pyvenv/bin/python",
+      "-m",
+      "streamlit",
+      "run",
+      "/mnt/data/work_v11/streamlit_app.py",
+      "--server.headless=true",
+      "--server.address=127.0.0.1",
+      "--server.port=48893",
+      "--browser.gatherUsageStats=false"
+    ],
+    "health_url": "http://127.0.0.1:48893/_stcore/health",
+    "passed": false,
+    "status": "not_run_dependency_missing",
+    "message": "Streamlit is not installed; install with pip install -e \".[ui]\".",
+    "return_code": 2
+  },
+  "openai_live": {
+    "runtime": "openai_responses_planner",
+    "status": "not_requested",
+    "passed": false,
+    "return_code": null,
+    "note": "Live provider validation is opt-in because it can use configured credentials/network access."
+  },
+  "external_write_actions_performed": false,
+  "portal_or_email_actions_performed": false,
+  "network_policy": {
+    "default_run": "local_only_except_localhost_streamlit_health_check",
+    "openai_live_requires_explicit_include_openai": true
+  },
+  "remaining_user_manual_actions": [
+    "Run this report on the final presentation machine and retain the JSON output",
+    "If Streamlit is installed, require streamlit_live.passed=true before calling the live UI validated",
+    "Only run --include-openai if you deliberately choose to validate a configured provider",
+    "Perform timed pitch/demo and Q&A rehearsal",
+    "Perform all competition portal upload/final-submit/confirmation steps manually"
+  ]
+}

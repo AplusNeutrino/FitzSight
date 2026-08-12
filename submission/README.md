@@ -37,3 +37,12 @@ Project automation stops at local preparation, validation, hashing, packaging, a
 ## Evidence boundary
 
 Slides 4-8 are built from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`; current submission assets do not rely on stale benchmark constants. The offline HTML/MP4 are resilience artifacts, not evidence that Streamlit or OpenAI live runtime has been validated. Those external runtimes remain separately tracked until actual deployment output exists.
+
+## v0.11 final-machine kit
+
+- `FINAL_MACHINE_CHECKLIST.md` — final presentation-machine install/validation/fallback checklist.
+- `REHEARSAL_OPERATOR_CARD.md` — compact pitch/demo/Q&A operator card.
+- `REHEARSAL_PLAN.json` — machine-readable timing targets.
+- `FitzSight_Final_Machine_Kit.zip` — portable executable presentation-machine packet with source, launchers, offline fallbacks and the manual handoff ZIP.
+
+The default final-machine validator remains local-only except for its localhost Streamlit health probe. The OpenAI live planner is an explicit opt-in (`--include-openai`); portal/email actions remain user-manual only.

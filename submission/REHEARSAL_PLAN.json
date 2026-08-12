@@ -1,0 +1,46 @@
+{
+  "product": "FitzSight",
+  "version": "0.11.0",
+  "modes": {
+    "pitch": {
+      "min_seconds": 300,
+      "max_seconds": 480,
+      "target_seconds": 390,
+      "note": "Target a 6m30s pitch inside the 5-8 minute competition window.",
+      "checkpoints": [
+        "Problem and why dashboards are not enough",
+        "Question → plan → deterministic tools → evidence → verifier",
+        "CRM/FTD and net-deposit examples",
+        "False-correlation rejection and adversarial safety",
+        "Benchmark evidence and closing"
+      ]
+    },
+    "demo": {
+      "min_seconds": 60,
+      "max_seconds": 180,
+      "target_seconds": 140,
+      "note": "Keep the live demo under three minutes; fall back to offline HTML/video if the live UI is unstable.",
+      "checkpoints": [
+        "Ask one primary business question",
+        "Show plan and investigation trace",
+        "Show verified findings and Evidence IDs",
+        "Show one second intent or false-correlation guardrail",
+        "State deterministic/offline fallback"
+      ]
+    },
+    "qa": {
+      "min_seconds": 300,
+      "max_seconds": null,
+      "target_seconds": 600,
+      "note": "Use at least five minutes to rehearse judge questions on evidence, causality, safety, data, and reproducibility.",
+      "checkpoints": [
+        "Why an Agent instead of BI/dashboard?",
+        "What exactly can the LLM do?",
+        "How are hallucinations and causal overclaims blocked?",
+        "Why synthetic data and how is ground truth hidden?",
+        "What happens if Streamlit/OpenAI/network fails?",
+        "What is the compliance boundary?"
+      ]
+    }
+  }
+}

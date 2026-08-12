@@ -12,7 +12,7 @@ The repository and handoff scripts prepare files; they do not perform these exte
 - [ ] Keep the offline HTML and MP4 backup locally.
 - [ ] Keep the repository URL ready: `https://github.com/AplusNeutrino/FitzSight`.
 - [ ] Run `python scripts/preflight_submission.py` and confirm PASS.
-- [ ] Optionally run `python scripts/runtime_doctor.py` on the final demo machine.
+- [ ] On the final demo machine, prefer `python scripts/final_machine_check.py --output final_machine_report.json` and retain the local report.
 
 ## B. Portal fields — manual user action
 

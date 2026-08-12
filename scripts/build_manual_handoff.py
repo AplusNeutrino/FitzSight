@@ -15,6 +15,9 @@ HANDOFF_FILES = (
     "submission/MANUAL_SUBMISSION_CHECKLIST.md",
     "submission/RUNTIME_VALIDATION_FOR_USER.md",
     "submission/GOAI_FIELD_MAP.md",
+    "submission/FINAL_MACHINE_CHECKLIST.md",
+    "submission/REHEARSAL_OPERATOR_CARD.md",
+    "submission/REHEARSAL_PLAN.json",
     "submission/PORTAL_COPY.md",
     "submission/FitzSight_GOAI_Initial_Round.pptx",
     "submission/FitzSight_GOAI_Initial_Round.pdf",
@@ -91,7 +94,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manual_actions = {
             "product": "FitzSight",
-            "version": "0.10.0",
+            "version": "0.11.0",
             "execution_policy": "external_submission_user_manual_only",
             "automation_boundary": {
                 "local_prepare_validate_package": True,
@@ -112,6 +115,7 @@ def build_packet(output: Path) -> dict[str, object]:
             "environment_dependent_checks": [
                 "Run Streamlit live validation on the final presentation machine",
                 "Optionally run OpenAI live planner validation with deliberately configured stable credentials/model",
+                "Run the final-machine readiness check on the presentation machine",
                 "Perform timed pitch/demo and Q&A rehearsal",
             ],
         }
@@ -128,7 +132,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manifest = {
             "product": "FitzSight",
-            "version": "0.10.0",
+            "version": "0.11.0",
             "purpose": "user_manual_submission_handoff",
             "network_actions_performed": False,
             "external_submission_performed": False,
@@ -169,7 +173,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
     return {
         "product": "FitzSight",
-        "version": "0.10.0",
+        "version": "0.11.0",
         "output": str(output),
         "bytes": output.stat().st_size,
         "sha256": sha256(output),

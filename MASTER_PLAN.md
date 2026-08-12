@@ -3498,3 +3498,19 @@ FitzSight automation prepares, validates, hashes, renders, and packages local co
 ## D-034 — Final handoff must be self-contained and operator-oriented
 
 The user should be able to take over with a single portable handoff packet containing the copy-ready portal text, PPT/PDF, offline demo/video, compliance/evaluation summaries, manual field map, runtime instructions, and submission checklist. Remaining external/runtime/rehearsal tasks must be clearly separated from completed local implementation work.
+
+---
+
+# v0.11 Implementation Decisions (2026-08-12)
+
+## D-035 — The final-machine default must remain local and provider-safe
+
+The one-command final-machine check may run deterministic local checks and probe a Streamlit process only through localhost. It must not call a live model provider by default. OpenAI live validation requires an explicit `--include-openai` opt-in and deliberately configured credentials/model access.
+
+## D-036 — Final-machine readiness and external submission are separate truths
+
+A machine can be locally demo-ready while GOAI portal submission remains incomplete. Final-machine reports therefore record local runtime/preflight/handoff state but never infer portal upload, final submission, email confirmation, or other external account actions.
+
+## D-037 — Human rehearsal evidence must be human-performed
+
+FitzSight may provide timing targets, operator cards, and a local timing recorder, but code presence or a synthetic timing value is not proof that the user performed a real pitch/demo/Q&A rehearsal. The corresponding roadmap tasks remain open until real user-provided rehearsal evidence exists.

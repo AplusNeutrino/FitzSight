@@ -14,7 +14,7 @@ from fitzsight.runtime import build_agent_runtime
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run the FitzSight v0.9 deterministic benchmark catalog.")
+    parser = argparse.ArgumentParser(description="Run the FitzSight deterministic benchmark catalog.")
     parser.add_argument("--catalog", default=str(ROOT / "evaluation" / "benchmark_catalog.json"))
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument("--backend", choices=["auto", "duckdb", "sqlite"], default="auto")

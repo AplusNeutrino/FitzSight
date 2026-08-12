@@ -1,0 +1,28 @@
+{
+  "product": "FitzSight",
+  "version": "0.11.0",
+  "automated_artifact_preparation_ready": true,
+  "artifacts": {
+    "portal_copy": true,
+    "pitch_pptx": true,
+    "pitch_pdf": true,
+    "offline_html": true,
+    "offline_video": true,
+    "manual_checklist": true,
+    "operator_boundary": true,
+    "manual_handoff_zip": true,
+    "final_machine_kit": true
+  },
+  "manual_handoff_zip_integrity": true,
+  "final_machine_kit_integrity": true,
+  "external_write_actions_performed": false,
+  "manual_user_actions_remaining": [
+    "Actual GOAI portal review/upload/final submit",
+    "Confirmation screenshot/email/receipt capture",
+    "Run scripts/final_machine_check.py on the final presentation machine",
+    "Final-machine Streamlit live validation",
+    "Optional OpenAI live planner validation",
+    "Timed pitch/demo and Q&A rehearsal"
+  ],
+  "ready_for_user_takeover": true
+}

@@ -74,7 +74,7 @@ def build_report(data_dir: Path) -> dict[str, object]:
     }
     return {
         "product": "FitzSight",
-        "runtime_doctor_version": "0.9",
+        "runtime_doctor_version": "0.11",
         "checks": checks,
         "core_demo_ready": checks["python"]["ok"] and checks["fitzsight_source"]["ok"],
         "streamlit_live_ready": checks["streamlit"]["ok"],

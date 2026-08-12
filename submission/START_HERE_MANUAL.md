@@ -23,6 +23,17 @@ Use these files directly:
 
 For a single portable packet, use `FitzSight_Manual_Handoff.zip`.
 
+
+## Final presentation machine
+
+For a portable executable presentation environment, use:
+
+```text
+FitzSight_Final_Machine_Kit.zip
+```
+
+Extract it on the final machine and run `RUN_FINAL_CHECKS.bat` (Windows) or `sh RUN_FINAL_CHECKS.sh` (macOS/Linux). The default check does not call a live model provider and performs no portal/email actions.
+
 ## Minimal manual path
 
 1. Open `MANUAL_SUBMISSION_CHECKLIST.md`.

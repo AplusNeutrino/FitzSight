@@ -24,7 +24,7 @@ def _zip_ok(path: Path) -> bool:
         return False
 
 
-def readiness_report() -> dict[str, object]:
+def readiness_report(*, require_final_machine_kit: bool = True) -> dict[str, object]:
     required = {
         "portal_copy": ROOT / "submission" / "PORTAL_COPY.md",
         "pitch_pptx": ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx",
@@ -34,20 +34,31 @@ def readiness_report() -> dict[str, object]:
         "manual_checklist": ROOT / "submission" / "MANUAL_SUBMISSION_CHECKLIST.md",
         "operator_boundary": ROOT / "docs" / "OPERATOR_BOUNDARY.md",
         "manual_handoff_zip": ROOT / "submission" / "FitzSight_Manual_Handoff.zip",
+        "final_machine_kit": ROOT / "submission" / "FitzSight_Final_Machine_Kit.zip",
     }
     presence = {name: path.exists() for name, path in required.items()}
-    automated_ready = all(presence.values()) and _zip_ok(required["manual_handoff_zip"])
+    if not require_final_machine_kit:
+        presence["final_machine_kit"] = True
+    automated_ready = (
+        all(presence.values())
+        and _zip_ok(required["manual_handoff_zip"])
+        and (not require_final_machine_kit or _zip_ok(required["final_machine_kit"]))
+    )
 
     return {
         "product": "FitzSight",
-        "version": "0.10.0",
+        "version": "0.11.0",
         "automated_artifact_preparation_ready": automated_ready,
         "artifacts": presence,
         "manual_handoff_zip_integrity": _zip_ok(required["manual_handoff_zip"]),
+        "final_machine_kit_integrity": (
+            _zip_ok(required["final_machine_kit"]) if require_final_machine_kit else None
+        ),
         "external_write_actions_performed": False,
         "manual_user_actions_remaining": [
             "Actual GOAI portal review/upload/final submit",
             "Confirmation screenshot/email/receipt capture",
+            "Run scripts/final_machine_check.py on the final presentation machine",
             "Final-machine Streamlit live validation",
             "Optional OpenAI live planner validation",
             "Timed pitch/demo and Q&A rehearsal",

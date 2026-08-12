@@ -158,7 +158,7 @@ def run_suite(data_dir: Path, backend: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run FitzSight v0.9 adversarial safety/evidence evaluation.")
+    parser = argparse.ArgumentParser(description="Run FitzSight adversarial safety/evidence evaluation.")
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument("--backend", choices=["auto", "duckdb", "sqlite"], default="auto")
     parser.add_argument("--output", default=None)

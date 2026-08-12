@@ -21,12 +21,18 @@ REQUIRED_FILES = (
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
     "docs/V0.10_BENCHMARK_RESULTS.json",
     "docs/V0.10_ADVERSARIAL_RESULTS.json",
+    "docs/V0.11_BENCHMARK_RESULTS.json",
+    "docs/V0.11_ADVERSARIAL_RESULTS.json",
+    "docs/V0.11_FINAL_MACHINE_READINESS.json",
     "docs/V0.9_DETERMINISTIC_LATENCY.json",
     "docs/V0.9_RUNTIME_STATUS.json",
     "docs/V0.10_HANDOFF_READINESS.json",
+    "docs/FINAL_MACHINE_OPERATIONS.md",
     "docs/V0.9_VALIDATION.md",
     "docs/V0.10_VALIDATION.md",
+    "docs/V0.11_VALIDATION.md",
     "RELEASE_NOTES_v0.10.md",
+    "RELEASE_NOTES_v0.11.md",
     "submission/FitzSight_GOAI_Initial_Round.pptx",
     "submission/FitzSight_GOAI_Initial_Round.pdf",
     "submission/FitzSight_Offline_Demo.html",
@@ -48,6 +54,13 @@ REQUIRED_FILES = (
     "docs/OPERATOR_BOUNDARY.md",
     "scripts/build_manual_handoff.py",
     "scripts/handoff_readiness.py",
+    "scripts/final_machine_check.py",
+    "scripts/rehearsal_assistant.py",
+    "scripts/build_final_machine_kit.py",
+    "submission/FINAL_MACHINE_CHECKLIST.md",
+    "submission/REHEARSAL_OPERATOR_CARD.md",
+    "submission/REHEARSAL_PLAN.json",
+    "submission/FitzSight_Final_Machine_Kit.zip",
     "scripts/runtime_doctor.py",
     "scripts/validate_streamlit_runtime.py",
     "scripts/validate_openai_runtime.py",
@@ -102,22 +115,29 @@ def _zip_ok(path: Path) -> bool:
         return False
 
 
-def run_preflight() -> dict[str, object]:
-    missing = [rel for rel in REQUIRED_FILES if not (ROOT / rel).exists()]
+def run_preflight(*, require_final_machine_kit: bool = True) -> dict[str, object]:
+    required_files = tuple(
+        rel for rel in REQUIRED_FILES
+        if require_final_machine_kit or rel != "submission/FitzSight_Final_Machine_Kit.zip"
+    )
+    missing = [rel for rel in required_files if not (ROOT / rel).exists()]
     generated_csv = sorted(
         str(path.relative_to(ROOT))
         for path in (ROOT / "data" / "generated").glob("*.csv")
     )
     secrets = scan_secrets()
 
-    asset_paths = (
+    asset_paths_list = [
         ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx",
         ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pdf",
         ROOT / "submission" / "FitzSight_Offline_Demo.html",
         ROOT / "submission" / "FitzSight_Offline_Demo_Backup.mp4",
         ROOT / "submission" / "FitzSight_GOAI_Upload_Bundle.zip",
         ROOT / "submission" / "FitzSight_Manual_Handoff.zip",
-    )
+    ]
+    if require_final_machine_kit:
+        asset_paths_list.append(ROOT / "submission" / "FitzSight_Final_Machine_Kit.zip")
+    asset_paths = tuple(asset_paths_list)
     assets = {}
     for path in asset_paths:
         if path.exists():
@@ -139,6 +159,8 @@ def run_preflight() -> dict[str, object]:
     upload_zip_ok = _zip_ok(upload_zip)
     manual_handoff_zip = ROOT / "submission" / "FitzSight_Manual_Handoff.zip"
     manual_handoff_zip_ok = _zip_ok(manual_handoff_zip)
+    final_machine_kit = ROOT / "submission" / "FitzSight_Final_Machine_Kit.zip"
+    final_machine_kit_ok = _zip_ok(final_machine_kit) if require_final_machine_kit else None
     passed = (
         not missing
         and not generated_csv
@@ -147,6 +169,7 @@ def run_preflight() -> dict[str, object]:
         and offline_demo_ok
         and upload_zip_ok
         and manual_handoff_zip_ok
+        and (final_machine_kit_ok is not False)
     )
     return {
         "passed": passed,
@@ -157,6 +180,7 @@ def run_preflight() -> dict[str, object]:
         "offline_demo_verified_5_of_5": offline_demo_ok,
         "upload_bundle_zip_integrity": upload_zip_ok,
         "manual_handoff_zip_integrity": manual_handoff_zip_ok,
+        "final_machine_kit_integrity": final_machine_kit_ok,
         "manual_submission_boundary": {
             "mode": "user_manual_only",
             "external_write_actions_performed": False,
@@ -167,6 +191,7 @@ def run_preflight() -> dict[str, object]:
             "USER MANUAL: confirm portal-specific field/file-size constraints in the actual GOAI upload UI",
             "USER MANUAL: upload the required project introduction and PPT/PDF",
             "USER MANUAL: capture portal/email confirmation evidence",
+            "USER MANUAL: run scripts/final_machine_check.py on the final presentation machine",
             "Run Streamlit live validation on a machine with the UI dependency installed",
             "Run OpenAI live planner validation only if stable credentials/model access are available",
         ],

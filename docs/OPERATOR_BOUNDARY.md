@@ -54,3 +54,9 @@ Streamlit and OpenAI live validation are also environment-dependent. FitzSight p
 ## Handoff principle
 
 The project should reach a state where the user can take the prepared handoff packet, follow a short manual checklist, and complete external submission without needing further code generation or analytical work.
+
+## v0.11 final-machine tooling
+
+The final-machine kit and readiness scripts do not weaken this boundary. `scripts/final_machine_check.py` performs local checks and may probe a Streamlit process only through `127.0.0.1`. It does not open the competition portal, access Gmail/email, or write to an external account.
+
+The OpenAI live planner is excluded from the default final-machine check. It runs only when the user deliberately supplies `--include-openai` in an environment they control with configured credentials/model access.

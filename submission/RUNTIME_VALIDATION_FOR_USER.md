@@ -2,6 +2,16 @@
 
 These checks are separate from portal submission. They require the environment in which you will actually present FitzSight.
 
+## 0. Preferred one-command check
+
+```bash
+python scripts/final_machine_check.py --output final_machine_report.json
+```
+
+This runs the deterministic smoke/preflight/handoff checks and attempts the localhost Streamlit health check when the dependency is available. The OpenAI live planner is **not** called unless you explicitly pass `--include-openai`.
+
+Keep `final_machine_report.json` as local runtime evidence.
+
 ## 1. General readiness
 
 ```bash

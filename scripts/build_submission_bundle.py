@@ -25,6 +25,8 @@ DEFAULT_FILES = (
     "submission/MANUAL_SUBMISSION_CHECKLIST.md",
     "submission/RUNTIME_VALIDATION_FOR_USER.md",
     "submission/GOAI_FIELD_MAP.md",
+    "submission/FINAL_MACHINE_CHECKLIST.md",
+    "submission/REHEARSAL_OPERATOR_CARD.md",
     "docs/OPERATOR_BOUNDARY.md",
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
     "docs/EVALUATION_SUMMARY.md",

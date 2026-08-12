@@ -1,8 +1,8 @@
 # FitzSight Implementation Status
 
-**Version:** v0.10.0  
-**Date:** 2026-08-11  
-**Phase:** Operator handoff + manual-submission boundary; five-intent analytical core frozen
+**Version:** v0.11.0  
+**Date:** 2026-08-12  
+**Phase:** Final-machine operations + manual operator closeout; analytical core frozen
 
 ## Analytical core
 
@@ -14,7 +14,7 @@ Supported Agent intents remain:
 4. `marketing_lead_quality_investigation`
 5. `false_correlation_guardrail_investigation`
 
-The trust boundary is unchanged:
+Trust boundary remains:
 
 ```text
 Question
@@ -26,74 +26,67 @@ Question
 → verified / withheld answer
 ```
 
-## v0.10 completed
+## v0.11 completed
 
-- [x] explicit operator boundary: local preparation/validation/package only by default;
-- [x] actual competition portal upload/submission/confirmation marked user-manual only;
-- [x] no default Gmail/email access for submission confirmation;
-- [x] `submission/START_HERE_MANUAL.md` single takeover entry point;
-- [x] `submission/MANUAL_SUBMISSION_CHECKLIST.md`;
-- [x] `submission/RUNTIME_VALIDATION_FOR_USER.md`;
-- [x] `submission/GOAI_FIELD_MAP.md`;
-- [x] `docs/OPERATOR_BOUNDARY.md`;
-- [x] `scripts/build_manual_handoff.py`;
-- [x] `scripts/handoff_readiness.py`;
-- [x] portable `submission/FitzSight_Manual_Handoff.zip`;
-- [x] submission preflight expanded to verify the manual handoff packet and external-write boundary;
-- [x] upload convenience bundle expanded with manual operator documents;
-- [x] user takeover readiness represented in machine-readable output;
-- [x] release documentation/tests updated.
+- [x] portable `submission/FitzSight_Final_Machine_Kit.zip`;
+- [x] Windows + POSIX launchers for final checks and demo start;
+- [x] `scripts/final_machine_check.py` one-command local readiness report;
+- [x] deterministic Agent smoke test included in final-machine readiness;
+- [x] submission preflight + handoff readiness included in final-machine readiness;
+- [x] Streamlit health validation attempted automatically when dependency is available;
+- [x] OpenAI live validation remains explicit opt-in via `--include-openai`;
+- [x] local rehearsal timing recorder `scripts/rehearsal_assistant.py`;
+- [x] machine-readable pitch/demo/Q&A timing targets;
+- [x] final-machine checklist and compact rehearsal operator card;
+- [x] manual handoff packet expanded with final-machine/rehearsal instructions;
+- [x] preflight expanded to verify final-machine kit integrity;
+- [x] v0.11 benchmark/adversarial regression artifacts;
+- [x] operator/manual-submission boundary retained.
 
-## Competition handoff state
+## Build validation
 
-Automation prepares everything it can locally:
+The full suite is run in complete non-overlapping groups because a larger single process can exceed the sandbox time ceiling.
 
 ```text
-code + benchmark + safety checks
-PPTX / PDF
-portal copy
-offline HTML
-H.264 backup video
-runtime validators
-checksums / manifests
-manual handoff ZIP
+79 tests collected
+Group 1: 31 passed
+Group 2: 21 passed, 1 skipped
+Group 3: 26 passed
+Aggregate: 78 passed, 1 skipped
+compileall: PASS
 ```
 
-The user performs the remaining external actions:
+The single skip is the DuckDB-specific build-sandbox integration test. DuckDB was already validated separately in the deployment environment.
+
+## Evaluation regression
 
 ```text
-open actual GOAI portal
-verify current fields/limits
-upload/paste assets
-review final portal state
-click final submit
-save confirmation screenshot/email/receipt
-```
-
-Repository evidence must not be interpreted as proof that the external submission occurred.
-
-## Verified analytical/evaluation state retained
-
-```text
-5 / 5 deterministic scenarios PASS
+5 / 5 deterministic benchmark scenarios PASS
+8 / 8 adversarial cases PASS
 root-cause scenario accuracy:         100%
 false-correlation rejection accuracy: 100%
 mean evidence coverage:               100%
 verifier violations:                  0
-8 / 8 adversarial cases PASS
 ```
 
-## External runtime state
+## Build-environment final-machine readiness
 
-### Done
+```text
+local_core_ready:                     true
+deterministic Agent smoke:            verified
+submission preflight:                 PASS
+manual handoff ZIP integrity:         PASS
+final-machine kit integrity:          PASS
+Streamlit live:                       NOT VALIDATED (dependency missing)
+OpenAI live:                          NOT REQUESTED
+external write actions performed:     false
+portal/email actions performed:       false
+```
 
-- DuckDB deployment runtime with `data/generated`;
-- constrained planner on DuckDB;
-- JSON-file planner on DuckDB.
+## Remaining evidence is external/manual
 
-### Still pending real environment evidence
-
-- Streamlit health-check on the final presentation machine;
-- optional OpenAI Responses live planner with deliberately configured stable credentials/model.
-
-These external runtime checks do not change the manual-only submission policy.
+- final-presentation-machine Streamlit live validation;
+- optional OpenAI Responses live planner validation with deliberately configured credentials/model;
+- actual GOAI portal upload/final submit/confirmation — user-manual only;
+- real timed pitch/demo/Q&A rehearsal;
+- live-provider latency/cost only if the optional live provider is actually validated.

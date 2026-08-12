@@ -24,9 +24,35 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.10.0
+## Current release: v0.11.0
 
-v0.10 is the **operator handoff layer**. It keeps the five-intent analytical core unchanged and makes the boundary explicit: FitzSight automation prepares, validates, hashes, and packages all local competition assets, while the actual GOAI portal submission and confirmation workflow is user-manual only. A portable handoff ZIP, field map, manual checklist, runtime checklist, and machine-readable readiness report are generated so the user can take over without additional code work.
+v0.11 is the **final-machine operations layer**. It keeps the five-intent analytical core and the user-manual submission boundary unchanged, while adding a portable presentation-machine kit, one-command final-machine readiness check, explicit opt-in live-provider validation, Windows/POSIX launchers, and local rehearsal timing records. The goal is that the user can take over on a presentation machine without needing new analytical implementation work.
+
+
+## Final-machine operator path
+
+Use the portable kit:
+
+```text
+submission/FitzSight_Final_Machine_Kit.zip
+```
+
+After extraction, the default final-machine check is:
+
+```bash
+python scripts/final_machine_check.py --output final_machine_report.json
+```
+
+The default path performs local readiness checks and a localhost-only Streamlit health check when Streamlit is installed. It does **not** call the OpenAI live planner unless `--include-openai` is explicitly supplied, and it never performs GOAI portal/email submission actions.
+
+Human timing can be recorded locally with:
+
+```bash
+python scripts/rehearsal_assistant.py --mode pitch --interactive --output pitch_rehearsal.json
+python scripts/rehearsal_assistant.py --mode demo --interactive --output demo_rehearsal.json
+```
+
+Actual portal upload/final submit/confirmation remains user-manual only.
 
 ## Supported workflows
 
