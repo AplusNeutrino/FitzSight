@@ -1,11 +1,8 @@
-# FitzSight — Initial-Round Pitch Deck Content Draft
+# FitzSight — Initial-Round Pitch Deck Content Source
 
-This document is the **v0.12 editable content source** for the next formal presentation regeneration. The currently committed PPT/PDF are still the prior generated assets:
-
-- `submission/FitzSight_GOAI_Initial_Round.pptx`
-- `submission/FitzSight_GOAI_Initial_Round.pdf`
-
-The v0.12 narrative source has been restructured to one hero Agent Journey + one refusal story. **The committed PPT/PDF and `scripts/build_pitch_deck.py` have not yet been regenerated to this v0.12 narrative**, so this file must not be used to claim that the formal deck is already synchronized. The hero product-process values come from `scripts/build_hero_evidence.py` / `docs/V0.12_HERO_RUN.json`, not independent hand-authored claims.
+> Formal asset status: **v0.12.1 synchronized**. `submission/FitzSight_GOAI_Initial_Round.pptx` and `.pdf` are regenerated from this one CRM/FTD hero + one false-correlation refusal narrative using current verified runtime/evaluation evidence.
+> Runtime screenshot status: the hero trace/answer images are derived from `docs/V0.12_HERO_RUN.json`; they are not hand-authored analytical mockups.
+> This file is the editable content contract for the synchronized formal deck. It does not claim live Streamlit/OpenAI-provider validation.
 
 ## Slide 1 — FitzSight
 

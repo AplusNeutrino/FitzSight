@@ -129,3 +129,7 @@ Autonomous investigation
 ```
 
 Production identity/RBAC/PII/audit-retention controls are explicitly separated into `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md` and are not claimed as current PoC implementation.
+## v0.12.1 judge-facing synchronization
+
+The formal deck and demo/operator materials now expose this same authority model: approved intent/action boundaries, deterministic analytics, source-addressable Evidence, EvidenceClaimVerifier, failure/uncertainty states, and a human decision boundary. Presentation assets do not introduce a second analytics path or additional tool authority.
+

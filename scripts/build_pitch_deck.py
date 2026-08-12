@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from pathlib import Path
 from functools import lru_cache
+from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
 import shutil
 import subprocess
 import sys
 
+from PIL import Image
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
@@ -31,10 +32,12 @@ from fitzsight.demo import DEMO_QUESTIONS
 from fitzsight.runtime import build_agent_runtime
 
 SUBMISSION_DIR = ROOT / "submission"
+DOCS_DIR = ROOT / "docs"
 PPTX_PATH = SUBMISSION_DIR / "FitzSight_GOAI_Initial_Round.pptx"
 PDF_PATH = SUBMISSION_DIR / "FitzSight_GOAI_Initial_Round.pdf"
+HERO_TRACE = SUBMISSION_DIR / "FitzSight_Hero_Run_Trace.png"
+HERO_ANSWER = SUBMISSION_DIR / "FitzSight_Hero_Run_Answer.png"
 
-# 16:9 widescreen.
 SLIDE_W = Inches(13.333333)
 SLIDE_H = Inches(7.5)
 
@@ -47,20 +50,14 @@ CYAN = RGBColor(88, 211, 255)
 GREEN = RGBColor(84, 211, 155)
 AMBER = RGBColor(255, 200, 87)
 RED = RGBColor(255, 107, 107)
+PURPLE = RGBColor(173, 141, 255)
 WHITE = RGBColor(255, 255, 255)
-
 FONT = "Liberation Sans"
 
 
 @lru_cache(maxsize=1)
 def _pitch_runs() -> dict[str, dict]:
-    """Generate the competition-facing metrics from fresh verified Agent runs.
-
-    This intentionally uses a temporary synthetic-data directory so the deck never
-    relies on whatever CSV bundle happens to exist in the repository. Every numeric
-    claim on the demo slides therefore comes from the current deterministic runtime.
-    """
-
+    """Fresh deterministic runs used only for current competition-facing numbers."""
     runs: dict[str, dict] = {}
     with TemporaryDirectory(prefix="fitzsight_pitch_") as tmp:
         store, _registry, agent = build_agent_runtime(
@@ -73,7 +70,7 @@ def _pitch_runs() -> dict[str, dict]:
                 result = agent.run(question)
                 if result.final_answer.status != "verified" or not result.verification.passed:
                     raise RuntimeError(
-                        f"Pitch-deck metric source failed verification for {result.plan.intent}"
+                        f"Pitch metric source failed verification for {result.plan.intent}"
                     )
                 runs[result.plan.intent] = result.to_dict()
         finally:
@@ -89,6 +86,29 @@ def _diagnosis(intent: str) -> dict:
     return _pitch_runs()[intent]["investigation"]["diagnosis"]
 
 
+def _json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
+def _hero() -> dict:
+    return _json(DOCS_DIR / "V0.12_HERO_RUN.json")
+
+
+@lru_cache(maxsize=1)
+def _evaluation_snapshot() -> dict[str, dict]:
+    required = {
+        "benchmark": DOCS_DIR / "V0.12_BENCHMARK_RESULTS.json",
+        "adversarial": DOCS_DIR / "V0.12_ADVERSARIAL_RESULTS.json",
+        "holdout": DOCS_DIR / "V0.12_HOLDOUT_RESULTS.json",
+        "ablation": DOCS_DIR / "V0.12_ABLATION_RESULTS.json",
+    }
+    missing = [str(p) for p in required.values() if not p.exists()]
+    if missing:
+        raise FileNotFoundError(f"Missing v0.12 evaluation assets: {missing}")
+    return {name: _json(path) for name, path in required.items()}
+
+
 def _money_k(value: float, *, signed: bool = True) -> str:
     sign = ""
     if signed:
@@ -102,37 +122,12 @@ def _pp(value: float) -> str:
     return f"{value:+.2f} pp"
 
 
-def _pct(value: float, digits: int = 1) -> str:
+def _pct(value: float, digits: int = 0) -> str:
     return f"{value * 100:.{digits}f}%"
 
 
 def _pvalue(value: float) -> str:
     return f"{value:.2e}" if value < 0.001 else f"{value:.5f}"
-
-
-def _segment_profile(metrics: dict, segment: str) -> dict:
-    for profile in metrics["segmentation"]["profiles"]:
-        if profile["segment"] == segment:
-            return profile
-    raise KeyError(f"Missing segment profile: {segment}")
-
-
-def _evaluation_snapshot() -> dict:
-    """Read the latest available benchmark/adversarial release-gate snapshot."""
-
-    bench_candidates = [
-        ROOT / "docs" / "V0.9_BENCHMARK_RESULTS.json",
-        ROOT / "docs" / "V0.7_BENCHMARK_RESULTS.json",
-    ]
-    adv_candidates = [
-        ROOT / "docs" / "V0.9_ADVERSARIAL_RESULTS.json",
-        ROOT / "docs" / "V0.7_ADVERSARIAL_RESULTS.json",
-    ]
-    bench = next((json.loads(p.read_text(encoding="utf-8")) for p in bench_candidates if p.exists()), None)
-    adv = next((json.loads(p.read_text(encoding="utf-8")) for p in adv_candidates if p.exists()), None)
-    if bench is None or adv is None:
-        raise FileNotFoundError("Benchmark/adversarial release-gate results are required to build the pitch deck")
-    return {"benchmark": bench, "adversarial": adv}
 
 
 def set_bg(slide, color=BG):
@@ -164,14 +159,14 @@ def add_text(slide, text, x, y, w, h, *, size=24, color=TEXT, bold=False,
 
 def add_title(slide, title, subtitle=None, *, kicker=None):
     if kicker:
-        add_text(slide, kicker.upper(), 0.7, 0.35, 6.4, 0.3, size=10, color=CYAN, bold=True)
-    add_text(slide, title, 0.7, 0.72, 11.8, 0.72, size=30, bold=True)
+        add_text(slide, kicker.upper(), 0.72, 0.35, 6.8, 0.28, size=10, color=CYAN, bold=True)
+    add_text(slide, title, 0.72, 0.72, 11.9, 0.7, size=28, bold=True)
     if subtitle:
-        add_text(slide, subtitle, 0.72, 1.48, 11.5, 0.42, size=14, color=MUTED)
+        add_text(slide, subtitle, 0.74, 1.43, 11.5, 0.38, size=13, color=MUTED)
 
 
 def add_footer(slide, n):
-    add_text(slide, "FitzSight · GOAI 2026 · Boundless Agents · AI+金融", 0.72, 7.13, 9.5, 0.2, size=8, color=MUTED)
+    add_text(slide, "FitzSight · GOAI 2026 · Boundless Agents · AI+金融", 0.72, 7.13, 9.6, 0.2, size=8, color=MUTED)
     add_text(slide, str(n), 12.1, 7.08, 0.5, 0.24, size=9, color=MUTED, align=PP_ALIGN.RIGHT)
 
 
@@ -185,17 +180,16 @@ def panel(slide, x, y, w, h, *, fill=PANEL, radius=True, line=None):
 
 
 def chip(slide, text, x, y, w, *, fill=PANEL_2, color=TEXT):
-    shp = panel(slide, x, y, w, 0.36, fill=fill)
-    add_text(slide, text, x+0.12, y+0.08, w-0.24, 0.18, size=10, color=color, bold=True, align=PP_ALIGN.CENTER)
-    return shp
+    panel(slide, x, y, w, 0.36, fill=fill)
+    add_text(slide, text, x + 0.1, y + 0.085, w - 0.2, 0.18, size=9.5, color=color, bold=True, align=PP_ALIGN.CENTER)
 
 
 def metric_card(slide, x, y, w, h, label, value, *, accent=CYAN, note=None):
     panel(slide, x, y, w, h, fill=PANEL)
-    add_text(slide, label, x+0.18, y+0.16, w-0.36, 0.26, size=10, color=MUTED, bold=True)
-    add_text(slide, value, x+0.18, y+0.54, w-0.36, 0.55, size=24, color=accent, bold=True)
+    add_text(slide, label, x + 0.18, y + 0.15, w - 0.36, 0.24, size=9.5, color=MUTED, bold=True)
+    add_text(slide, value, x + 0.18, y + 0.47, w - 0.36, 0.48, size=22, color=accent, bold=True)
     if note:
-        add_text(slide, note, x+0.18, y+h-0.38, w-0.36, 0.24, size=8.5, color=MUTED)
+        add_text(slide, note, x + 0.18, y + h - 0.34, w - 0.36, 0.2, size=8.5, color=MUTED)
 
 
 def arrow(slide, x1, y1, x2, y2, *, color=CYAN, width=2.0):
@@ -206,371 +200,389 @@ def arrow(slide, x1, y1, x2, y2, *, color=CYAN, width=2.0):
     return line
 
 
-def flow_node(slide, text, x, y, w=1.7, *, fill=PANEL_2, accent=CYAN):
-    panel(slide, x, y, w, 0.72, fill=fill, line=accent)
-    add_text(slide, text, x+0.08, y+0.17, w-0.16, 0.34, size=11, bold=True, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
+def flow_node(slide, text, x, y, w=1.7, *, fill=PANEL_2, accent=CYAN, h=0.72, size=11):
+    panel(slide, x, y, w, h, fill=fill, line=accent)
+    add_text(slide, text, x + 0.08, y + 0.12, w - 0.16, h - 0.2, size=size, bold=True, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
 
 
-def add_bar(slide, x, y, w, label, value, max_abs, *, color=CYAN, value_fmt="{:+.2f}"):
-    add_text(slide, label, x, y, 2.1, 0.22, size=10, color=TEXT, bold=True)
-    bar_x = x + 2.25
-    base_y = y + 0.05
-    base_w = w - 2.25
-    panel(slide, bar_x, base_y, base_w, 0.16, fill=PANEL_2, radius=False)
-    ratio = min(abs(value) / max_abs, 1.0) if max_abs else 0
-    fill_w = max(0.04, base_w * ratio)
-    fill_color = color if value >= 0 else RED
-    panel(slide, bar_x, base_y, fill_w, 0.16, fill=fill_color, radius=False)
-    add_text(slide, value_fmt.format(value), bar_x+base_w-0.8, y-0.01, 0.75, 0.2, size=9.5, color=TEXT, bold=True, align=PP_ALIGN.RIGHT)
-
-
-def add_callout(slide, text, x, y, w, h, *, accent=CYAN):
+def add_callout(slide, text, x, y, w, h, *, accent=CYAN, size=12):
     panel(slide, x, y, w, h, fill=PANEL_2, line=accent)
     panel(slide, x, y, 0.06, h, fill=accent, radius=False)
-    add_text(slide, text, x+0.2, y+0.14, w-0.35, h-0.24, size=12, color=TEXT, bold=True, valign=MSO_ANCHOR.MIDDLE)
+    add_text(slide, text, x + 0.2, y + 0.12, w - 0.35, h - 0.22, size=size, color=TEXT, bold=True, valign=MSO_ANCHOR.MIDDLE)
+
+
+def add_picture_contain(slide, path: Path, x: float, y: float, w: float, h: float, *, border=RGBColor(210, 218, 232)):
+    with Image.open(path) as im:
+        iw, ih = im.size
+    scale = min(w / iw, h / ih)
+    pw = iw * scale
+    ph = ih * scale
+    px = x + (w - pw) / 2
+    py = y + (h - ph) / 2
+    panel(slide, x, y, w, h, fill=WHITE, line=border)
+    slide.shapes.add_picture(str(path), Inches(px), Inches(py), width=Inches(pw), height=Inches(ph))
 
 
 def slide_1(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
-    add_text(s, "FITZSIGHT", 0.75, 0.65, 4.5, 0.55, size=13, color=CYAN, bold=True)
-    add_text(s, "Evidence-grounded\nFinancial Operations\nIntelligence Agent", 0.75, 1.34, 7.9, 2.05, size=31, bold=True)
-    add_text(s, "GOAI 2026 · Boundless Agents · AI+金融", 0.8, 3.65, 6.6, 0.4, size=16, color=MUTED)
-    add_callout(s, "Question → Data → Analysis → Evidence → Decision", 0.8, 4.48, 6.8, 0.8, accent=CYAN)
-    # Visual evidence chain on right
-    x = 9.2
-    for i, (t, c) in enumerate([("PLAN", CYAN), ("TOOLS", GREEN), ("EVIDENCE", AMBER), ("VERIFY", CYAN)]):
-        panel(s, x, 1.15+i*1.15, 2.7, 0.82, fill=PANEL, line=c)
-        add_text(s, t, x+0.2, 1.39+i*1.15, 2.3, 0.3, size=15, color=c, bold=True, align=PP_ALIGN.CENTER)
-        if i < 3:
-            arrow(s, x+1.35, 1.97+i*1.15, x+1.35, 2.25+i*1.15, color=MUTED, width=1.3)
-    add_text(s, "Not chat with a CSV.\nAn auditable investigation.", 9.25, 6.05, 2.8, 0.65, size=13, color=MUTED, bold=True, align=PP_ALIGN.CENTER)
+    add_text(s, "FITZSIGHT", 0.78, 0.66, 3.5, 0.35, size=12, color=CYAN, bold=True)
+    add_text(s, "Evidence-grounded\nFinancial Operations\nIntelligence Agent", 0.78, 1.28, 7.5, 2.0, size=31, bold=True)
+    add_text(s, "Brokerage / FinTech Operations Analyst", 0.8, 3.55, 6.5, 0.35, size=15, color=MUTED, bold=True)
+    add_callout(s, "Autonomous investigation. Human decision.", 0.8, 4.25, 6.2, 0.72, accent=GREEN, size=15)
+    labels = [("QUESTION", CYAN), ("PLAN", CYAN), ("TOOLS", GREEN), ("EVIDENCE", AMBER), ("VERIFY", PURPLE)]
+    for i, (t, c) in enumerate(labels):
+        flow_node(s, t, 9.15, 0.9 + i * 1.05, 2.75, fill=PANEL, accent=c, h=0.68, size=12)
+        if i < len(labels) - 1:
+            arrow(s, 10.53, 1.58 + i * 1.05, 10.53, 1.86 + i * 1.05, color=MUTED, width=1.2)
+    add_text(s, "GOAI 2026 · Boundless Agents · AI+金融", 0.8, 6.38, 6.8, 0.3, size=13, color=MUTED)
+    add_text(s, "Not chat with a CSV.\nA bounded investigation you can audit.", 8.8, 6.1, 3.4, 0.6, size=12.5, color=MUTED, bold=True, align=PP_ALIGN.CENTER)
     add_footer(s, 1)
 
 
 def slide_2(prs):
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"The gap: dashboards show what, analysts still investigate why", kicker="Problem")
-    steps=["Find tables","Define KPI","Compare periods","Drill dimensions","Test significance","Inspect events","Reconcile numbers","Write report"]
-    y=2.05
-    for i,t in enumerate(steps):
-        x=0.75+(i%4)*3.05; yy=y+(i//4)*1.25
-        panel(s,x,yy,2.55,0.76,fill=PANEL)
-        add_text(s,f"{i+1:02d}",x+0.16,yy+0.17,0.35,0.26,size=11,color=CYAN,bold=True)
-        add_text(s,t,x+0.52,yy+0.15,1.82,0.35,size=12,bold=True)
-    add_callout(s,"A generic LLM can generate an explanation faster — but plausibility is not auditability.",0.75,4.85,11.75,0.86,accent=AMBER)
-    metric_card(s,0.75,5.95,3.55,0.9,"Existing stack","Dashboard + SQL + BI",accent=MUTED)
-    metric_card(s,4.55,5.95,3.55,0.9,"Missing layer","Reproducible investigation",accent=CYAN)
-    metric_card(s,8.35,5.95,4.15,0.9,"Design target","Evidence before narrative",accent=GREEN)
-    add_footer(s,2)
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Dashboards show what changed. The investigation behind why is still manual.", kicker="Industry problem")
+    add_text(s, "Primary user", 0.8, 1.75, 1.5, 0.25, size=10, color=CYAN, bold=True)
+    add_text(s, "Brokerage / FinTech Operations Analyst", 0.8, 2.08, 5.9, 0.38, size=19, bold=True)
+    steps = ["Find tables", "Define KPI", "Compare periods", "Drill drivers", "Test significance", "Inspect events", "Reconcile evidence", "Write report"]
+    for i, t in enumerate(steps):
+        x = 0.8 + (i % 4) * 3.0
+        y = 2.82 + (i // 4) * 1.05
+        panel(s, x, y, 2.62, 0.72, fill=PANEL)
+        add_text(s, f"{i+1:02d}", x + 0.16, y + 0.18, 0.34, 0.24, size=10, color=CYAN, bold=True)
+        add_text(s, t, x + 0.52, y + 0.16, 1.85, 0.28, size=11.5, bold=True)
+    add_callout(s, "A generic LLM can write a plausible explanation quickly. Financial operations needs a reproducible evidence chain before narrative.", 0.8, 5.15, 11.75, 0.88, accent=AMBER, size=12)
+    chip(s, "acquisition", 1.0, 6.28, 2.15, fill=PANEL_2, color=CYAN)
+    arrow(s, 3.18, 6.46, 4.0, 6.46, color=MUTED, width=1.3)
+    chip(s, "FTD conversion", 4.05, 6.28, 2.35, fill=PANEL_2, color=GREEN)
+    arrow(s, 6.43, 6.46, 7.25, 6.46, color=MUTED, width=1.3)
+    chip(s, "client-fund flows", 7.3, 6.28, 2.55, fill=PANEL_2, color=AMBER)
+    add_text(s, "beachhead workflow", 10.15, 6.36, 2.0, 0.22, size=9.5, color=MUTED, bold=True, align=PP_ALIGN.CENTER)
+    add_footer(s, 2)
 
 
 def slide_3(prs):
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"FitzSight turns a business question into a verified investigation", kicker="Product")
-    labels=[("Question",CYAN),("Constrained\nPlan",CYAN),("SQL / Python\nTools",GREEN),("Evidence\nGraph",AMBER),("Verifier",CYAN),("Verified\nAnswer",GREEN)]
-    xs=[0.65,2.75,4.85,7.0,9.1,11.0]
-    widths=[1.55,1.55,1.65,1.55,1.35,1.7]
-    for i,((t,c),x,w) in enumerate(zip(labels,xs,widths)):
-        flow_node(s, t, x, 2.45, w, fill=PANEL, accent=c)
-    # fix flow nodes manually due signature
-    # connectors
-    for i in range(len(xs)-1):
-        arrow(s,xs[i]+widths[i],2.81,xs[i+1]-0.08,2.81,color=MUTED,width=1.4)
-    add_callout(s,"Planner decides what to investigate. Deterministic tools own every number. Verifier decides what may be shown.",0.8,4.0,11.7,0.95,accent=CYAN)
-    metric_card(s,0.8,5.3,3.5,1.15,"Planner authority","Approved actions only",accent=CYAN,note="No free-form SQL or high-impact actions")
-    metric_card(s,4.55,5.3,3.5,1.15,"Calculation authority","Read-only SQL / Python",accent=GREEN,note="Statistics and decompositions are executable")
-    metric_card(s,8.3,5.3,4.2,1.15,"Answer authority","EvidenceClaimVerifier",accent=AMBER,note="Verification failure → answer withheld")
-    add_footer(s,3)
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "FitzSight converts a business question into a verified decision-support investigation", kicker="Product")
+    labels = [("Question", CYAN), ("Constrained\nplan", CYAN), ("Deterministic\ntools", GREEN), ("Evidence\ngraph", AMBER), ("Verifier", PURPLE), ("Verified\nanswer", GREEN)]
+    xs = [0.62, 2.72, 4.82, 6.98, 9.08, 11.0]
+    widths = [1.55, 1.55, 1.65, 1.55, 1.35, 1.7]
+    for (t, c), x, w in zip(labels, xs, widths):
+        flow_node(s, t, x, 2.35, w, fill=PANEL, accent=c, h=0.82, size=10.5)
+    for i in range(len(xs) - 1):
+        arrow(s, xs[i] + widths[i], 2.76, xs[i + 1] - 0.07, 2.76, color=MUTED, width=1.3)
+    add_callout(s, "The model may select the next approved analytical branch. It never owns business arithmetic, arbitrary SQL, or high-impact financial actions.", 0.8, 3.75, 11.75, 0.9, accent=CYAN, size=12)
+    metric_card(s, 0.8, 5.05, 3.6, 1.2, "Planner authority", "Approved actions only", accent=CYAN, note="Bounded adaptivity; local intent gate first")
+    metric_card(s, 4.62, 5.05, 3.6, 1.2, "Calculation authority", "Read-only SQL / Python", accent=GREEN, note="Every competition-facing number is executable")
+    metric_card(s, 8.45, 5.05, 4.1, 1.2, "Answer authority", "EvidenceClaimVerifier", accent=PURPLE, note="Verification failure → attribution withheld")
+    add_footer(s, 3)
 
 
 def slide_4(prs):
-    m = _metrics(CRM_INTENT)
-    d = _diagnosis(CRM_INTENT)
+    hero = _hero()
+    run = hero["run"]
+    metrics = run["investigation"]["metrics"]
+    trace = run["investigation"]["execution_trace"]
+    branch = metrics["bounded_branching"]
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Hero journey — evidence selects the next approved step", subtitle="Question: “Why did European FTD conversion deteriorate after July 15?”", kicker="Bounded-adaptive Agent")
+    add_picture_contain(s, HERO_TRACE, 5.45, 1.82, 7.1, 4.92)
+    metric_card(s, 0.8, 1.95, 4.25, 1.05, "Actual execution", f"{len(trace)} approved steps", accent=CYAN, note="Rendered from the verified v0.12 run JSON")
+    statuses = [
+        ("Contribution drilldown", "executed", GREEN),
+        ("Latency / anomaly scan", "executed", GREEN),
+        ("Operational event check", branch["event_check_status"], AMBER),
+        ("Document evidence", metrics["document_evidence"]["source_ref"], PURPLE),
+    ]
+    for i, (lab, value, col) in enumerate(statuses):
+        panel(s, 0.8, 3.18 + i * 0.72, 4.25, 0.58, fill=PANEL, line=col)
+        add_text(s, lab, 1.02, 3.32 + i * 0.72, 1.95, 0.22, size=9.5, color=MUTED, bold=True)
+        add_text(s, value, 2.95, 3.30 + i * 0.72, 1.8, 0.24, size=10.5, color=col, bold=True, align=PP_ALIGN.RIGHT)
+    add_callout(s, "Result-driven branching ≠ unrestricted autonomy. Every next step remains inside the approved action catalog.", 0.8, 6.2, 4.25, 0.58, accent=GREEN, size=10.5)
+    add_footer(s, 4)
+
+
+def slide_5(prs):
+    hero = _hero()["run"]
+    m = hero["investigation"]["metrics"]
+    d = hero["investigation"]["diagnosis"]
     affected = float(m["affected"]["conversion_change_pp"])
     control = float(m["control"]["conversion_change_pp"])
     response = float(m["affected_response_median_change_minutes"])
-    conversion_p = float(m["conversion_test"]["p_value"])
-    top_team = m["team_contribution_analysis"]["segments"][0]["segment"]
+    contrib = m["team_contribution_analysis"]["segments"][0]
     anomaly_days = int(m["post_change_response_anomalies"]["anomaly_count"])
-    root_status = str(d["root_cause_status"]).replace("_", " ").title()
-
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Demo 1 — Why did European FTD conversion deteriorate after July 15?", kicker="CRM / Sales")
-    metric_card(s,0.75,1.9,2.35,1.15,"Affected FTD",_pp(affected),accent=RED,note="Europe Team A+B")
-    metric_card(s,3.25,1.9,2.35,1.15,"Control",_pp(control),accent=AMBER,note="Other Europe teams")
-    metric_card(s,5.75,1.9,2.35,1.15,"Response median",f"{response:+.2f} min",accent=RED,note="Affected cohort")
-    metric_card(s,8.25,1.9,2.0,1.15,"Conversion p",_pvalue(conversion_p),accent=GREEN)
-    metric_card(s,10.4,1.9,2.1,1.15,"Root cause",root_status.replace("Supported ", ""),accent=CYAN,note="Not causal proof")
-    max_abs=max(abs(affected),abs(control),1.0)
-    add_bar(s,0.85,3.55,5.65,"Affected",affected,max_abs,color=RED,value_fmt="{:+.2f} pp")
-    add_bar(s,0.85,4.15,5.65,"Control",control,max_abs,color=AMBER,value_fmt="{:+.2f} pp")
-    panel(s,7.05,3.4,5.45,2.25,fill=PANEL)
-    add_text(s,"Investigation evidence",7.28,3.62,2.8,0.3,size=12,color=CYAN,bold=True)
-    bullets=[
-        f"Response latency shifted by {response:+.2f} minutes after the routing change",
-        f"{top_team} is the largest negative team-level contributor",
-        "Nearby CRM routing event exists in the business-event log",
-        f"{anomaly_days} post-change response-time days exceed the robust threshold",
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Hero finding — evidence supports a CRM routing candidate, not a proven causal conclusion", kicker="Verified answer")
+    metric_card(s, 0.8, 1.8, 2.15, 1.28, "Affected FTD", _pp(affected), accent=RED, note="Europe Team A+B")
+    metric_card(s, 3.1, 1.8, 2.15, 1.28, "Control", _pp(control), accent=AMBER, note="Other Europe teams")
+    metric_card(s, 5.4, 1.8, 2.15, 1.28, "Response median", f"{response:+.2f} min", accent=RED)
+    metric_card(s, 7.7, 1.8, 2.15, 1.28, "Top contributor", str(contrib["segment"]), accent=CYAN, note=f"contribution {float(contrib['total_contribution_pp']):+.2f} pp")
+    metric_card(s, 10.0, 1.8, 2.55, 1.28, "Root-cause status", "supported", accent=GREEN, note="candidate · not causal proof")
+    add_picture_contain(s, HERO_ANSWER, 6.1, 3.3, 6.45, 3.1)
+    panel(s, 0.8, 3.3, 4.95, 3.1, fill=PANEL)
+    add_text(s, "Evidence chain", 1.05, 3.52, 2.1, 0.28, size=12, color=CYAN, bold=True)
+    rows = [
+        ("Quantitative shift", f"Affected {affected:+.2f} pp vs control {control:+.2f} pp"),
+        ("Latency signal", f"Median response {response:+.2f} minutes"),
+        ("Contribution", f"{contrib['segment']} is largest negative contributor"),
+        ("Robust anomaly", f"{anomaly_days} post-change high-anomaly days"),
+        ("Operational context", "Nearby CRM routing event"),
+        ("Source-addressable doc", "CRM-CHANGE-2026-0715#p1"),
     ]
-    for i,b in enumerate(bullets):
-        add_text(s,"• "+b,7.3,4.05+i*0.37,4.8,0.28,size=10.5,color=TEXT)
-    add_callout(s,"Result: supported root-cause candidate, with evidence and a causal boundary.",0.85,6.08,11.65,0.65,accent=GREEN)
-    add_footer(s,4)
+    for i, (lab, val) in enumerate(rows):
+        add_text(s, lab, 1.05, 3.98 + i * 0.36, 1.65, 0.22, size=9.2, color=MUTED, bold=True)
+        add_text(s, val, 2.75, 3.98 + i * 0.36, 2.65, 0.25, size=9.8, color=TEXT)
+    add_footer(s, 5)
 
-def slide_5(prs):
-    m = _metrics(NET_DEPOSIT_INTENT)
-    dec = m["driver_decomposition"]
-    concentration = m["customer_concentration"]
-    net_change = float(dec["net_change"])
-    deposit_change = float(dec["deposit_change"])
-    withdrawal_change = float(dec["withdrawal_change"])
-    share = float(concentration["share_of_current_withdrawals"])
-    n_customers = int(concentration["customer_count"])
-
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Demo 2 — Why did European net deposits fall in the week starting August 3?", kicker="Financial Operations")
-    metric_card(s,0.75,1.9,2.5,1.15,"Net-deposit change",_money_k(net_change),accent=RED)
-    metric_card(s,3.45,1.9,2.5,1.15,"Deposits",_money_k(deposit_change),accent=GREEN)
-    metric_card(s,6.15,1.9,2.5,1.15,"Withdrawals",_money_k(withdrawal_change),accent=RED)
-    metric_card(s,8.85,1.9,3.65,1.15,f"Top {n_customers} withdrawal share",_pct(share),accent=AMBER,note="Concentration, not motive inference")
-    panel(s,0.85,3.45,7.2,2.25,fill=PANEL)
-    add_text(s,"Driver decomposition",1.05,3.68,2.6,0.28,size=12,color=CYAN,bold=True)
-    bars=[("Deposit change",deposit_change/1000,GREEN),("Withdrawal pressure",-withdrawal_change/1000,RED),("Net change",net_change/1000,RED)]
-    max_abs=max(abs(v) for _,v,_ in bars)
-    for i,(lab,val,col) in enumerate(bars):
-        add_bar(s,1.1,4.2+i*0.45,6.5,lab,val,max_abs,color=col,value_fmt="{:+.1f}k")
-    panel(s,8.35,3.45,4.15,2.25,fill=PANEL)
-    add_text(s,"What FitzSight refuses to infer",8.6,3.72,3.55,0.3,size=12,color=AMBER,bold=True)
-    for i,t in enumerate(["Customer motive","AML suspicion","Investment intent","Automated account action"]):
-        chip(s,t,8.7,4.2+i*0.36,3.45,fill=PANEL_2,color=MUTED)
-    add_callout(s,"Observed driver: concentrated withdrawal pressure. Unsupported story: why customers withdrew.",0.85,6.08,11.65,0.65,accent=AMBER)
-    add_footer(s,5)
 
 def slide_6(prs):
-    m = _metrics(CUSTOMER_INTELLIGENCE_INTENT)
-    seg = m["segmentation"]
-    high = _segment_profile(m, "High Value")
-    customers = int(seg["customer_count"])
-    coverage = float(seg["coverage"])
-    customer_share = float(high["customer_share"])
-    deposit_share = float(high["deposit_share"])
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Failure branch — error evidence ends attribution, not the investigation", subtitle="Tested dependency failure: the operational-event lookup raises an error Evidence record.", kicker="Fail closed")
+    nodes = [
+        ("event_check", RED),
+        ("error Evidence", RED),
+        ("no document corroboration", AMBER),
+        ("insufficient_evidence", AMBER),
+        ("verified bounded answer", GREEN),
+    ]
+    x = 0.75
+    widths = [1.8, 1.8, 2.15, 2.15, 2.1]
+    for i, ((label, col), w) in enumerate(zip(nodes, widths)):
+        flow_node(s, label, x, 2.35, w, fill=PANEL, accent=col, h=0.88, size=10.2)
+        if i < len(nodes)-1:
+            arrow(s, x+w, 2.79, x+w+0.20, 2.79, color=MUTED, width=1.2)
+        x += w + 0.25
+    panel(s, 0.8, 4.05, 5.6, 1.55, fill=PANEL, line=RED)
+    add_text(s, "What fails", 1.05, 4.3, 1.6, 0.25, size=11, color=RED, bold=True)
+    add_text(s, "Operational-event dependency is unavailable. The system records the error and does not manufacture event or document corroboration.", 1.05, 4.72, 4.95, 0.62, size=11, color=TEXT)
+    panel(s, 6.75, 4.05, 5.8, 1.55, fill=PANEL, line=GREEN)
+    add_text(s, "What still succeeds", 7.0, 4.3, 1.9, 0.25, size=11, color=GREEN, bold=True)
+    add_text(s, "The evidence-backed metric findings remain valid; EvidenceClaimVerifier passes a guarded answer whose root_cause_status is insufficient_evidence.", 7.0, 4.72, 5.0, 0.62, size=11, color=TEXT)
+    add_callout(s, "Agent quality is not “always finding a cause.” It is completing the task with the correct uncertainty boundary.", 0.8, 6.12, 11.75, 0.65, accent=AMBER, size=11.5)
+    add_footer(s, 6)
 
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Demo 3 — Customer Intelligence without hidden labels", kicker="Customer Intelligence")
-    metric_card(s,0.75,1.9,2.45,1.15,"Europe customers",f"{customers:,}",accent=CYAN)
-    metric_card(s,3.4,1.9,2.45,1.15,"Coverage",_pct(coverage,0),accent=GREEN)
-    metric_card(s,6.05,1.9,2.45,1.15,"High Value users",_pct(customer_share),accent=AMBER)
-    metric_card(s,8.7,1.9,3.8,1.15,"High Value deposit share",_pct(deposit_share),accent=GREEN)
-    panel(s,0.8,3.45,7.25,2.1,fill=PANEL)
-    add_text(s,"Transparent behavioral value policy",1.03,3.7,3.7,0.3,size=12,color=CYAN,bold=True)
-    features=["Deposit value","Deposit frequency","Trade volume","Trade frequency","Withdrawal value"]
-    for i,f in enumerate(features):
-        chip(s,f,1.05+(i%3)*2.15,4.2+(i//3)*0.55,1.85,fill=PANEL_2,color=TEXT)
-    arrow(s,5.95,4.95,7.35,4.95,color=MUTED,width=1.5)
-    panel(s,8.35,3.45,4.15,2.1,fill=PANEL)
-    add_text(s,"Descriptive use only",8.65,3.72,3.45,0.3,size=12,color=AMBER,bold=True)
-    for i,t in enumerate(["No credit decision","No AML decision","No eligibility decision","No adverse action"]):
-        add_text(s,"• "+t,8.65,4.18+i*0.32,3.2,0.24,size=10.5,color=MUTED)
-    add_callout(s,"Normal Agent SQL never reads customer_segment_gt. Segments are built from observable behavior.",0.85,6.08,11.65,0.65,accent=GREEN)
-    add_footer(s,6)
 
 def slide_7(prs):
-    m = _metrics(MARKETING_LEAD_QUALITY_INTENT)
-    volume_pct=float(m["lead_volume_change_pct"])
-    conversion=float(m["conversion_change_pp"])
-    mix=float(m["paid_search_share_change_pp"])
-    paid=float(m["paid_search_conversion_test"]["difference_pp_b_minus_a"])
-    pval=float(m["paid_search_conversion_test"]["p_value"])
-
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Demo 4 — More leads ≠ better acquisition quality", kicker="Marketing / Sales")
-    metric_card(s,0.75,1.9,2.3,1.15,"Lead volume",f"{volume_pct:+.0f}%",accent=GREEN)
-    metric_card(s,3.2,1.9,2.3,1.15,"Aggregate FTD",_pp(conversion),accent=RED)
-    metric_card(s,5.65,1.9,2.3,1.15,"Paid Search mix",_pp(mix),accent=AMBER)
-    metric_card(s,8.1,1.9,2.3,1.15,"Paid Search FTD",_pp(paid),accent=RED)
-    metric_card(s,10.55,1.9,1.95,1.15,"p-value",_pvalue(pval),accent=GREEN)
-    panel(s,0.85,3.45,11.65,2.1,fill=PANEL)
-    add_text(s,"FitzSight separates three questions",1.1,3.72,4.2,0.3,size=12,color=CYAN,bold=True)
-    flow_node(s,"1. Volume",1.15,4.25,2.1,fill=PANEL_2,accent=GREEN)
-    flow_node(s,"2. Channel mix",4.05,4.25,2.4,fill=PANEL_2,accent=AMBER)
-    flow_node(s,"3. Within-channel\nperformance",7.3,4.1,2.8,fill=PANEL_2,accent=RED)
-    arrow(s,3.25,4.61,4.0,4.61,color=MUTED,width=1.4)
-    arrow(s,6.45,4.61,7.25,4.61,color=MUTED,width=1.4)
-    add_text(s,"Paid Search is the measurable quality failure — not simply a high lead count.",1.15,5.08,10.6,0.3,size=12,color=TEXT,bold=True,align=PP_ALIGN.CENTER)
-    add_footer(s,7)
-
-def slide_8(prs):
     m = _metrics(FALSE_CORRELATION_INTENT)
     d = _diagnosis(FALSE_CORRELATION_INTENT)
-    asia=float(m["conversion_change_pp"])
-    affiliate=float(m["affiliate_conversion_test"]["difference_pp_b_minus_a"])
-    pval=float(m["affiliate_conversion_test"]["p_value"])
-    nearby=m["nearby_business_events"][0]["event_type"].replace("_", " ").title() if m["nearby_business_events"] else "None"
-    supported=bool(d["nearby_event_cause_supported"])
+    asia = float(m["conversion_change_pp"])
+    affiliate = float(m["affiliate_conversion_test"]["difference_pp_b_minus_a"])
+    pval = float(m["affiliate_conversion_test"]["p_value"])
+    event = m["nearby_business_events"][0]["event_type"].replace("_", " ").title() if m["nearby_business_events"] else "None"
+    supported = bool(d["nearby_event_cause_supported"])
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Refusal story — temporal proximity is not evidence of causality", subtitle="Question: “Asia conversion fell after July 20. Did the nearby office relocation cause it?”", kicker="1 + 1 trust story")
+    metric_card(s, 0.8, 1.9, 2.2, 1.05, "Asia FTD", _pp(asia), accent=RED)
+    metric_card(s, 3.15, 1.9, 2.2, 1.05, "Affiliate FTD", _pp(affiliate), accent=RED)
+    metric_card(s, 5.5, 1.9, 2.2, 1.05, "Affiliate p", _pvalue(pval), accent=GREEN)
+    metric_card(s, 7.85, 1.9, 2.2, 1.05, "Nearby event", event, accent=AMBER)
+    metric_card(s, 10.2, 1.9, 2.35, 1.05, "Event causal support", str(supported).upper(), accent=GREEN if not supported else RED)
+    panel(s, 0.8, 3.35, 5.7, 2.35, fill=PANEL)
+    add_text(s, "Tempting narrative", 1.08, 3.62, 2.2, 0.3, size=12, color=AMBER, bold=True)
+    flow_node(s, "Office relocation", 1.1, 4.18, 2.1, fill=PANEL_2, accent=AMBER, h=0.8)
+    arrow(s, 3.23, 4.58, 4.0, 4.58, color=AMBER, width=1.4)
+    flow_node(s, "Asia FTD ↓", 4.05, 4.18, 1.65, fill=PANEL_2, accent=RED, h=0.8)
+    add_text(s, "REJECTED", 2.72, 5.18, 1.8, 0.25, size=11, color=RED, bold=True, align=PP_ALIGN.CENTER)
+    panel(s, 6.85, 3.35, 5.7, 2.35, fill=PANEL)
+    add_text(s, "Measured driver", 7.13, 3.62, 2.2, 0.3, size=12, color=CYAN, bold=True)
+    flow_node(s, "Affiliate quality ↓", 7.2, 4.18, 2.25, fill=PANEL_2, accent=RED, h=0.8)
+    arrow(s, 9.5, 4.58, 10.2, 4.58, color=CYAN, width=1.4)
+    flow_node(s, "Supported driver", 10.25, 4.18, 1.65, fill=PANEL_2, accent=GREEN, h=0.8)
+    add_text(s, "false-correlation rejection = true", 7.25, 5.18, 4.4, 0.25, size=10.5, color=GREEN, bold=True, align=PP_ALIGN.CENTER)
+    add_callout(s, "FitzSight is evaluated on explanations it refuses to make — not only the answers it produces.", 0.8, 6.13, 11.75, 0.64, accent=GREEN, size=11.5)
+    add_footer(s, 7)
 
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Demo 5 — The system is tested on explanations it refuses to make", kicker="False-correlation guardrail")
-    metric_card(s,0.75,1.9,2.25,1.15,"Asia FTD",_pp(asia),accent=RED)
-    metric_card(s,3.15,1.9,2.25,1.15,"Affiliate FTD",_pp(affiliate),accent=RED)
-    metric_card(s,5.55,1.9,2.25,1.15,"Affiliate p",_pvalue(pval),accent=GREEN)
-    metric_card(s,7.95,1.9,2.25,1.15,"Nearby event",nearby,accent=AMBER)
-    metric_card(s,10.35,1.9,2.15,1.15,"Causal support",str(supported).upper(),accent=GREEN if not supported else RED)
-    panel(s,0.85,3.45,11.65,2.3,fill=PANEL)
-    add_text(s,"Tempting story",1.15,3.7,2.2,0.3,size=12,color=AMBER,bold=True)
-    flow_node(s,"Office relocation",1.15,4.15,2.2,fill=PANEL_2,accent=AMBER)
-    arrow(s,3.4,4.5,4.4,4.5,color=AMBER,width=1.5)
-    flow_node(s,"Asia FTD ↓",4.45,4.15,1.8,fill=PANEL_2,accent=RED)
-    add_text(s,"Rejected",4.72,5.05,1.2,0.25,size=11,color=RED,bold=True,align=PP_ALIGN.CENTER)
-    add_text(s,"Measured evidence",7.1,3.7,2.6,0.3,size=12,color=CYAN,bold=True)
-    flow_node(s,"Affiliate quality ↓",7.15,4.15,2.35,fill=PANEL_2,accent=RED)
-    arrow(s,9.55,4.5,10.35,4.5,color=CYAN,width=1.5)
-    flow_node(s,"Supported driver",10.4,4.15,1.65,fill=PANEL_2,accent=GREEN)
-    add_callout(s,"Temporal proximity is context, not proof. FitzSight runs a falsification check before attribution.",0.85,6.15,11.65,0.62,accent=GREEN)
-    add_footer(s,8)
+
+def slide_8(prs):
+    net = _metrics(NET_DEPOSIT_INTENT)
+    cust = _metrics(CUSTOMER_INTELLIGENCE_INTENT)
+    marketing = _metrics(MARKETING_LEAD_QUALITY_INTENT)
+    net_dec = net["driver_decomposition"]
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Three additional workflows prove reuse — without diluting the hero narrative", kicker="Breadth proof")
+    cards = [
+        ("Client-fund flows", "Net-deposit / withdrawal concentration", f"Net change {_money_k(float(net_dec['net_change']))}", AMBER, "Observed driver only; no customer-motive inference"),
+        ("Customer Intelligence", "Behavioral-value segmentation", f"Coverage {_pct(float(cust['segmentation']['coverage']))}", CYAN, "Descriptive only; no AML / credit / eligibility decisions"),
+        ("Acquisition quality", "Volume vs mix vs within-channel quality", f"Leads {float(marketing['lead_volume_change_pct']):+.0f}% · FTD {_pp(float(marketing['conversion_change_pp']))}", GREEN, "Separates more leads from better leads"),
+    ]
+    for i, (title, subtitle, metric, col, note) in enumerate(cards):
+        y = 1.75 + i * 1.62
+        panel(s, 0.8, y, 11.75, 1.3, fill=PANEL, line=col)
+        add_text(s, f"0{i+1}", 1.02, y + 0.22, 0.55, 0.3, size=12, color=col, bold=True)
+        add_text(s, title, 1.75, y + 0.18, 2.4, 0.3, size=14, bold=True)
+        add_text(s, subtitle, 4.0, y + 0.18, 3.55, 0.3, size=11, color=MUTED, bold=True)
+        add_text(s, metric, 7.65, y + 0.18, 2.2, 0.3, size=12, color=col, bold=True)
+        add_text(s, note, 1.75, y + 0.72, 9.9, 0.32, size=10.5, color=TEXT)
+    add_callout(s, "Main pitch = one complete investigation + one refusal. These workflows are reusable breadth, not five equal demo stories.", 0.8, 6.62, 11.75, 0.42, accent=CYAN, size=10.5)
+    add_footer(s, 8)
+
 
 def slide_9(prs):
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Four trust boundaries make the Agent auditable", kicker="Technical differentiation")
-    cards=[
-        ("01","Local intent gate","Unsupported questions are refused before a model call.",CYAN),
-        ("02","Constrained planner","Only approved high-level actions; no SQL or arbitrary tool args.",AMBER),
-        ("03","Deterministic tools","Read-only SQL / Python own calculations, tests and decompositions.",GREEN),
-        ("04","Claim verifier","Evidence IDs, digest/status, ground-truth boundary and causal language.",CYAN),
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Technical depth comes from explicit authority boundaries, not more Agent labels", kicker="Architecture")
+    cards = [
+        ("01", "Local intent gate", "Unsupported questions are refused before an external model call.", CYAN),
+        ("02", "Constrained planner", "Only approved high-level actions. No planner-generated SQL or arbitrary tool parameters.", AMBER),
+        ("03", "Deterministic analytics", "Read-only SQL / Python own KPI calculations, tests, decompositions and anomaly checks.", GREEN),
+        ("04", "Source-addressable evidence", "Tool outputs and synthetic operational documents enter one append-only Evidence Registry.", PURPLE),
+        ("05", "EvidenceClaimVerifier", "Checks evidence integrity, _gt boundary and causal language before result delivery.", CYAN),
+        ("06", "Human decision boundary", "No trading, AML, credit, suitability or other high-impact financial decisions.", GREEN),
     ]
-    for i,(num,title,desc,col) in enumerate(cards):
-        x=0.8+(i%2)*6.0; y=1.95+(i//2)*2.05
-        panel(s,x,y,5.65,1.6,fill=PANEL,line=col)
-        add_text(s,num,x+0.2,y+0.2,0.5,0.3,size=12,color=col,bold=True)
-        add_text(s,title,x+0.8,y+0.18,4.35,0.35,size=16,bold=True)
-        add_text(s,desc,x+0.8,y+0.66,4.35,0.65,size=11,color=MUTED)
-    add_callout(s,"Verification fails → FitzSight withholds the analytical answer.",0.85,6.2,11.65,0.6,accent=RED)
-    add_footer(s,9)
+    for i, (num, title, desc, col) in enumerate(cards):
+        x = 0.8 + (i % 3) * 4.0
+        y = 1.72 + (i // 3) * 2.25
+        panel(s, x, y, 3.65, 1.75, fill=PANEL, line=col)
+        add_text(s, num, x + 0.18, y + 0.18, 0.42, 0.24, size=10.5, color=col, bold=True)
+        add_text(s, title, x + 0.65, y + 0.16, 2.7, 0.32, size=13, bold=True)
+        add_text(s, desc, x + 0.65, y + 0.62, 2.65, 0.85, size=10.2, color=MUTED)
+    add_callout(s, "Verification failure is a product state: FitzSight may finish with a guarded answer or withhold the unsupported attribution.", 0.8, 6.25, 11.75, 0.6, accent=RED, size=10.8)
+    add_footer(s, 9)
 
 
 def slide_10(prs):
-    snapshot = _evaluation_snapshot()
-    bench = snapshot["benchmark"]
-    adv = snapshot["adversarial"]
-    bm = bench["metrics"]
-    scenario_count = int(bench["scenario_count"])
-    passed = int(bench["passed"])
-    root_acc=float(bm["root_cause_scenario_accuracy"])
-    evidence_cov=float(bm["mean_evidence_coverage"])
-    violations=int(bm["total_verifier_violations"])
-    adv_passed=int(adv["passed"])
-    adv_count=int(adv["case_count"])
+    snap = _evaluation_snapshot()
+    bench = snap["benchmark"]
+    adv = snap["adversarial"]
+    hold = snap["holdout"]["metrics"]
+    abl = snap["ablation"]["metrics"]
+    full = abl["full_fitzsight"]
+    nogate = abl["no_verifier_gate_ablation"]
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Evaluation v2 asks whether the system generalizes — and whether the safety architecture matters", kicker="Evaluation & reproducibility")
+    metric_card(s, 0.8, 1.75, 2.3, 1.1, "Fixed benchmark", f"{bench['passed']} / {bench['scenario_count']} PASS", accent=GREEN)
+    metric_card(s, 3.25, 1.75, 2.3, 1.1, "Holdout runs", f"{hold['case_runs']} / {hold['case_runs']}", accent=GREEN, note="Unseen seeds + question paraphrases")
+    metric_card(s, 5.7, 1.75, 2.3, 1.1, "Routing stability", _pct(float(hold['intent_routing_stability'])), accent=CYAN)
+    metric_card(s, 8.15, 1.75, 2.3, 1.1, "Evidence coverage", _pct(float(hold['mean_evidence_coverage'])), accent=GREEN)
+    metric_card(s, 10.6, 1.75, 1.95, 1.1, "Supported", _pct(float(hold['supported_candidate_rate'])), accent=AMBER, note="1 CRM seed correctly insufficient")
+    panel(s, 0.8, 3.25, 5.75, 2.55, fill=PANEL)
+    add_text(s, "Adversarial release gate", 1.05, 3.52, 2.8, 0.3, size=12, color=AMBER, bold=True)
+    add_text(s, f"{adv['passed']} / {adv['case_count']} PASS", 1.05, 3.98, 2.3, 0.4, size=22, color=GREEN, bold=True)
+    for i, t in enumerate(["scope refusal", "planner policy", "evidence integrity", "causal overclaim", "_gt leak", "false correlation"]):
+        chip(s, t, 1.05 + (i % 2) * 2.45, 4.56 + (i // 2) * 0.38, 2.15, fill=PANEL_2, color=MUTED)
+    panel(s, 6.85, 3.25, 5.7, 2.55, fill=PANEL)
+    add_text(s, "Controlled architecture ablation", 7.1, 3.52, 3.6, 0.3, size=12, color=PURPLE, bold=True)
+    add_text(s, "Full FitzSight", 7.1, 4.02, 1.9, 0.26, size=10.5, color=MUTED, bold=True)
+    add_text(s, _pct(float(full['adversarial_refusal_correctness'])), 9.65, 3.97, 1.1, 0.35, size=20, color=GREEN, bold=True, align=PP_ALIGN.RIGHT)
+    add_text(s, "adversarial refusal", 10.85, 4.03, 1.25, 0.25, size=9, color=MUTED)
+    add_text(s, "No verifier/evidence gate", 7.1, 4.68, 2.6, 0.26, size=10.5, color=MUTED, bold=True)
+    add_text(s, _pct(float(nogate['unsafe_answer_rate_on_adversarial'])), 9.65, 4.62, 1.1, 0.35, size=20, color=RED, bold=True, align=PP_ALIGN.RIGHT)
+    add_text(s, "unsafe-answer rate", 10.85, 4.69, 1.3, 0.25, size=9, color=MUTED)
+    add_text(s, "This is a controlled architecture ablation — not a Generic LLM baseline.", 7.1, 5.28, 4.9, 0.28, size=9.5, color=AMBER, bold=True)
+    add_callout(s, "One unseen CRM seed returning insufficient_evidence is retained as a robustness success, not hidden to make the metric look perfect.", 0.8, 6.2, 11.75, 0.62, accent=AMBER, size=10.6)
+    add_footer(s, 10)
 
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Evaluation measures correctness, evidence quality — and safe refusal", kicker="Benchmark & adversarial release gate")
-    metric_card(s,0.75,1.95,2.75,1.2,"Benchmark scenarios",f"{passed} / {scenario_count} PASS",accent=GREEN)
-    metric_card(s,3.7,1.95,2.75,1.2,"Root-cause accuracy",_pct(root_acc,0),accent=GREEN)
-    metric_card(s,6.65,1.95,2.75,1.2,"Evidence coverage",_pct(evidence_cov,0),accent=GREEN)
-    metric_card(s,9.6,1.95,2.9,1.2,"Verifier violations",str(violations),accent=GREEN)
-    panel(s,0.8,3.55,5.7,2.2,fill=PANEL)
-    add_text(s,f"{scenario_count} deterministic scenarios",1.05,3.8,3.3,0.3,size=12,color=CYAN,bold=True)
-    for i,t in enumerate(["CRM routing","Net deposits","Customer Intelligence","Lead quality","False correlation"]):
-        chip(s,t,1.05+(i%2)*2.55,4.25+(i//2)*0.43,2.25,fill=PANEL_2,color=TEXT)
-    panel(s,6.8,3.55,5.7,2.2,fill=PANEL)
-    add_text(s,f"{adv_count} adversarial cases / {adv_passed} PASS",7.05,3.8,4.2,0.3,size=12,color=AMBER,bold=True)
-    items=["Scope refusal","Planner policy","Missing evidence","Causal overclaim","_gt leakage","False correlation"]
-    for i,t in enumerate(items):
-        chip(s,t,7.05+(i%2)*2.55,4.25+(i//2)*0.43,2.25,fill=PANEL_2,color=MUTED)
-    add_callout(s,"The release gate rewards the system for refusing unsupported answers, not only producing correct ones.",0.85,6.15,11.65,0.62,accent=AMBER)
-    add_footer(s,10)
 
 def slide_11(prs):
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); add_title(s,"Safety, compliance and reproducibility are product constraints", kicker="Open source")
-    left=["Synthetic benchmark data only","No real customer PII or employer data","No investment advice or trading actions","No automated AML / credit / suitability decisions","Evaluation-only *_gt fields blocked from normal Agent SQL"]
-    panel(s,0.8,1.9,6.2,4.75,fill=PANEL)
-    add_text(s,"Operational boundaries",1.05,2.18,3.4,0.3,size=13,color=CYAN,bold=True)
-    for i,t in enumerate(left):
-        add_text(s,"• "+t,1.08,2.72+i*0.62,5.5,0.44,size=11.5,color=TEXT)
-    panel(s,7.35,1.9,5.15,4.75,fill=PANEL)
-    add_text(s,"Reproducibility",7.65,2.18,2.8,0.3,size=13,color=GREEN,bold=True)
-    metric_card(s,7.65,2.75,2.0,1.0,"License","MIT",accent=GREEN)
-    metric_card(s,9.85,2.75,2.25,1.0,"Backend","DuckDB",accent=CYAN)
-    metric_card(s,7.65,4.0,2.0,1.0,"Fallback","SQLite",accent=AMBER)
-    metric_card(s,9.85,4.0,2.25,1.0,"Planner","Local fallback",accent=GREEN)
-    add_text(s,"Public repo",7.65,5.35,1.4,0.22,size=10,color=MUTED,bold=True)
-    add_text(s,"github.com/AplusNeutrino/FitzSight",7.65,5.72,4.1,0.35,size=11,color=CYAN,bold=True)
-    add_footer(s,11)
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_title(s, "Safety, traceability and open reuse are explicit product boundaries", kicker="AI + Finance")
+    panel(s, 0.8, 1.75, 5.75, 4.85, fill=PANEL)
+    add_text(s, "Implemented today", 1.08, 2.03, 2.2, 0.3, size=12, color=GREEN, bold=True)
+    implemented = [
+        "Synthetic benchmark data; no real customer PII",
+        "Read-only analytical path with deterministic fallback",
+        "Evidence Registry + source/paragraph document evidence",
+        "Causal-language guardrail and fail-closed verifier",
+        "No investment advice, trading or account actions",
+        "No automated AML, credit or suitability decisions",
+        "MIT license + public repo + tests + benchmark catalog",
+    ]
+    for i, t in enumerate(implemented):
+        add_text(s, "• " + t, 1.08, 2.48 + i * 0.48, 5.05, 0.36, size=10.6, color=TEXT)
+    panel(s, 6.85, 1.75, 5.7, 4.85, fill=PANEL)
+    add_text(s, "Production blueprint — not claimed as implemented", 7.12, 2.03, 4.9, 0.3, size=12, color=AMBER, bold=True)
+    blueprint = [
+        "Identity / RBAC",
+        "Row- and field-level policy",
+        "PII masking",
+        "Retention / enterprise audit controls",
+        "Approved business-system connectors",
+    ]
+    for i, t in enumerate(blueprint):
+        chip(s, t, 7.15, 2.55 + i * 0.52, 4.65, fill=PANEL_2, color=MUTED)
+    add_callout(s, "Financial boundary: evidence-grounded decision support. The authorized analyst or institution retains the final judgment.", 7.15, 5.45, 4.9, 0.78, accent=GREEN, size=10.5)
+    add_footer(s, 11)
 
 
 def slide_12(prs):
-    snapshot = _evaluation_snapshot()
-    bench = snapshot["benchmark"]
-    adv = snapshot["adversarial"]
-    coverage=float(bench["metrics"]["mean_evidence_coverage"])
-    s=prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
-    add_text(s,"FITZSIGHT",0.8,0.7,3.0,0.45,size=13,color=CYAN,bold=True)
-    add_text(s,"BI tells you what changed.\nFitzSight investigates why the measurable evidence changed.",0.8,1.55,10.9,1.35,size=30,bold=True)
-    add_callout(s,"A reproducible financial investigation you can inspect, verify, challenge — and sometimes refuse.",0.8,3.35,10.8,0.85,accent=GREEN)
-    metric_card(s,0.8,4.75,2.45,1.15,"Agent intents",str(len(DEMO_QUESTIONS)),accent=CYAN)
-    metric_card(s,3.45,4.75,2.45,1.15,"Benchmark",f"{bench['passed']} / {bench['scenario_count']}",accent=GREEN)
-    metric_card(s,6.1,4.75,2.45,1.15,"Adversarial",f"{adv['passed']} / {adv['case_count']}",accent=AMBER)
-    metric_card(s,8.75,4.75,2.85,1.15,"Evidence coverage",_pct(coverage,0),accent=GREEN)
-    add_text(s,"Evidence-grounded autonomous financial operations investigation",0.85,6.42,10.7,0.35,size=14,color=MUTED,bold=True)
-    add_footer(s,12)
+    snap = _evaluation_snapshot()
+    hold = snap["holdout"]["metrics"]
+    s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s)
+    add_text(s, "FITZSIGHT", 0.8, 0.68, 3.0, 0.4, size=12, color=CYAN, bold=True)
+    add_text(s, "BI tells you what changed.\nFitzSight investigates what the evidence supports — and what it does not.", 0.8, 1.5, 11.0, 1.55, size=29, bold=True)
+    add_callout(s, "Autonomous investigation. Human decision.", 0.8, 3.42, 7.2, 0.82, accent=GREEN, size=15)
+    metric_card(s, 0.8, 4.72, 2.6, 1.15, "Hero", "CRM / FTD", accent=CYAN, note="bounded-adaptive investigation")
+    metric_card(s, 3.62, 4.72, 2.6, 1.15, "Trust case", "False correlation", accent=AMBER, note="refuses unsupported causality")
+    metric_card(s, 6.44, 4.72, 2.6, 1.15, "Holdout", f"{hold['case_runs']} / {hold['case_runs']}", accent=GREEN, note="routed + verified")
+    metric_card(s, 9.26, 4.72, 3.25, 1.15, "Evidence coverage", _pct(float(hold['mean_evidence_coverage'])), accent=GREEN, note="synthetic benchmark scope")
+    add_text(s, "A reproducible financial investigation you can inspect, verify, challenge — and sometimes refuse.", 0.85, 6.42, 11.1, 0.38, size=14, color=MUTED, bold=True)
+    add_footer(s, 12)
+
 
 def build_speaker_notes() -> Path:
-    crm = _metrics(CRM_INTENT)
+    hero = _hero()["run"]
+    hm = hero["investigation"]["metrics"]
+    hd = hero["investigation"]["diagnosis"]
+    false_m = _metrics(FALSE_CORRELATION_INTENT)
+    false_d = _diagnosis(FALSE_CORRELATION_INTENT)
     net = _metrics(NET_DEPOSIT_INTENT)
     customer = _metrics(CUSTOMER_INTELLIGENCE_INTENT)
     marketing = _metrics(MARKETING_LEAD_QUALITY_INTENT)
-    false_corr = _metrics(FALSE_CORRELATION_INTENT)
-    snapshot = _evaluation_snapshot()
+    snap = _evaluation_snapshot()
+    hold = snap["holdout"]["metrics"]
+    full = snap["ablation"]["metrics"]["full_fitzsight"]
+    nogate = snap["ablation"]["metrics"]["no_verifier_gate_ablation"]
 
-    crm_affected = float(crm["affected"]["conversion_change_pp"])
-    crm_control = float(crm["control"]["conversion_change_pp"])
-    crm_response = float(crm["affected_response_median_change_minutes"])
+    notes = f"""# FitzSight — GOAI Initial-Round 12-Slide Speaker Notes (v0.12.1)
 
-    net_dec = net["driver_decomposition"]
-    net_conc = net["customer_concentration"]
-
-    high = _segment_profile(customer, "High Value")
-
-    notes = f"""# FitzSight — 12-Slide Speaker Notes
-
-> Numeric claims in Slides 4-8 are generated from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`.
+> Competition-facing numerical claims are derived from verified deterministic runtime evidence or the checked-in v0.12 evaluation JSON. This deck does not claim live Streamlit or live OpenAI-provider validation.
 
 ## Slide 1 — FitzSight
 
-“FitzSight is an evidence-grounded financial operations Agent. It turns a business question into a bounded, reproducible investigation: question, data, analysis, evidence, decision.”
+“FitzSight is an evidence-grounded financial operations Agent for Brokerage / FinTech Operations Analysts. The operating principle is simple: autonomous investigation, human decision.”
 
-## Slide 2 — Problem
+## Slide 2 — Industry problem
 
-“Financial teams already have dashboards and SQL. The slow part is the investigation behind ‘why did this change?’ A generic LLM can write a plausible explanation quickly, but plausibility is not auditability.”
+“Dashboards and SQL show what changed. The expensive part is the investigation behind why: define the KPI, compare cohorts, drill drivers, test significance, inspect operational context, reconcile evidence, then write a report.”
 
 ## Slide 3 — Product
 
-“The model or fallback planner selects an approved workflow. SQL and Python calculate. Evidence records each step. A verifier decides which claims are allowed into the final answer.”
+“The planner can select approved analytical actions, but deterministic SQL and Python own every number. Evidence records each step. The verifier determines which claims may reach the analyst.”
 
-## Slide 4 — CRM / FTD
+## Slide 4 — Hero journey
 
-“The affected European teams changed by {_pp(crm_affected)} versus {_pp(crm_control)} in the control cohort, while median response time changed by {crm_response:+.2f} minutes. The result is a supported root-cause candidate, not a causal proof.”
+“This is the actual v0.12 verified execution trace, rendered from runtime JSON. The contribution and statistical results trigger the next approved latency and event branches. The planner still cannot invent SQL or arbitrary tools.”
 
-## Slide 5 — Net deposits
+## Slide 5 — Hero finding
 
-“European net deposits changed by {_money_k(float(net_dec['net_change']))} week over week. Deposits changed by {_money_k(float(net_dec['deposit_change']))}, while withdrawals increased by {_money_k(float(net_dec['withdrawal_change']))}. The largest {int(net_conc['customer_count'])} withdrawals account for {_pct(float(net_conc['share_of_current_withdrawals']))} of current withdrawals. FitzSight reports that concentration without inventing customer motives.”
+“The affected European teams moved {_pp(float(hm['affected']['conversion_change_pp']))} versus {_pp(float(hm['control']['conversion_change_pp']))} in the control cohort. Median response time changed {float(hm['affected_response_median_change_minutes']):+.2f} minutes. The evidence chain also includes contribution, anomaly, operational-event and document evidence at {hm['document_evidence']['source_ref']}. The final status is {hd['root_cause_status']}, not proven real-world causality.”
 
-## Slide 6 — Customer Intelligence
+## Slide 6 — Failure branch
 
-“Customer segmentation is transparent and descriptive. It uses observable behavior, not hidden benchmark labels. High Value customers are {_pct(float(high['customer_share']))} of European customers but contribute {_pct(float(high['deposit_share']))} of deposits in the current synthetic benchmark.”
+“We also test the branch where the event dependency fails. FitzSight records error Evidence, skips document corroboration, changes root-cause status to insufficient_evidence, and still returns a verified bounded answer. The system is not rewarded for always forcing a cause.”
 
-## Slide 7 — Acquisition quality
+## Slide 7 — Refusal case
 
-“Lead volume increased {float(marketing['lead_volume_change_pct']):.0f}%, while FTD conversion changed by {_pp(float(marketing['conversion_change_pp']))}. FitzSight separates volume, channel mix and within-channel performance; Paid Search conversion changed by {_pp(float(marketing['paid_search_conversion_test']['difference_pp_b_minus_a']))} with p={_pvalue(float(marketing['paid_search_conversion_test']['p_value']))}.”
+“In Asia, aggregate FTD changes {_pp(float(false_m['conversion_change_pp']))}; Affiliate conversion changes {_pp(float(false_m['affiliate_conversion_test']['difference_pp_b_minus_a']))}. A nearby office relocation exists, but causal support is {str(bool(false_d['nearby_event_cause_supported'])).upper()}. Temporal proximity is explicitly rejected as proof.”
 
-## Slide 8 — False correlation
+## Slide 8 — Breadth
 
-“This is a deliberate trap. An office relocation occurs near an Asia conversion decline of {_pp(float(false_corr['conversion_change_pp']))}. Affiliate conversion changes by {_pp(float(false_corr['affiliate_conversion_test']['difference_pp_b_minus_a']))}; the falsification check therefore rejects the nearby office event as a supported cause.”
+“Three other workflows prove reuse without diluting the main story: client-fund-flow concentration, descriptive customer segmentation, and acquisition volume-versus-quality. For example, current net-deposit change is {_money_k(float(net['driver_decomposition']['net_change']))}; customer segmentation covers {_pct(float(customer['segmentation']['coverage']))}; marketing lead volume changes {float(marketing['lead_volume_change_pct']):+.0f}% while FTD changes {_pp(float(marketing['conversion_change_pp']))}.”
 
-## Slide 9 — Technical difference
+## Slide 9 — Architecture
 
-“The four trust boundaries are local intent gating, constrained planning, deterministic tools and a fail-closed verifier. A model never receives unrestricted authority to execute SQL or financial actions.”
+“The technical depth is in authority separation: local intent gate, constrained planner, deterministic tools, source-addressable Evidence Registry, EvidenceClaimVerifier, and an explicit human-decision boundary.”
 
-## Slide 10 — Evaluation
+## Slide 10 — Evaluation v2
 
-“The benchmark contains {snapshot['benchmark']['scenario_count']} deterministic scenarios and {snapshot['benchmark']['passed']} pass. Mean evidence coverage is {_pct(float(snapshot['benchmark']['metrics']['mean_evidence_coverage']),0)}, with {snapshot['benchmark']['metrics']['total_verifier_violations']} verifier violations. The adversarial release gate contains {snapshot['adversarial']['case_count']} cases and {snapshot['adversarial']['passed']} pass.”
+“Five fixed benchmark scenarios pass. Eight holdout seed-and-paraphrase runs route and verify successfully with {_pct(float(hold['mean_evidence_coverage']))} evidence coverage. Supported-candidate rate is only {_pct(float(hold['supported_candidate_rate']))} because one unseen CRM seed correctly returns insufficient evidence. In the controlled architecture ablation, full FitzSight refuses {_pct(float(full['adversarial_refusal_correctness']))} of adversarial fixtures; removing the verifier/evidence gate yields {_pct(float(nogate['unsafe_answer_rate_on_adversarial']))} unsafe-answer rate. This is not a Generic LLM baseline.”
 
-## Slide 11 — Safety and open source
+## Slide 11 — Safety and reuse
 
-“All benchmark data is synthetic. The system is not an investment adviser or automated compliance engine. The core project is MIT licensed, DuckDB is the preferred local backend, and a deterministic fallback keeps the demo usable without a cloud model.”
+“Current implementation uses synthetic data, read-only analytics, evidence tracing and fail-closed verification. Enterprise RBAC, PII masking and retention remain a production blueprint, not an implemented claim. Final professional judgment remains human.”
 
 ## Slide 12 — Close
 
-“BI tells you what changed. FitzSight investigates why the measurable evidence changed — with a result you can inspect, verify, challenge, and sometimes refuse.”
+“BI tells you what changed. FitzSight investigates what the measurable evidence supports — and what it does not. It is a reproducible financial investigation you can inspect, verify, challenge, and sometimes refuse.”
 """
     path = SUBMISSION_DIR / "PITCH_SPEAKER_NOTES.md"
     path.write_text(notes, encoding="utf-8")
@@ -579,11 +591,13 @@ def build_speaker_notes() -> Path:
 
 def build_pptx() -> Path:
     SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
+    for asset in (HERO_TRACE, HERO_ANSWER):
+        if not asset.exists():
+            raise FileNotFoundError(f"Required runtime-derived hero visual missing: {asset}")
     prs = Presentation()
     prs.slide_width = SLIDE_W
     prs.slide_height = SLIDE_H
-    # remove default slide if any (Presentation starts with none in python-pptx)
-    for builder in [slide_1,slide_2,slide_3,slide_4,slide_5,slide_6,slide_7,slide_8,slide_9,slide_10,slide_11,slide_12]:
+    for builder in [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, slide_8, slide_9, slide_10, slide_11, slide_12]:
         builder(prs)
     prs.save(PPTX_PATH)
     return PPTX_PATH
@@ -594,15 +608,7 @@ def export_pdf(pptx_path: Path) -> Path | None:
     if not libreoffice:
         return None
     completed = subprocess.run(
-        [
-            libreoffice,
-            "--headless",
-            "--convert-to",
-            "pdf",
-            "--outdir",
-            str(SUBMISSION_DIR),
-            str(pptx_path),
-        ],
+        [libreoffice, "--headless", "--convert-to", "pdf", "--outdir", str(SUBMISSION_DIR), str(pptx_path)],
         cwd=ROOT,
         check=False,
         stdout=subprocess.PIPE,

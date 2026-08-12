@@ -3550,3 +3550,7 @@ Competition-facing language should use **Autonomous investigation. Human decisio
 ## D-044 — Enterprise controls are blueprint-only unless implemented
 
 SSO, RBAC/ABAC, row/field authorization, PII masking, tenant isolation, retention and production observability are deployment-blueprint requirements, not current PoC implementation claims.
+
+## v0.12.1 competition-asset synchronization
+
+The published v0.12 core remains the implementation baseline. v0.12.1 synchronizes the formal GOAI presentation layer around one CRM/FTD hero + one false-correlation refusal, includes runtime-derived hero evidence and Evaluation v2, and completes a handbook reviewer gate. This update does not expand the approved intent catalog or planner/tool authority. Live Streamlit/OpenAI validation, portal confirmation and human rehearsal remain evidence-gated outside this plan update.

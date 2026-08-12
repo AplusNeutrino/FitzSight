@@ -16,7 +16,7 @@
 
 **Evidence-grounded Financial Operations Intelligence Agent**
 
-中文：**面向金融企业经营分析与风险研判的证据驱动智能体**
+中文：**面向 Brokerage / FinTech Operations Analyst 的证据驱动金融运营调查 Agent**
 
 ## Compact Chinese project introduction — 436 Chinese characters
 
@@ -41,3 +41,12 @@ A reproducible local demo is available through `python scripts/start_demo.py`. T
 ## Safety / compliance statement
 
 FitzSight is analytical decision support only. It does not provide investment advice, automated compliance conclusions, credit decisions, suitability decisions, AML enforcement, trading execution, account freezes, transfers, or automated adverse customer actions. The competition build uses reproducible synthetic data and no real customer PII or former-employer confidential datasets.
+## v0.12.1 reviewer-facing positioning
+
+**Primary user:** Brokerage / FinTech Operations Analyst  
+**Hero chain:** acquisition → FTD conversion → client-fund flows  
+**Main story:** one bounded-adaptive CRM/FTD investigation + one false-correlation refusal.  
+**Evaluation v2:** eight unseen-seed/question-paraphrase runs route and verify 8/8 with 100% evidence coverage; supported-candidate rate is 75% because one unseen CRM seed correctly returns `insufficient_evidence`. The controlled no-verifier-gate experiment is an architecture ablation, not a Generic LLM baseline.
+
+Tagline: **Autonomous investigation. Human decision.**
+

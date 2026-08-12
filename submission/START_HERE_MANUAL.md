@@ -60,3 +60,7 @@ python scripts/validate_openai_runtime.py
 ```
 
 If Streamlit or the model provider is unavailable, use the deterministic local/offline fallback. The analytical benchmark does not depend on a cloud model.
+
+## v0.12.1 prepared-asset status
+
+The formal PPTX/PDF have been regenerated to the one-hero + one-refusal narrative and render-reviewed. The handoff packet includes the synchronized speaker/demo/operator sources. This prepared status does not imply Streamlit/OpenAI live runtime or GOAI portal submission success.

@@ -26,21 +26,29 @@ def test_pitch_metric_source_is_current_verified_runtime():
     assert all(run["verification"]["passed"] for run in runs.values())
 
 
-def test_current_submission_deck_uses_current_fixed_seed_values():
+def test_current_submission_deck_uses_v0121_one_plus_one_evidence_story():
     text = _pptx_text(ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx")
-    for expected in ("-$187.8k", "+$59.2k", "+$246.9k", "91.6%", "3.7%", "53.7%"):
+    for expected in (
+        "Autonomous investigation. Human decision.",
+        "-7.53 pp",
+        "-1.21 pp",
+        "+29.15 min",
+        "CRM-CHANGE-2026-0715#p1",
+        "False correlation",
+        "75%",
+        "100%",
+    ):
         assert expected in text
-    for stale in ("-$223.9k", "+$24.4k", "+$248.3k", "92.2%", "55.8%"):
+    for stale in ("Demo 2 —", "Demo 3 —", "Demo 4 —", "Demo 5 —"):
         assert stale not in text
 
 
-def test_speaker_notes_are_generated_from_current_metrics(tmp_path: Path, monkeypatch):
+def test_speaker_notes_are_generated_from_current_hero_and_evaluation(tmp_path: Path, monkeypatch):
     monkeypatch.setattr(build_pitch_deck, "SUBMISSION_DIR", tmp_path)
     path = build_pitch_deck.build_speaker_notes()
     notes = path.read_text(encoding="utf-8")
-    assert "-$187.8k" in notes
-    assert "+$59.2k" in notes
-    assert "91.6%" in notes
-    assert "3.7%" in notes
-    assert "53.7%" in notes
-    assert "-$223.9k" not in notes
+    assert "-7.53 pp" in notes
+    assert "+29.15 min" in notes
+    assert "75%" in notes
+    assert "architecture ablation" in notes.lower()
+    assert "Generic LLM baseline" in notes

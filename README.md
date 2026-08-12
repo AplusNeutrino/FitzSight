@@ -30,11 +30,11 @@ EvidenceClaimVerifier
 Verified decision-support answer
 ```
 
-## Current release: v0.12.0
+## Current release: v0.12.1
 
-v0.12 is the **GOAI alignment + bounded-adaptive hero + evaluation-v2 layer**. It preserves the five approved business intents and v0.11 final-machine/operator boundary, while making the CRM/FTD workflow the primary judge-facing journey. Tool results can now decide whether the next *approved* CRM action should execute; the action catalog remains closed and planner/model output still cannot generate SQL, table names, filesystem paths, arbitrary tool arguments, or high-impact financial actions.
+v0.12.1 is the **GOAI-aligned formal-presentation synchronization release** built on the v0.12 bounded-adaptive hero + Evaluation v2 core. It preserves the five approved business intents and v0.11 final-machine/operator boundary, while making the CRM/FTD workflow the primary judge-facing journey. Tool results can now decide whether the next *approved* CRM action should execute; the action catalog remains closed and planner/model output still cannot generate SQL, table names, filesystem paths, arbitrary tool arguments, or high-impact financial actions.
 
-The release also adds fixed synthetic operational-document evidence with stable source/paragraph IDs, a runtime-derived hero process view, unseen-seed/question-paraphrase evaluation, a controlled verifier/evidence-gate ablation, and an explicit enterprise deployment boundary separating implemented PoC controls from production requirements.
+The v0.12 core adds fixed synthetic operational-document evidence with stable source/paragraph IDs, a runtime-derived hero process view, unseen-seed/question-paraphrase evaluation, a controlled verifier/evidence-gate ablation, and an explicit enterprise deployment boundary separating implemented PoC controls from production requirements. **v0.12.1 regenerates the formal 12-slide PPTX/PDF around one CRM/FTD hero + one false-correlation refusal, synchronizes the judge-facing operator assets, and records a final GOAI reviewer gate without adding unimplemented product claims.**
 
 
 ## Final-machine operator path

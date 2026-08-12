@@ -108,7 +108,7 @@ def build_report(*, attempt_streamlit: bool = True, include_openai: bool = False
 
     return {
         "product": "FitzSight",
-        "version": "0.12.0",
+        "version": "0.12.1",
         "purpose": "final_machine_local_readiness",
         "local_core_ready": local_ready,
         "deterministic_agent_smoke": deterministic,

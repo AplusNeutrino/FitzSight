@@ -31,6 +31,9 @@ DEFAULT_FILES = (
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
     "docs/EVALUATION_SUMMARY.md",
     "docs/COMPLIANCE_AND_SAFETY.md",
+    "docs/V0.12.1_GOAI_REVIEWER_GATE.md",
+    "docs/V0.12.1_VALIDATION.md",
+    "RELEASE_NOTES_v0.12.1.md",
 )
 
 

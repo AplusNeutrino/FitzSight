@@ -39,3 +39,7 @@ Do not debug on stage and do not switch to an unverified calculation path.
 - **How do you stop hallucinated causes?** Evidence IDs + verifier + false-correlation/falsification checks.
 - **Why synthetic data?** Reproducible ground truth without PII/employer/confidential data.
 - **What if the cloud fails?** Core demo has deterministic local/offline fallback.
+## v0.12.1 stage cue
+
+Main demo order: **CRM question → branch trace → verified answer/document Evidence → failure branch → false-correlation refusal → Evaluation v2 → Human decision boundary.** Use net deposit / segmentation / marketing only when asked for breadth.
+

@@ -46,3 +46,7 @@ Do not mark the tracker rehearsal task complete until a human timed run has been
 | Date | Pitch | Demo | Issues | Result |
 |---|---:|---:|---|---|
 | | | | | |
+## v0.12.1 narrative gate
+
+The timed pitch must preserve the 1+1 structure: one complete CRM/FTD investigation and one refusal/trust case. Do not re-expand the main story into five equal demos. Human rehearsal evidence remains required before R4/R5 can be marked done.
+

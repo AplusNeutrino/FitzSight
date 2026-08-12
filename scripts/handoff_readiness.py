@@ -47,7 +47,7 @@ def readiness_report(*, require_final_machine_kit: bool = True) -> dict[str, obj
 
     return {
         "product": "FitzSight",
-        "version": "0.12.0",
+        "version": "0.12.1",
         "automated_artifact_preparation_ready": automated_ready,
         "artifacts": presence,
         "manual_handoff_zip_integrity": _zip_ok(required["manual_handoff_zip"]),

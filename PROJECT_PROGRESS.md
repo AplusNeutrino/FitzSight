@@ -9,10 +9,10 @@ This repository contains the FitzSight implementation. Roadmap and status are tr
 
 When implementation state and the tracker differ, reconcile them using verifiable code, tests, checksums, and commits, then update the source progress document.
 
-## Current implementation handoff — v0.12.0
+## Current implementation handoff — v0.12.1
 
-The current delivery advances the GOAI-alignment milestone with a bounded-adaptive CRM/FTD hero, synthetic source-paragraph document evidence, runtime-derived hero process evidence, holdout/paraphrase evaluation, a controlled verifier-gate ablation, enterprise deployment boundary documentation, and human-decision wording.
+v0.12.1 keeps the published v0.12 core unchanged and synchronizes the judge-facing layer: the formal 12-slide deck/PDF, speaker notes, demo/operator assets, packaging, and final GOAI handbook reviewer gate now use the same one-hero + one-refusal evidence contract.
 
 The unique roadmap/status source remains `AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md`; this repository file is only an implementation handoff note and must not become a second tracker.
 
-Formal PPT/PDF regeneration remains in progress and is not claimed complete in v0.12.0.
+Formal PPT/PDF regeneration and the GOAI reviewer gate are complete in this delivery. Streamlit/OpenAI live runtime, portal confirmation and human rehearsal remain separately evidence-gated.

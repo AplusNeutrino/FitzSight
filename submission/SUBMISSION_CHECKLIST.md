@@ -13,8 +13,12 @@
 - [x] `FitzSight_GOAI_Initial_Round.pptx` generated.
 - [x] `FitzSight_GOAI_Initial_Round.pdf` exported from the same deck.
 - [x] PDF rendered and visually reviewed for clipping / overlap.
-- [x] 12-slide narrative aligns with the implemented v0.9 product state.
-- [x] Slides 4-8 regenerate numeric claims from fresh verified deterministic Agent runs; stale current-release constants are not used.
+- [x] 12-slide narrative aligns with the implemented v0.12 core and v0.12.1 formal-deck synchronization.
+- [x] Main story is one CRM/FTD hero + one false-correlation refusal; numeric claims come from fresh verified deterministic runs or checked-in v0.12 evaluation evidence.
+- [x] Runtime-derived hero trace/answer evidence is visible in the formal deck.
+- [x] Failure/uncertainty branch is shown without claiming a live dependency outage.
+- [x] Evaluation v2 holdout and controlled architecture ablation are labeled accurately.
+- [x] GOAI six-dimension final reviewer gate completed against the official handbook.
 
 ## Technical evidence
 

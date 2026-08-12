@@ -31,6 +31,9 @@ HANDOFF_FILES = (
     "docs/INITIAL_ROUND_PROJECT_SUMMARY.md",
     "docs/EVALUATION_SUMMARY.md",
     "docs/COMPLIANCE_AND_SAFETY.md",
+    "docs/V0.12.1_GOAI_REVIEWER_GATE.md",
+    "docs/V0.12.1_VALIDATION.md",
+    "RELEASE_NOTES_v0.12.1.md",
     "docs/OPERATOR_BOUNDARY.md",
 )
 
@@ -94,7 +97,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manual_actions = {
             "product": "FitzSight",
-            "version": "0.12.0",
+            "version": "0.12.1",
             "execution_policy": "external_submission_user_manual_only",
             "automation_boundary": {
                 "local_prepare_validate_package": True,
@@ -132,7 +135,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
         manifest = {
             "product": "FitzSight",
-            "version": "0.12.0",
+            "version": "0.12.1",
             "purpose": "user_manual_submission_handoff",
             "network_actions_performed": False,
             "external_submission_performed": False,
@@ -173,7 +176,7 @@ def build_packet(output: Path) -> dict[str, object]:
 
     return {
         "product": "FitzSight",
-        "version": "0.12.0",
+        "version": "0.12.1",
         "output": str(output),
         "bytes": output.stat().st_size,
         "sha256": sha256(output),

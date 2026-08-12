@@ -47,3 +47,13 @@ First, validate and polish the live Streamlit demo and external structured plann
 ## 12. Is this investment advice or an automated compliance system?
 
 No. FitzSight is internal analytical decision support. It does not make investment recommendations, execute trades, freeze accounts, label customers for AML enforcement, or make automated credit/suitability/adverse-action decisions.
+
+## v0.12.1 top-line answers
+
+**Why is this an Agent rather than a fixed dashboard?** The CRM hero allows deterministic tool results to select the next action from a closed approved catalog, then verifies the resulting claims; the planner still cannot generate arbitrary SQL or tool parameters.
+
+**What happens when evidence is missing?** The tested event-dependency failure records error Evidence, skips unsupported document corroboration, sets `root_cause_status=insufficient_evidence`, and still returns only a verified bounded answer.
+
+**Why trust the benchmark?** The fixed 5/5 suite is supplemented by eight unseen-seed/question-paraphrase holdouts and a controlled verifier/evidence-gate architecture ablation. One unseen CRM seed remains insufficient rather than being relabeled as a success.
+
+**Does FitzSight make financial decisions?** No. Autonomous investigation, human decision. It does not provide investment, AML, credit, suitability, trading or account-action decisions.

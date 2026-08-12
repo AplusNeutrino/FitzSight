@@ -36,7 +36,7 @@ Project automation stops at local preparation, validation, hashing, packaging, a
 
 ## Evidence boundary
 
-Slides 4-8 are built from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`; current submission assets do not rely on stale benchmark constants. The offline HTML/MP4 are resilience artifacts, not evidence that Streamlit or OpenAI live runtime has been validated. Those external runtimes remain separately tracked until actual deployment output exists.
+The v0.12.1 formal deck is built from fresh verified deterministic FitzSight runs plus checked-in v0.12 hero/holdout/ablation evidence. Its main narrative is one CRM/FTD hero + one false-correlation refusal; the remaining workflows are breadth proof. Current submission assets do not rely on stale benchmark constants. The offline HTML/MP4 are resilience artifacts, not evidence that Streamlit or OpenAI live runtime has been validated. Those external runtimes remain separately tracked until actual deployment output exists.
 
 ## v0.11 final-machine kit
 
@@ -46,3 +46,7 @@ Slides 4-8 are built from fresh verified deterministic FitzSight runs by `script
 - `FitzSight_Final_Machine_Kit.zip` — portable executable presentation-machine packet with source, launchers, offline fallbacks and the manual handoff ZIP.
 
 The default final-machine validator remains local-only except for its localhost Streamlit health probe. The OpenAI live planner is an explicit opt-in (`--include-openai`); portal/email actions remain user-manual only.
+## v0.12.1 formal-deck status
+
+`FitzSight_GOAI_Initial_Round.pptx` and `.pdf` are synchronized with the v0.12 evidence contract and have been render-reviewed. The deck includes actual runtime-derived hero trace/answer imagery. Live Streamlit/OpenAI-provider evidence remains separate and is not implied by these assets.
+

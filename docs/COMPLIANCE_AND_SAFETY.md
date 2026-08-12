@@ -63,3 +63,7 @@ The CRM hero may choose the next approved analytical step from observed tool res
 The v0.12 document-evidence feature is intentionally narrow: three synthetic operational paragraphs are addressed by stable document/paragraph IDs. It performs no arbitrary filesystem access, internet retrieval, vector search, or production RAG. These documents are synthetic competition fixtures and contain no customer/employer data.
 
 Enterprise SSO, RBAC/ABAC, row/field authorization, PII masking, tenant isolation, retention and production observability remain blueprint requirements, not current implementation claims. See `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md`.
+## v0.12.1 competition-language audit
+
+The formal PPT/PDF, speaker notes and demo runbook use **“Autonomous investigation. Human decision.”** and describe FitzSight as analytical decision support. They distinguish implemented PoC safeguards from the planned enterprise deployment blueprint, and they do not claim live-provider validation or authority to make investment, AML, credit, suitability, trading or other high-impact financial decisions.
+

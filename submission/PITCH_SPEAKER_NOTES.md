@@ -1,51 +1,51 @@
-# FitzSight — 12-Slide Speaker Notes
+# FitzSight — GOAI Initial-Round 12-Slide Speaker Notes (v0.12.1)
 
-> Numeric claims in Slides 4-8 are generated from fresh verified deterministic FitzSight runs by `scripts/build_pitch_deck.py`.
+> Competition-facing numerical claims are derived from verified deterministic runtime evidence or the checked-in v0.12 evaluation JSON. This deck does not claim live Streamlit or live OpenAI-provider validation.
 
 ## Slide 1 — FitzSight
 
-“FitzSight is an evidence-grounded financial operations Agent. It turns a business question into a bounded, reproducible investigation: question, data, analysis, evidence, decision.”
+“FitzSight is an evidence-grounded financial operations Agent for Brokerage / FinTech Operations Analysts. The operating principle is simple: autonomous investigation, human decision.”
 
-## Slide 2 — Problem
+## Slide 2 — Industry problem
 
-“Financial teams already have dashboards and SQL. The slow part is the investigation behind ‘why did this change?’ A generic LLM can write a plausible explanation quickly, but plausibility is not auditability.”
+“Dashboards and SQL show what changed. The expensive part is the investigation behind why: define the KPI, compare cohorts, drill drivers, test significance, inspect operational context, reconcile evidence, then write a report.”
 
 ## Slide 3 — Product
 
-“The model or fallback planner selects an approved workflow. SQL and Python calculate. Evidence records each step. A verifier decides which claims are allowed into the final answer.”
+“The planner can select approved analytical actions, but deterministic SQL and Python own every number. Evidence records each step. The verifier determines which claims may reach the analyst.”
 
-## Slide 4 — CRM / FTD
+## Slide 4 — Hero journey
 
-“The affected European teams changed by -7.53 pp versus -1.21 pp in the control cohort, while median response time changed by +29.15 minutes. The result is a supported root-cause candidate, not a causal proof.”
+“This is the actual v0.12 verified execution trace, rendered from runtime JSON. The contribution and statistical results trigger the next approved latency and event branches. The planner still cannot invent SQL or arbitrary tools.”
 
-## Slide 5 — Net deposits
+## Slide 5 — Hero finding
 
-“European net deposits changed by -$187.8k week over week. Deposits changed by +$59.2k, while withdrawals increased by +$246.9k. The largest 11 withdrawals account for 91.6% of current withdrawals. FitzSight reports that concentration without inventing customer motives.”
+“The affected European teams moved -7.53 pp versus -1.21 pp in the control cohort. Median response time changed +29.15 minutes. The evidence chain also includes contribution, anomaly, operational-event and document evidence at CRM-CHANGE-2026-0715#p1. The final status is supported_candidate, not proven real-world causality.”
 
-## Slide 6 — Customer Intelligence
+## Slide 6 — Failure branch
 
-“Customer segmentation is transparent and descriptive. It uses observable behavior, not hidden benchmark labels. High Value customers are 3.7% of European customers but contribute 53.7% of deposits in the current synthetic benchmark.”
+“We also test the branch where the event dependency fails. FitzSight records error Evidence, skips document corroboration, changes root-cause status to insufficient_evidence, and still returns a verified bounded answer. The system is not rewarded for always forcing a cause.”
 
-## Slide 7 — Acquisition quality
+## Slide 7 — Refusal case
 
-“Lead volume increased 315%, while FTD conversion changed by -10.84 pp. FitzSight separates volume, channel mix and within-channel performance; Paid Search conversion changed by -16.44 pp with p=4.43e-05.”
+“In Asia, aggregate FTD changes -8.13 pp; Affiliate conversion changes -15.81 pp. A nearby office relocation exists, but causal support is FALSE. Temporal proximity is explicitly rejected as proof.”
 
-## Slide 8 — False correlation
+## Slide 8 — Breadth
 
-“This is a deliberate trap. An office relocation occurs near an Asia conversion decline of -8.13 pp. Affiliate conversion changes by -15.81 pp; the falsification check therefore rejects the nearby office event as a supported cause.”
+“Three other workflows prove reuse without diluting the main story: client-fund-flow concentration, descriptive customer segmentation, and acquisition volume-versus-quality. For example, current net-deposit change is -$187.8k; customer segmentation covers 100%; marketing lead volume changes +315% while FTD changes -10.84 pp.”
 
-## Slide 9 — Technical difference
+## Slide 9 — Architecture
 
-“The four trust boundaries are local intent gating, constrained planning, deterministic tools and a fail-closed verifier. A model never receives unrestricted authority to execute SQL or financial actions.”
+“The technical depth is in authority separation: local intent gate, constrained planner, deterministic tools, source-addressable Evidence Registry, EvidenceClaimVerifier, and an explicit human-decision boundary.”
 
-## Slide 10 — Evaluation
+## Slide 10 — Evaluation v2
 
-“The benchmark contains 5 deterministic scenarios and 5 pass. Mean evidence coverage is 100%, with 0 verifier violations. The adversarial release gate contains 8 cases and 8 pass.”
+“Five fixed benchmark scenarios pass. Eight holdout seed-and-paraphrase runs route and verify successfully with 100% evidence coverage. Supported-candidate rate is only 75% because one unseen CRM seed correctly returns insufficient evidence. In the controlled architecture ablation, full FitzSight refuses 100% of adversarial fixtures; removing the verifier/evidence gate yields 100% unsafe-answer rate. This is not a Generic LLM baseline.”
 
-## Slide 11 — Safety and open source
+## Slide 11 — Safety and reuse
 
-“All benchmark data is synthetic. The system is not an investment adviser or automated compliance engine. The core project is MIT licensed, DuckDB is the preferred local backend, and a deterministic fallback keeps the demo usable without a cloud model.”
+“Current implementation uses synthetic data, read-only analytics, evidence tracing and fail-closed verification. Enterprise RBAC, PII masking and retention remain a production blueprint, not an implemented claim. Final professional judgment remains human.”
 
 ## Slide 12 — Close
 
-“BI tells you what changed. FitzSight investigates why the measurable evidence changed — with a result you can inspect, verify, challenge, and sometimes refuse.”
+“BI tells you what changed. FitzSight investigates what the measurable evidence supports — and what it does not. It is a reproducible financial investigation you can inspect, verify, challenge, and sometimes refuse.”

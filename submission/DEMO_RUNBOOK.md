@@ -116,3 +116,14 @@ The primary demo story is now the CRM / FTD hero. Before relying on live Streaml
 8. approved follow-up.
 
 Then use the Asia office-relocation case as the single strongest refusal/falsification story. Other workflows are breadth/Q&A, not equal-weight main-demo sections.
+## v0.12.1 primary judge route — 1 hero + 1 refusal
+
+1. Open with the Brokerage / FinTech Operations Analyst question: **“Why did European FTD conversion deteriorate after July 15?”**
+2. Show the bounded CRM execution trace: contribution/statistics → conditional latency/anomaly → conditional event check → source-addressable document Evidence → verifier.
+3. Show the verified answer and explain that the CRM routing item is a **supported candidate, not causal proof**.
+4. Show the tested dependency-failure branch: event lookup error → error Evidence → no document corroboration → `insufficient_evidence` → verified bounded answer.
+5. Switch once to the Asia false-correlation case and show the refusal: Affiliate deterioration is measured; office relocation is nearby but causal support is false.
+6. Close with Evaluation v2, safety/human-decision boundary, and the three additional workflows as breadth only.
+
+Do not spend the main demo running five equal workflows. Net deposit, Customer Intelligence and Marketing are appendix/Q&A breadth proof.
+

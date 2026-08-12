@@ -26,7 +26,9 @@ def _ignore(directory: str, names: list[str]) -> set[str]:
     for name in names:
         if name in {"__pycache__", ".pytest_cache", ".git"} or name.endswith(".pyc"):
             ignored.add(name)
-        if name in {SELF_ARCHIVE_NAME, "SHA256SUMS.txt", "REPOSITORY_MANIFEST.md"}:
+        if name in {SELF_ARCHIVE_NAME, "SHA256SUMS.txt", "REPOSITORY_MANIFEST.md",
+                    "V0.12.1_SUBMISSION_PREFLIGHT.json", "V0.12.1_HANDOFF_READINESS.json",
+                    "V0.12.1_FINAL_MACHINE_READINESS.json"}:
             ignored.add(name)
     if directory_path.name == "generated":
         for name in names:
@@ -85,7 +87,7 @@ def build_kit(output: Path) -> dict[str, object]:
             )
         manifest = {
             "product": "FitzSight",
-            "version": "0.12.0",
+            "version": "0.12.1",
             "purpose": "portable_final_presentation_machine_kit",
             "source_scope": "full_local_repository_snapshot_excluding_caches_generated_csv_and_self_archive",
             "external_submission_performed": False,
@@ -132,7 +134,7 @@ def build_kit(output: Path) -> dict[str, object]:
 
     return {
         "product": "FitzSight",
-        "version": "0.12.0",
+        "version": "0.12.1",
         "output": str(output),
         "bytes": output.stat().st_size,
         "sha256": sha256(output),

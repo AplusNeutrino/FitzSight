@@ -56,3 +56,7 @@ Outputs:
 - `submission/FitzSight_Hero_Run_Evidence.png`
 
 The PNG is rendered from the actual verified runtime JSON, not a manually authored analytical mock.
+
+## v0.12.1 judge-facing route
+
+The main judge-facing UI story is now: CRM/FTD question → bounded branch trace → Evidence IDs/source paragraph → verifier → verified answer → tested insufficient-evidence failure state, followed by one false-correlation refusal. Net deposit, segmentation and marketing are breadth/Q&A views rather than equal hero scenes. UI remains presentation-only and may not recompute business metrics.

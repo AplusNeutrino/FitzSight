@@ -1,6 +1,6 @@
 # FitzSight Implementation Status
 
-**Version:** v0.12.0  
+**Version:** v0.12.1  
 **Date:** 2026-08-12  
 **Phase:** GOAI alignment + bounded-adaptive hero + evaluation v2; formal deck regeneration still pending
 
@@ -23,7 +23,7 @@ Supported Agent intents:
 
 The CRM hero uses a bounded approved action graph. Quantitative results may decide whether the next approved drilldown executes, but no planner/model output can introduce SQL, arbitrary tool arguments, arbitrary file access or high-impact financial actions.
 
-## v0.12 status
+## v0.12.1 status
 
 ### done
 
@@ -36,20 +36,17 @@ The CRM hero uses a bounded approved action graph. Quantitative results may deci
 - [x] V12-09 enterprise deployment boundary / blueprint
 - [x] V12-10 decision-support / human-decision language normalization
 
-### in_progress
+### done in v0.12.1
 
-- [ ] V12-05 formal deck implementation of 1 hero + 1 refusal; `docs/PITCH_DECK_CONTENT.md` is updated, committed PPT/PDF are not yet regenerated
-- [ ] V12-11 full competition asset synchronization; code/docs/demo source updated, final PPT/PDF dependent sync remains
-
-### todo
-
-- [ ] V12-12 final GOAI handbook reviewer gate after deck regeneration
+- [x] V12-05 formal 12-slide deck regenerated as 1 hero + 1 refusal; PPTX/PDF render-reviewed
+- [x] V12-11 competition-facing docs, speaker notes, demo/operator assets and handoff packages synchronized
+- [x] V12-12 final GOAI handbook reviewer gate completed against current code/test/runtime evidence
 
 ## Build validation
 
 ```text
-85 tests collected
-84 passed
+87 tests collected
+86 passed
 1 skipped
 0 failed
 compileall: PASS
@@ -85,7 +82,7 @@ No-verifier-gate unsafe answer rate on adversarial:        100%
 
 - Streamlit live runtime: **not validated in this sandbox** (dependency missing); this is separate from the passing local deterministic final-machine core check.
 - OpenAI Responses live planner: **not requested / not validated**.
-- Formal v0.12 PPT/PDF: **not regenerated yet**.
+- Formal v0.12.1 PPT/PDF: **regenerated and render-reviewed** from current evidence; this is presentation evidence, not live Streamlit/OpenAI evidence.
 - GOAI portal / final submit / Gmail confirmation: **user-manual only; not performed**.
 
 ## Local release readiness
@@ -97,8 +94,8 @@ final-machine local_core_ready:   true
 deterministic Agent smoke:        verified
 ```
 
-- `docs/V0.12_SUBMISSION_PREFLIGHT.json` records the local asset/preflight gate.
-- `docs/V0.12_HANDOFF_READINESS.json` records `ready_for_user_takeover=true`.
-- `docs/V0.12_FINAL_MACHINE_READINESS.json` records `local_core_ready=true` with a verified deterministic smoke run.
+- `docs/V0.12.1_SUBMISSION_PREFLIGHT.json` records the local asset/preflight gate.
+- `docs/V0.12.1_HANDOFF_READINESS.json` records `ready_for_user_takeover=true`.
+- `docs/V0.12.1_FINAL_MACHINE_READINESS.json` records `local_core_ready=true` with a verified deterministic smoke run.
 
-These results do **not** close Streamlit live validation, OpenAI live-provider validation, formal PPT/PDF regeneration, portal submission, or human rehearsal tasks.
+These results do **not** close Streamlit live validation, OpenAI live-provider validation, portal submission, or human rehearsal tasks.

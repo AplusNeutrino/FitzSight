@@ -17,5 +17,6 @@ This map is a handoff aid. The portal itself remains the source of truth for whi
 | Safety/compliance explanation | `COMPLIANCE_AND_SAFETY.md` (repo: `docs/COMPLIANCE_AND_SAFETY.md`) |
 | Evaluation summary | `EVALUATION_SUMMARY.md` (repo: `docs/EVALUATION_SUMMARY.md`) |
 | Detailed project summary | `INITIAL_ROUND_PROJECT_SUMMARY.md` (repo: `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`) |
+| GOAI final reviewer gate | `V0.12.1_GOAI_REVIEWER_GATE.md` (repo: `docs/V0.12.1_GOAI_REVIEWER_GATE.md`) |
 
 Before manual upload, compare this map with the actual portal and use only the fields/files the portal requests.
