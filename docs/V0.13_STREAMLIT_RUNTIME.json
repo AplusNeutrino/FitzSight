@@ -1,0 +1,23 @@
+{
+  "product": "FitzSight",
+  "runtime": "streamlit",
+  "port": 9296,
+  "command": [
+    "C:\\Users\\ZFY\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "streamlit",
+    "run",
+    "C:\\Users\\ZFY\\Documents\\Codex\\2026-08-16\\aplusneutrino-fitzsight-https-github-com-aplusneutrino\\work\\FitzSight\\streamlit_app.py",
+    "--global.developmentMode=false",
+    "--server.headless=true",
+    "--server.address=127.0.0.1",
+    "--server.port=9296",
+    "--browser.gatherUsageStats=false"
+  ],
+  "health_url": "http://127.0.0.1:9296/_stcore/health",
+  "passed": true,
+  "status": "passed",
+  "http_status": 200,
+  "health_body": "ok",
+  "startup_seconds": 2.6751255999988643
+}

@@ -1,135 +1,31 @@
-# FitzSight Architecture — v0.6
+# FitzSight v0.13.0 架构
 
-## Core principle
-
-```text
-LLM / planner decides only the approved analytical workflow.
-SQL / Python calculates.
-Evidence Registry records.
-Verifier decides what may be presented.
+```mermaid
+flowchart LR
+  Q[用户问题] --> G[本地意图门控]
+  G -->|目录外| R[明确拒绝]
+  G -->|批准意图| P[DeepSeek V4 或本地规划器]
+  P --> V[结构化计划校验]
+  V --> T[确定性只读工具]
+  T --> E[Evidence Registry]
+  E --> C[EvidenceClaimVerifier]
+  C -->|通过| A[已核验答案]
+  C -->|失败| F[insufficient_evidence / failed]
 ```
 
-## Runtime
+## 三层分权
 
-```text
-User question
-    ↓
-Local intent classifier
-    ├── CRM / FTD
-    ├── Net Deposit
-    └── Customer Intelligence
-    ↓
-Constrained planner
-    ├── deterministic fallback
-    ├── JSON adapter
-    └── optional OpenAI Responses provider
-    ↓
-Intent-specific deterministic executor
-    ↓
-Read-only analytical tools
-    ↓
-Evidence Registry
-    ↓
-EvidenceClaimVerifier
-    ↓
-Verified answer / fail closed
-```
+1. **规划层**：DeepSeek V4 Flash/Pro 只产生 JSON 高层计划；默认可使用完全离线的 `ConstrainedRulePlanner`。
+2. **工具层**：只读 SQL、统计检验、贡献分解、异常检测与文档证据检索产生全部关键数字。
+3. **验证层**：Evidence Registry 保存来源，EvidenceClaimVerifier 验证证据覆盖、禁止内容和因果边界。
 
-## Approved deterministic executors
+## 任务闭环
 
-### CRM / FTD
+问题 → 意图门控 → 计划 → 动作执行 → 证据登记 → 结论核验 → 支持/假设/拒绝。任何工具失败、字段缺失、证据不足或越界请求均进入显式失败路径。
 
-- schema inspection;
-- affected/control SQL;
-- statistical tests;
-- contribution decomposition;
-- anomaly detection;
-- event check.
+## 数据与权限
 
-### Net Deposit
-
-- period money-flow measurement;
-- deposit/withdrawal driver decomposition;
-- customer concentration;
-- regional controls;
-- event check.
-
-### Customer Intelligence
-
-- schema inspection;
-- observable customer-feature aggregation;
-- transparent behavioral-value segmentation;
-- segment deposit/withdrawal/trading profiles;
-- decision-use guardrail.
-
-## Data layer
-
-Preferred: DuckDB.
-
-Fallback: SQLite for restricted/offline development.
-
-Synthetic CSV files are the reproducible source for the competition benchmark.
-
-## SQL boundary
-
-Normal Agent queries are passed through `ReadOnlySQLTool`:
-
-- SELECT/WITH only;
-- no multiple statements;
-- no DDL/DML/admin keywords;
-- no external file/network scan functions;
-- bounded output;
-- every call registered as evidence.
-
-The v0.6 row limit is 25,000 so the complete 20,000-customer synthetic benchmark can be profiled without truncation.
-
-## Evidence boundary
-
-Every evidence record contains:
-
-- Evidence ID;
-- tool name;
-- parameters;
-- result payload;
-- result digest;
-- execution status.
-
-The final renderer does not recompute analytical metrics. It renders only previously verified claim text.
-
-## Evaluation-only data
-
-Synthetic generator fields ending in `_gt` are benchmark-only. Normal Agent SQL is prohibited from using them, and the verifier scans read-only SQL evidence for leakage.
-
-## UI boundary
-
-Streamlit is a presentation layer. KPI cards, charts, trace, and evidence cards are constructed from verified result objects. The UI must not become an independent analytics path.
-
-## v0.12 bounded-adaptive hero extension
-
-The CRM / FTD hero remains inside the approved intent boundary, but execution is no longer presented as an unconditional fixed pipeline. The deterministic executor records branch decisions after contribution/statistical evidence and may execute or skip the next approved action:
-
-```text
-contribution/statistics
-  ├─ trigger met → anomaly_scan
-  │                 ├─ latency/statistical trigger met → event_check
-  │                 │                                └─ matching event → document_evidence_check
-  │                 └─ trigger not met → attribution withheld
-  └─ trigger not met → attribution withheld
-```
-
-Every branch decision is registered as `agent.branch_decision` evidence. The document layer is a fixed synthetic source/paragraph catalog; it does not permit arbitrary paths or network retrieval.
-
-The output boundary is:
-
-```text
-Autonomous investigation
-→ EvidenceClaimVerifier
-→ analytical decision support
-→ authorized human decision outside FitzSight
-```
-
-Production identity/RBAC/PII/audit-retention controls are explicitly separated into `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md` and are not claimed as current PoC implementation.
-## v0.12.1 judge-facing synchronization
-
-The formal deck and demo/operator materials now expose this same authority model: approved intent/action boundaries, deterministic analytics, source-addressable Evidence, EvidenceClaimVerifier, failure/uncertainty states, and a human decision boundary. Presentation assets do not introduce a second analytics path or additional tool authority.
-
+- 比赛版本使用固定种子的合成金融运营数据。
+- 数据库查询为只读且经过 SQL 安全检查。
+- 模型不获得数据库连接、SQL 生成、资金操作或客户操作权限。
+- 生产 RBAC、脱敏、留存与审计集成属于后续部署蓝图，不作为当前 PoC 已实现能力。

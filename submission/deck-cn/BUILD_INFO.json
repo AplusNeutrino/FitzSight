@@ -1,0 +1,11 @@
+{
+  "product": "FitzSight",
+  "version": "0.13.0",
+  "language": "zh-CN",
+  "pages": 12,
+  "style": "guizang-ppt-skill Style B Swiss / IKB",
+  "skill_repository": "https://github.com/op7418/guizang-ppt-skill",
+  "skill_commit": "c91369c449d34755d320a8b81d0734000d99d1ab",
+  "skill_license": "AGPL-3.0",
+  "deepseek_live": "not_requested"
+}

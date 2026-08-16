@@ -1,22 +1,11 @@
-# FitzSight — Submission Field Map
+# GOAI 初赛字段映射
 
-This map is a handoff aid. The portal itself remains the source of truth for which fields are actually present.
-
-| Likely portal need | Prepared source |
+| 门户字段 | 本地来源 |
 |---|---|
-| Project name | `FitzSight` |
-| Track | `Boundless Agents · AI+金融` |
-| One-line positioning | `PORTAL_COPY.md` |
-| Chinese introduction | `PORTAL_COPY.md` |
-| English introduction | `PORTAL_COPY.md` |
-| Repository URL | `https://github.com/AplusNeutrino/FitzSight` |
-| PPT | `FitzSight_GOAI_Initial_Round.pptx` |
-| PDF | `FitzSight_GOAI_Initial_Round.pdf` |
-| Optional HTML demo | `FitzSight_Offline_Demo.html` |
-| Optional video | `FitzSight_Offline_Demo_Backup.mp4` |
-| Safety/compliance explanation | `COMPLIANCE_AND_SAFETY.md` (repo: `docs/COMPLIANCE_AND_SAFETY.md`) |
-| Evaluation summary | `EVALUATION_SUMMARY.md` (repo: `docs/EVALUATION_SUMMARY.md`) |
-| Detailed project summary | `INITIAL_ROUND_PROJECT_SUMMARY.md` (repo: `docs/INITIAL_ROUND_PROJECT_SUMMARY.md`) |
-| GOAI final reviewer gate | `V0.12.1_GOAI_REVIEWER_GATE.md` (repo: `docs/V0.12.1_GOAI_REVIEWER_GATE.md`) |
+| 项目名 | FitzSight |
+| 一句话价值 | `PORTAL_COPY.md` |
+| 作品简介 | `PORTAL_COPY.md` 的 500 字内中文简介 |
+| 项目仓库 | `https://github.com/AplusNeutrino/FitzSight` |
+| 初赛方案 | `FitzSight_GOAI_初赛方案_CN.pdf` |
 
-Before manual upload, compare this map with the actual portal and use only the fields/files the portal requests.
+初赛文件只上传 PDF；HTML、演示包、源代码和内部交接 ZIP 不进入门户附件。

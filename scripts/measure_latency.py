@@ -98,7 +98,7 @@ def main() -> int:
         "overall_p50_ms": percentile(all_ms, 0.50),
         "overall_p95_ms": percentile(all_ms, 0.95),
         "provider_cost_measured": False,
-        "provider_cost_note": "OpenAI live planner cost cannot be measured without a real provider call. Use scripts/validate_openai_runtime.py to capture token/latency telemetry without logging the API key.",
+        "provider_cost_note": "DeepSeek live planner cost and latency were deliberately not measured. Offline deterministic latency and mock request-contract tests are the v0.13 release evidence; scripts/validate_deepseek_runtime.py remains an explicit opt-in.",
         "results": results,
     }
     output = Path(args.output)

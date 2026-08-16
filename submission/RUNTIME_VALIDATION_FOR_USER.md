@@ -1,79 +1,26 @@
-# FitzSight — Runtime Validation for the Final Machine
+# FitzSight v0.13.0 运行验证
 
-These checks are separate from portal submission. They require the environment in which you will actually present FitzSight.
+## 默认离线验证
 
-## 0. Preferred one-command check
-
-```bash
-python scripts/final_machine_check.py --output final_machine_report.json
+```powershell
+python -m pytest
+python scripts/final_machine_check.py --skip-streamlit --output docs/V0.13_FINAL_MACHINE_READINESS.json
 ```
 
-This runs the deterministic smoke/preflight/handoff checks and attempts the localhost Streamlit health check when the dependency is available. The OpenAI live planner is **not** called unless you explicitly pass `--include-openai`.
+该命令不调用外部模型，报告中应为 `deepseek_live.status=not_requested`。
 
-Keep `final_machine_report.json` as local runtime evidence.
+## Streamlit 本地健康检查
 
-## 1. General readiness
-
-```bash
-python scripts/runtime_doctor.py
-```
-
-Expected core state: deterministic demo ready. DuckDB was already validated in a deployment environment.
-
-## 2. Streamlit live path
-
-Install the optional UI dependency if needed:
-
-```bash
-pip install -e ".[ui]"
-```
-
-Then run:
-
-```bash
+```powershell
 python scripts/validate_streamlit_runtime.py
 ```
 
-Only a real health-check PASS on this machine is valid evidence for closing the Streamlit live-runtime task.
+## DeepSeek 在线验证（显式选择）
 
-If it fails, do not improvise a new analytical path. Use:
-
-```bash
-python scripts/start_demo.py --mode cli --backend auto
+```powershell
+$env:DEEPSEEK_API_KEY = "<api-key>"
+$env:FITZSIGHT_DEEPSEEK_MODEL = "deepseek-v4-flash"
+python scripts/validate_deepseek_runtime.py
 ```
 
-or open:
-
-```text
-submission/FitzSight_Offline_Demo.html
-submission/FitzSight_Offline_Demo_Backup.mp4
-```
-
-## 3. OpenAI planner — optional
-
-This path is not required for the deterministic competition fallback.
-
-Only if you intentionally configure stable credentials and a model available to your account:
-
-```bash
-pip install -e ".[openai]"
-export OPENAI_API_KEY="..."
-export FITZSIGHT_MODEL="..."
-python scripts/validate_openai_runtime.py
-```
-
-Do not paste API keys into screenshots, logs, tickets, emails, or repository files.
-
-## 4. What to report back if you want the tracker updated
-
-For Streamlit, provide the validator's final status/output.
-
-For OpenAI, provide the validator result and non-secret telemetry only, such as:
-
-- requested/returned model;
-- response ID if safe to retain;
-- token counts;
-- planning latency;
-- final Agent verification status.
-
-Never provide the API key.
+在线验证只保留请求 ID、请求/响应模型、耗时和 token；不保存密钥、完整提示词或思考内容。本轮提交主动未执行该步骤。

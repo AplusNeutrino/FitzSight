@@ -18,7 +18,7 @@ By default, FitzSight automation **does not submit** anything to the competition
 Allowed by default:
 
 - build and test FitzSight code;
-- generate PPTX/PDF, offline HTML/video, manifests, checksums, and upload-ready ZIPs;
+- generate Chinese PDF-only deck, offline HTML/video, manifests, checksums, and upload-ready ZIPs;
 - run local preflight, benchmark, adversarial, runtime-doctor, and secret checks;
 - prepare copy-ready portal text and manual checklists;
 - identify which external steps still require human action.
@@ -49,7 +49,7 @@ Repository evidence alone must never be treated as proof that these external ste
 
 ## External runtime validation
 
-Streamlit and OpenAI live validation are also environment-dependent. FitzSight provides local validators, but a live result is marked complete only after the user runs them in an environment where the dependency/credential is genuinely available and provides the output as evidence.
+Streamlit and DeepSeek live validation are also environment-dependent. FitzSight provides local validators, but a live result is marked complete only after the user runs them in an environment where the dependency/credential is genuinely available and provides the output as evidence.
 
 ## Handoff principle
 
@@ -59,4 +59,4 @@ The project should reach a state where the user can take the prepared handoff pa
 
 The final-machine kit and readiness scripts do not weaken this boundary. `scripts/final_machine_check.py` performs local checks and may probe a Streamlit process only through `127.0.0.1`. It does not open the competition portal, access Gmail/email, or write to an external account.
 
-The OpenAI live planner is excluded from the default final-machine check. It runs only when the user deliberately supplies `--include-openai` in an environment they control with configured credentials/model access.
+The DeepSeek live planner is excluded from the default final-machine check. It runs only when the user deliberately supplies `--include-deepseek` in an environment they control with configured credentials/model access.

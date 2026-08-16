@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pathlib import Path
 import sys
 
@@ -9,10 +7,16 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import preflight_submission
 
 
-def test_required_submission_file_list_contains_both_deck_formats():
-    assert "submission/FitzSight_GOAI_Initial_Round.pptx" in preflight_submission.REQUIRED_FILES
-    assert "submission/FitzSight_GOAI_Initial_Round.pdf" in preflight_submission.REQUIRED_FILES
+def test_required_submission_file_list_is_pdf_only():
+    assert "submission/FitzSight_GOAI_初赛方案_CN.pdf" in preflight_submission.REQUIRED_FILES
+    assert not any(path.endswith(".pptx") for path in preflight_submission.REQUIRED_FILES)
 
 
-def test_secret_scanner_has_openai_key_pattern():
-    assert any("OPENAI_API_KEY" in pattern.pattern for pattern in preflight_submission.SECRET_PATTERNS)
+def test_secret_scanner_has_deepseek_key_pattern():
+    assert any("DEEPSEEK_API_KEY" in pattern.pattern for pattern in preflight_submission.SECRET_PATTERNS)
+
+
+def test_current_submission_preflight_passes():
+    report = preflight_submission.run_preflight(require_final_machine_kit=False)
+    assert report["passed"] is True
+    assert report["deepseek_live"] == "not_requested"

@@ -1,0 +1,26 @@
+name: FitzSight CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install locked dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+      - name: Provider migration audit
+        run: python scripts/check_provider_migration.py
+      - name: Test
+        run: python -m pytest
+      - name: Submission preflight
+        run: python scripts/preflight_submission.py

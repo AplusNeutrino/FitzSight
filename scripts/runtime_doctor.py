@@ -41,17 +41,18 @@ def build_report(data_dir: Path) -> dict[str, object]:
             "ok": module_available("streamlit"),
             "detail": "installed" if module_available("streamlit") else "install with pip install -e \".[ui]\"",
         },
-        "openai_sdk": {
-            "ok": module_available("openai"),
-            "detail": "installed" if module_available("openai") else "install with pip install -e \".[openai]\"",
+        "deepseek_http_client": {
+            "ok": module_available("httpx"),
+            "detail": "installed" if module_available("httpx") else "install with pip install -e \".[deepseek]\"",
         },
-        "openai_api_key": {
-            "ok": bool(os.getenv("OPENAI_API_KEY")),
-            "detail": "configured" if os.getenv("OPENAI_API_KEY") else "not configured",
+        "deepseek_api_key": {
+            "ok": bool(os.getenv("DEEPSEEK_API_KEY")),
+            "detail": "configured" if os.getenv("DEEPSEEK_API_KEY") else "not configured",
         },
-        "fitzsight_model": {
-            "ok": bool(os.getenv("FITZSIGHT_MODEL")),
-            "detail": os.getenv("FITZSIGHT_MODEL") or "not configured",
+        "deepseek_model": {
+            "ok": os.getenv("FITZSIGHT_DEEPSEEK_MODEL", "deepseek-v4-flash")
+            in {"deepseek-v4-flash", "deepseek-v4-pro"},
+            "detail": os.getenv("FITZSIGHT_DEEPSEEK_MODEL", "deepseek-v4-flash"),
         },
         "data_directory": {
             "ok": data_dir.exists(),
@@ -65,20 +66,21 @@ def build_report(data_dir: Path) -> dict[str, object]:
             "ok": all(
                 path.exists()
                 for path in (
-                    ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pptx",
-                    ROOT / "submission" / "FitzSight_GOAI_Initial_Round.pdf",
+                    ROOT / "submission" / "FitzSight_GOAI_初赛方案_CN.pdf",
                 )
             ),
-            "detail": "PPTX/PDF present",
+            "detail": "Chinese PDF present",
         },
     }
     return {
         "product": "FitzSight",
-        "runtime_doctor_version": "0.12",
+        "runtime_doctor_version": "0.13",
         "checks": checks,
         "core_demo_ready": checks["python"]["ok"] and checks["fitzsight_source"]["ok"],
         "streamlit_live_ready": checks["streamlit"]["ok"],
-        "openai_live_ready": checks["openai_sdk"]["ok"] and checks["openai_api_key"]["ok"] and checks["fitzsight_model"]["ok"],
+        "deepseek_live_ready": checks["deepseek_http_client"]["ok"]
+        and checks["deepseek_api_key"]["ok"]
+        and checks["deepseek_model"]["ok"],
         "secrets_disclosed": False,
     }
 

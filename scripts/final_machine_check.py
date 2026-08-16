@@ -67,7 +67,7 @@ def _deterministic_agent_smoke() -> dict[str, object]:
     }
 
 
-def build_report(*, attempt_streamlit: bool = True, include_openai: bool = False) -> dict[str, object]:
+def build_report(*, attempt_streamlit: bool = True, include_deepseek: bool = False) -> dict[str, object]:
     doctor = _load_script("runtime_doctor.py").build_report(ROOT / "data" / "generated")
     kit_present = (ROOT / "submission" / "FitzSight_Final_Machine_Kit.zip").exists()
     preflight = _load_script("preflight_submission.py").run_preflight(require_final_machine_kit=kit_present)
@@ -86,17 +86,17 @@ def build_report(*, attempt_streamlit: bool = True, include_openai: bool = False
             "return_code": None,
         }
 
-    openai_report: dict[str, object]
-    if include_openai:
-        openai_report, openai_code = _run_json_script("validate_openai_runtime.py")
-        openai_report = {**openai_report, "return_code": openai_code}
+    deepseek_report: dict[str, object]
+    if include_deepseek:
+        deepseek_report, deepseek_code = _run_json_script("validate_deepseek_runtime.py")
+        deepseek_report = {**deepseek_report, "return_code": deepseek_code}
     else:
-        openai_report = {
-            "runtime": "openai_responses_planner",
+        deepseek_report = {
+            "runtime": "deepseek_chat_planner",
             "status": "not_requested",
             "passed": False,
             "return_code": None,
-            "note": "Live provider validation is opt-in because it can use configured credentials/network access.",
+            "note": "Live provider validation was deliberately not requested; offline and mock tests are the release evidence.",
         }
 
     local_ready = bool(
@@ -108,7 +108,7 @@ def build_report(*, attempt_streamlit: bool = True, include_openai: bool = False
 
     return {
         "product": "FitzSight",
-        "version": "0.12.1",
+        "version": "0.13.0",
         "purpose": "final_machine_local_readiness",
         "local_core_ready": local_ready,
         "deterministic_agent_smoke": deterministic,
@@ -125,17 +125,17 @@ def build_report(*, attempt_streamlit: bool = True, include_openai: bool = False
             "final_machine_kit_integrity": handoff.get("final_machine_kit_integrity"),
         },
         "streamlit_live": streamlit_report,
-        "openai_live": openai_report,
+        "deepseek_live": deepseek_report,
         "external_write_actions_performed": False,
         "portal_or_email_actions_performed": False,
         "network_policy": {
             "default_run": "local_only_except_localhost_streamlit_health_check",
-            "openai_live_requires_explicit_include_openai": True,
+            "deepseek_live_requires_explicit_include_deepseek": True,
         },
         "remaining_user_manual_actions": [
             "Run this report on the final presentation machine and retain the JSON output",
             "If Streamlit is installed, require streamlit_live.passed=true before calling the live UI validated",
-            "Only run --include-openai if you deliberately choose to validate a configured provider",
+            "Only run --include-deepseek if you deliberately choose to validate a configured provider",
             "Perform timed pitch/demo and Q&A rehearsal",
             "Perform all competition portal upload/final-submit/confirmation steps manually",
         ],
@@ -148,9 +148,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--skip-streamlit", action="store_true")
     parser.add_argument(
-        "--include-openai",
+        "--include-deepseek",
         action="store_true",
-        help="Explicitly opt in to the live OpenAI planner validator if credentials/model are configured.",
+        help="Explicitly opt in to the live DeepSeek planner validator if credentials are configured.",
     )
     parser.add_argument("--output", default=None)
     return parser.parse_args()
@@ -160,7 +160,7 @@ def main() -> int:
     args = parse_args()
     report = build_report(
         attempt_streamlit=not args.skip_streamlit,
-        include_openai=args.include_openai,
+        include_deepseek=args.include_deepseek,
     )
     rendered = json.dumps(report, indent=2, ensure_ascii=False, default=str)
     print(rendered)

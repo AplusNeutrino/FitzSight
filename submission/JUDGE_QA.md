@@ -48,7 +48,7 @@ First, validate and polish the live Streamlit demo and external structured plann
 
 No. FitzSight is internal analytical decision support. It does not make investment recommendations, execute trades, freeze accounts, label customers for AML enforcement, or make automated credit/suitability/adverse-action decisions.
 
-## v0.12.1 top-line answers
+## v0.13.0 top-line answers
 
 **Why is this an Agent rather than a fixed dashboard?** The CRM hero allows deterministic tool results to select the next action from a closed approved catalog, then verifies the resulting claims; the planner still cannot generate arbitrary SQL or tool parameters.
 

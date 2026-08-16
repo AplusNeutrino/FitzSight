@@ -1,101 +1,16 @@
-# FitzSight Implementation Status
+# FitzSight v0.13.0 实现状态
 
-**Version:** v0.12.1  
-**Date:** 2026-08-12  
-**Phase:** GOAI alignment + bounded-adaptive hero + evaluation v2; formal deck regeneration still pending
+| 能力 | 状态 | 证据 |
+|---|---|---|
+| 五类受限金融运营意图 | 已实现 | `src/fitzsight/agent/catalog.py` |
+| DeepSeek V4 Flash/Pro 规划器 | 已实现 | `src/fitzsight/providers/deepseek_planner.py` |
+| 模型白名单与网络前意图门控 | 已实现 | Provider 单元测试 |
+| 确定性 SQL / 统计 / 异常 / 贡献工具 | 已实现 | `src/fitzsight/tools/`、完整测试 |
+| Evidence Registry 与结论核验 | 已实现 | `src/fitzsight/evidence.py`、`agent/verifier.py` |
+| Streamlit 产品界面 | 已实现 | `streamlit_app.py` |
+| 中文 12 页 PDF-only 初赛稿 | 已实现 | `submission/FitzSight_GOAI_初赛方案_CN.pdf` |
+| DeepSeek 在线调用 | `not_run` | 主动未运行；仅离线与 Mock 契约验证 |
+| 真实 Provider 延迟 | `not_run` | 不伪造在线延迟 |
+| GOAI 门户最终提交 | 人工待办 | 自动化不访问或提交门户 |
 
-## Primary product position
-
-- **Primary persona:** Brokerage / FinTech Operations Analyst
-- **Secondary:** Regional Operations Manager / Sales Operations Manager
-- **Beachhead:** acquisition → FTD conversion → client-fund flows
-- **Decision boundary:** **Autonomous investigation. Human decision.**
-
-## Current analytical core
-
-Supported Agent intents:
-
-1. `crm_routing_ftd_investigation` — primary hero
-2. `net_deposit_anomaly_investigation`
-3. `customer_intelligence_segmentation`
-4. `marketing_lead_quality_investigation`
-5. `false_correlation_guardrail_investigation` — primary refusal/falsification story
-
-The CRM hero uses a bounded approved action graph. Quantitative results may decide whether the next approved drilldown executes, but no planner/model output can introduce SQL, arbitrary tool arguments, arbitrary file access or high-impact financial actions.
-
-## v0.12.1 status
-
-### done
-
-- [x] V12-02 primary persona / beachhead freeze
-- [x] V12-03 bounded-adaptive CRM/FTD hero journey and fail-closed dependency branch
-- [x] V12-04 real runtime-derived hero product-process evidence for Demo
-- [x] V12-06 holdout seed + question-paraphrase evaluation
-- [x] V12-07 controlled verifier/evidence-gate architecture ablation
-- [x] V12-08 lightweight synthetic document evidence with source/paragraph IDs
-- [x] V12-09 enterprise deployment boundary / blueprint
-- [x] V12-10 decision-support / human-decision language normalization
-
-### done in v0.12.1
-
-- [x] V12-05 formal 12-slide deck regenerated as 1 hero + 1 refusal; PPTX/PDF render-reviewed
-- [x] V12-11 competition-facing docs, speaker notes, demo/operator assets and handoff packages synchronized
-- [x] V12-12 final GOAI handbook reviewer gate completed against current code/test/runtime evidence
-
-## Build validation
-
-```text
-87 tests collected
-86 passed
-1 skipped
-0 failed
-compileall: PASS
-```
-
-Tests were executed in complete non-overlapping groups because a single combined pytest process can exceed the sandbox command ceiling. The skip is the DuckDB-specific build-sandbox integration test and is not counted as a live DuckDB PASS here.
-
-## Evaluation regression
-
-```text
-5 / 5 fixed deterministic benchmark scenarios PASS
-8 / 8 adversarial cases PASS
-root-cause scenario accuracy:         100%
-false-correlation rejection accuracy: 100%
-mean evidence coverage:               100%
-verifier violations:                  0
-```
-
-Evaluation v2:
-
-```text
-8 / 8 holdout runs route + verify
-holdout routing stability:             100%
-holdout evidence coverage:             100%
-false-correlation refusal correctness: 100%
-holdout supported-candidate rate:       75%
-
-Full FitzSight adversarial refusal in controlled ablation: 100%
-No-verifier-gate unsafe answer rate on adversarial:        100%
-```
-
-## Runtime / external evidence boundaries
-
-- Streamlit live runtime: **not validated in this sandbox** (dependency missing); this is separate from the passing local deterministic final-machine core check.
-- OpenAI Responses live planner: **not requested / not validated**.
-- Formal v0.12.1 PPT/PDF: **regenerated and render-reviewed** from current evidence; this is presentation evidence, not live Streamlit/OpenAI evidence.
-- GOAI portal / final submit / Gmail confirmation: **user-manual only; not performed**.
-
-## Local release readiness
-
-```text
-submission preflight:             PASS
-handoff ready_for_user_takeover:  true
-final-machine local_core_ready:   true
-deterministic Agent smoke:        verified
-```
-
-- `docs/V0.12.1_SUBMISSION_PREFLIGHT.json` records the local asset/preflight gate.
-- `docs/V0.12.1_HANDOFF_READINESS.json` records `ready_for_user_takeover=true`.
-- `docs/V0.12.1_FINAL_MACHINE_READINESS.json` records `local_core_ready=true` with a verified deterministic smoke run.
-
-These results do **not** close Streamlit live validation, OpenAI live-provider validation, portal submission, or human rehearsal tasks.
+当前发布版本：**v0.13.0**。

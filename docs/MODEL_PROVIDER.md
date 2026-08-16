@@ -1,70 +1,42 @@
-# Optional Model Provider Boundary
+# DeepSeek V4 Provider
 
-## OpenAI Responses planner
+## 配置
 
-v0.6 includes an optional `OpenAIResponsesPlanner`.
+| 项目 | 值 |
+|---|---|
+| 端点 | `https://api.deepseek.com/chat/completions` |
+| 默认模型 | `deepseek-v4-flash` |
+| 可选模型 | `deepseek-v4-pro` |
+| 密钥 | `DEEPSEEK_API_KEY` |
+| 模型环境变量 | `FITZSIGHT_DEEPSEEK_MODEL` |
+| HTTP 客户端 | `httpx` |
 
-The provider exists only above the deterministic FitzSight intent/tool boundary.
+模型名执行严格白名单；旧模型名和任意值在构造 Provider 时立即拒绝。
 
-```text
-Question
-  ↓
-local scope classifier
-  ↓
-OpenAI Responses planner (optional)
-  ↓ strict JSON schema
-local plan validator
-  ↓
-deterministic investigation engine
-```
+## 请求契约
 
-## Request policy
+`DeepSeekChatPlanner` 发送非流式 Chat Completions 请求：
 
-The provider implementation:
+- `response_format={"type":"json_object"}`；
+- `thinking={"type":"disabled"}`；
+- `temperature=0`；
+- `max_tokens=800`；
+- 30 秒默认超时。
 
-- uses `client.responses.create(...)`;
-- uses `text.format.type = "json_schema"`;
-- enables strict schema adherence;
-- uses the SDK `output_text` convenience property;
-- sends `store=False`;
-- never exposes SQL/tool arguments in the allowed output schema.
+系统提示词要求 JSON，并提供目标 JSON 示例。收到响应后，本地 `StructuredJSONPlanner` 再次校验意图、步骤、顺序与动作白名单。
 
-The implementation follows the current official OpenAI Responses/Structured Outputs API shape as checked on 2026-08-11.
+## 安全顺序
 
-Official references:
+1. 本地 `classify_supported_intent` 先判定问题；不支持意图在网络调用前终止。
+2. Provider 只能解释本地已固定的动作序列。
+3. SQL、参数、统计数值与 Evidence ID 均由本地确定性组件产生。
+4. 遥测只记录请求/响应模型、耗时、token、请求 ID 与意图；不记录密钥、完整提示词或思考内容。
 
-- https://platform.openai.com/docs/api-reference/responses
-- https://platform.openai.com/docs/quickstart
+## 验证状态
 
-## Local validation remains authoritative
+v0.13.0 按发布决定不执行真实 Provider 调用。单元测试使用 Mock 覆盖请求契约、错误、超时、截断、JSON 与脱敏；最终报告固定记录 `deepseek_live: not_requested`，不生成虚假的在线延迟或成功状态。
 
-Even strict model output is not trusted automatically.
+官方契约：
 
-After the provider returns JSON:
-
-1. FitzSight parses it;
-2. requires the exact allowed object shape;
-3. checks the intent against the local classifier;
-4. checks the exact action sequence;
-5. rejects SQL/high-impact language in step purposes;
-6. only then passes control to the deterministic executor.
-
-## Credentials
-
-`OPENAI_API_KEY` must come from the environment.
-
-Never commit credentials.
-
-The model name is supplied through:
-
-```text
-FITZSIGHT_MODEL
-```
-
-or CLI `--model`.
-
-## Build validation boundary
-
-The build sandbox does not have a live API credential. Therefore v0.6 validates the provider using a fake Responses client and verifies the exact request configuration and local post-generation validation.
-
-A live API call remains a deployment-environment validation task.
+- https://api-docs.deepseek.com/api/create-chat-completion
+- https://api-docs.deepseek.com/quick_start/pricing/

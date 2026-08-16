@@ -13,3 +13,7 @@ data/generated/*.json
 Thumbs.db
 .vscode/
 .idea/
+build/
+.test-venv/
+.test-deps/
+.streamlit/secrets.toml

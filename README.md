@@ -1,568 +1,70 @@
-# FitzSight
+# FitzSight v0.13.0
 
-**Evidence-grounded Financial Operations Intelligence Agent**
+FitzSight 是证据驱动的金融运营调查智能体：把“为什么指标变了？”转化为受约束计划、确定性计算、可追溯 Evidence ID 与失败即关闭的结论核验。
 
-FitzSight is a GOAI 2026 · Boundless Agents · AI+金融 project focused on a practical analytical question:
+## 设计边界
 
-> **Why did this financial-operations metric change?**
+- 本地意图门控先于任何模型请求；仅支持五类批准调查。
+- DeepSeek V4 只生成固定动作目录中的 JSON 计划，不生成 SQL、不计算关键数字、不执行金融动作。
+- 只读 SQL、统计检验、贡献分解、异常检测与文档检索由确定性工具完成。
+- Evidence Registry 追加式记录来源；EvidenceClaimVerifier 决定结论能否呈现。
+- 比赛构建只使用可复现合成数据，不含真实客户 PII。
 
-**Primary persona:** Brokerage / FinTech Operations Analyst  
-**Secondary persona:** Regional Operations Manager / Sales Operations Manager  
-**Beachhead chain:** acquisition → FTD conversion → client-fund flows
+## 安装
 
-> **Autonomous investigation. Human decision.**
-
-The project does not ask an LLM to invent an explanation. It separates planning from calculation and verification:
-
-```text
-Business question
-        ↓
-Local approved-intent gate
-        ↓
-Constrained planner
-        ↓
-Deterministic SQL / Python tools
-        ↓
-Evidence Registry
-        ↓
-EvidenceClaimVerifier
-        ↓
-Verified decision-support answer
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.lock
+python -m pip install -e . --no-deps
 ```
 
-## Current release: v0.12.1
+## 运行
 
-v0.12.1 is the **GOAI-aligned formal-presentation synchronization release** built on the v0.12 bounded-adaptive hero + Evaluation v2 core. It preserves the five approved business intents and v0.11 final-machine/operator boundary, while making the CRM/FTD workflow the primary judge-facing journey. Tool results can now decide whether the next *approved* CRM action should execute; the action catalog remains closed and planner/model output still cannot generate SQL, table names, filesystem paths, arbitrary tool arguments, or high-impact financial actions.
+确定性 CLI（默认，不访问外部模型）：
 
-The v0.12 core adds fixed synthetic operational-document evidence with stable source/paragraph IDs, a runtime-derived hero process view, unseen-seed/question-paraphrase evaluation, a controlled verifier/evidence-gate ablation, and an explicit enterprise deployment boundary separating implemented PoC controls from production requirements. **v0.12.1 regenerates the formal 12-slide PPTX/PDF around one CRM/FTD hero + one false-correlation refusal, synchronizes the judge-facing operator assets, and records a final GOAI reviewer gate without adding unimplemented product claims.**
-
-
-## Final-machine operator path
-
-Use the portable kit:
-
-```text
-submission/FitzSight_Final_Machine_Kit.zip
+```powershell
+python scripts/agent_investigate.py --backend sqlite
 ```
 
-After extraction, the default final-machine check is:
+Streamlit：
 
-```bash
-python scripts/final_machine_check.py --output final_machine_report.json
-```
-
-The default path performs local readiness checks and a localhost-only Streamlit health check when Streamlit is installed. It does **not** call the OpenAI live planner unless `--include-openai` is explicitly supplied, and it never performs GOAI portal/email submission actions.
-
-Human timing can be recorded locally with:
-
-```bash
-python scripts/rehearsal_assistant.py --mode pitch --interactive --output pitch_rehearsal.json
-python scripts/rehearsal_assistant.py --mode demo --interactive --output demo_rehearsal.json
-```
-
-Actual portal upload/final submit/confirmation remains user-manual only.
-
-## Supported workflows
-
-### 1. Hero — CRM / FTD deterioration
-
-```text
-Why did European FTD conversion deteriorate after July 15?
-```
-
-Fixed-seed benchmark:
-
-```text
-affected FTD change:      -7.53 pp
-control FTD change:       -1.21 pp
-response median change:  +29.15 min
-verification:             PASS
-```
-
-v0.12 hero execution is bounded-adaptive:
-
-```text
-affected/control measurement
-→ statistical validation
-→ contribution decomposition
-→ conditional latency anomaly drilldown
-→ conditional operational-event check
-→ approved document paragraph evidence
-→ verifier
-→ decision-support answer
-→ approved follow-up
-```
-
-If the required evidence is absent or the event dependency fails, FitzSight records the branch and returns `insufficient_evidence` rather than manufacturing attribution.
-
-### 2. Net-deposit deterioration
-
-```text
-Why did European net deposits fall in the week starting August 3?
-```
-
-Fixed-seed benchmark:
-
-```text
-net-deposit change:      -$187,790.90
-deposit change:          +$59,158.18
-withdrawal change:       +$246,949.08
-top-11 withdrawal share:  91.6%
-verification:             PASS
-```
-
-The Agent reports withdrawal concentration as an observed driver. It does not infer why individual customers withdrew.
-
-### 3. Customer Intelligence
-
-```text
-How are European customer segments distributed by behavioral value,
-and which segment contributes most to deposits?
-```
-
-Fixed-seed benchmark:
-
-```text
-European customers:          6,770
-coverage:                     100%
-value groups:                 4
-High Value customer share:    3.7%
-High Value deposit share:     53.7%
-verification:                 5 / 5 PASS
-```
-
-The segmentation is descriptive operational analytics only. It is not a credit, AML, suitability, eligibility, or adverse-action system.
-
-### 4. Marketing lead quality
-
-```text
-Why did Americas lead volume rise while FTD conversion fell after June 15?
-```
-
-The synthetic campaign benchmark deliberately creates **more leads but lower acquisition quality**.
-
-```text
-lead volume change:        +838 (+315.0%)
-FTD conversion change:     -10.84 pp
-Paid Search mix change:    +60.52 pp
-Paid Search conversion:    -16.44 pp
-Paid Search p-value:       4.43e-05
-verification:              4 / 4 PASS
-```
-
-FitzSight distinguishes volume, mix, and within-channel performance instead of treating “more leads” as equivalent to “better performance.”
-
-### 5. False-correlation guardrail
-
-```text
-Why did Asia FTD conversion fall after July 20,
-and is the nearby office relocation the cause?
-```
-
-This benchmark puts an unrelated office-relocation event next to a real Affiliate conversion deterioration.
-
-```text
-Asia conversion change:              -8.13 pp
-Affiliate conversion change:        -15.81 pp
-Affiliate p-value:                    0.00463
-top negative performance channel:     Affiliate
-nearby office-event causal support:   false
-false correlation rejected:           true
-verification:                         4 / 4 PASS
-```
-
-Temporal proximity alone is not accepted as causal evidence.
-
----
-
-## Why FitzSight is not “chat with CSV”
-
-A supported answer requires all of the following:
-
-1. the question matches an approved business intent;
-2. the planner emits only the exact approved high-level action sequence;
-3. SQL/Python tools calculate every numeric result;
-4. supported claims reference Evidence IDs;
-5. the verifier checks evidence integrity, policy boundaries, and causal wording;
-6. failed verification causes the final answer to be withheld.
-
-The model, when enabled, is a constrained planner—not a calculator and not an unrestricted SQL agent.
-
----
-
-## Quick start
-
-Python 3.11+.
-
-```bash
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
-python scripts/generate_data.py
-```
-
-One-command competition demo:
-
-```bash
-python scripts/start_demo.py
-```
-
-`auto` mode launches Streamlit when the optional UI dependency is installed and otherwise falls back to the deterministic CLI. Explicit modes are also available:
-
-```bash
-python scripts/start_demo.py --mode ui --backend duckdb
-python scripts/start_demo.py --mode cli --backend duckdb
-```
-
-Run any supported workflow directly:
-
-```bash
-python scripts/agent_investigate.py \
-  --backend duckdb \
-  --question "Why did European FTD conversion deteriorate after July 15?"
-```
-
-```bash
-python scripts/agent_investigate.py \
-  --backend duckdb \
-  --question "Why did Americas lead volume rise while FTD conversion fell after June 15?"
-```
-
-```bash
-python scripts/agent_investigate.py \
-  --backend duckdb \
-  --question "Why did Asia FTD conversion fall after July 20, and is the nearby office relocation the cause?"
-```
-
-Run the full deterministic benchmark:
-
-```bash
-python scripts/run_benchmark.py --backend duckdb
-```
-
-Run the adversarial safety/evidence suite:
-
-```bash
-python scripts/run_adversarial_evaluation.py --backend duckdb
-```
-
-Run tests:
-
-```bash
-pytest -q
-```
-
----
-
-## Benchmark and evaluation
-
-The current benchmark catalog contains five deterministic business scenarios.
-
-Current SQLite build result:
-
-```text
-scenario count:                       5
-passed:                               5
-failed:                               0
-scenario pass rate:                   100%
-root-cause scenario accuracy:         100%
-false-correlation rejection accuracy: 100%
-mean evidence coverage:               100%
-verifier violations:                  0
-```
-
-The benchmark also records deterministic end-to-end latency. Latency is environment-specific and is not presented as a production guarantee.
-
-Evaluation artifacts:
-
-- `evaluation/benchmark_catalog.json`
-- `evaluation/adversarial_cases.json`
-- `scripts/run_benchmark.py`
-- `scripts/run_adversarial_evaluation.py`
-- `docs/V0.7_BENCHMARK_RESULTS.json`
-- `docs/V0.7_ADVERSARIAL_RESULTS.json`
-- `docs/V0.7_VALIDATION.md`
-- `docs/V0.8_VALIDATION.md`
-- `docs/V0.8_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.10_BENCHMARK_RESULTS.json`
-- `docs/V0.10_ADVERSARIAL_RESULTS.json`
-- `docs/V0.9_DETERMINISTIC_LATENCY.json`
-- `docs/V0.9_RUNTIME_STATUS.json`
-- `docs/OPERATOR_BOUNDARY.md`
-- `docs/V0.10_HANDOFF_READINESS.json`
-- `docs/V0.10_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.10_VALIDATION.md`
-
-### Adversarial release gate
-
-The eight-case adversarial suite checks:
-
-- unsupported trading actions are refused;
-- unsupported AML/account-freeze requests are refused;
-- planner SQL injection is rejected;
-- planner high-impact actions are rejected;
-- missing Evidence IDs are rejected;
-- causal overclaim wording is rejected;
-- evaluation-only `_gt` SQL leakage is rejected;
-- a nearby-but-unrelated event is not promoted to a cause.
-
-Current result:
-
-```text
-8 / 8 PASS
-all category catch/refusal rates: 100%
-```
-
----
-
-## Planner safety policy
-
-Planner/model output is untrusted input.
-
-The planner may only return one published intent and that intent's exact approved action sequence. It may not:
-
-- produce SQL;
-- choose arbitrary tables;
-- submit free-form tool arguments;
-- execute trades;
-- transfer funds;
-- freeze accounts;
-- contact customers;
-- create automated compliance conclusions;
-- create credit/suitability decisions;
-- make investment recommendations.
-
-Unsupported questions fail before an external model invocation.
-
----
-
-## SQL safety policy
-
-The read-only SQL tool:
-
-- accepts only `SELECT` / `WITH`;
-- rejects multiple statements;
-- rejects write/DDL/admin keywords;
-- rejects external file/network scan functions;
-- enforces bounded output;
-- records successful and failed calls in the Evidence Registry.
-
----
-
-## Evidence-first verification
-
-For every supported claim, `EvidenceClaimVerifier` checks:
-
-- referenced Evidence IDs exist;
-- evidence digests still match;
-- tool execution status is successful;
-- supported claims have evidence;
-- evaluation-only `*_gt` fields were not queried;
-- guarded claims include a policy boundary;
-- wording does not exceed the evidence status.
-
-If verification fails:
-
-```text
-answer = withheld
-```
-
----
-
-## Initial-round submission assets
-
-The repository now contains a reproducible competition-facing asset bundle:
-
-```text
-submission/
-├── FitzSight_GOAI_Initial_Round.pptx
-├── FitzSight_GOAI_Initial_Round.pdf
-├── DEMO_RUNBOOK.md
-├── PITCH_SPEAKER_NOTES.md
-├── SUBMISSION_CHECKLIST.md
-└── README.md
-```
-
-Regenerate the deck with:
-
-```bash
-pip install -e ".[submission]"
-python scripts/build_pitch_deck.py
-```
-
-Run repository/submission preflight with:
-
-```bash
-python scripts/preflight_submission.py
-```
-
-Build the manual handoff packet with:
-
-```bash
-python scripts/build_manual_handoff.py
-python scripts/handoff_readiness.py
-```
-
-The generated `submission/FitzSight_Manual_Handoff.zip` contains the copy-ready portal text, PPT/PDF, offline demo/video, compliance/evaluation summaries, and manual operator instructions. It performs **no network action and no external submission**.
-
-### Manual submission boundary
-
-By default, FitzSight/ChatGPT project automation does not open or submit the GOAI portal, access Gmail, send email, or modify external accounts. Those submission actions are explicitly user-controlled. See `docs/OPERATOR_BOUNDARY.md` and `submission/START_HERE_MANUAL.md`.
-
-## Runtime validation status
-
-### DuckDB — validated
-
-A deployment environment has successfully executed the constrained planner and JSON-file planner using DuckDB and `data/generated`, with final status `verified`.
-
-### OpenAI Responses planner — implemented, live runtime pending
-
-Install the optional provider:
-
-```bash
-pip install -e ".[openai]"
-export OPENAI_API_KEY="..."
-export FITZSIGHT_MODEL="<model available to your account>"
-```
-
-The live provider is not marked validated until actual deployment output exists.
-
-### Streamlit UI — implemented, runtime smoke test pending
-
-```bash
-pip install -e ".[ui]"
+```powershell
 streamlit run streamlit_app.py
 ```
 
-The current UI code contains five preset workflows, verified KPI cards, intent-specific charts, plan trace, evidence cards, and raw verified metrics. The UI renders verified Agent output and does not create a second analytical path.
+DeepSeek V4 可选规划器：
 
----
-
-## Synthetic-data and compliance policy
-
-All benchmark data is synthetic.
-
-Never add:
-
-- real customer PII;
-- former-employer CRM exports;
-- confidential transaction data;
-- internal sales reports;
-- real API secrets.
-
-The `_gt` fields used by synthetic benchmark construction are evaluation-only and must never be queried by the normal Agent workflow.
-
-FitzSight is analytical decision support. It does not provide investment advice or automated high-impact financial/compliance decisions.
-
-See `docs/COMPLIANCE_AND_SAFETY.md`.
-
----
-
-## Repository structure
-
-```text
-FitzSight/
-├── README.md
-├── MASTER_PLAN.md
-├── IMPLEMENTATION_STATUS.md
-├── LICENSE
-├── THIRD_PARTY_NOTICES.md
-├── streamlit_app.py
-├── evaluation/
-│   ├── benchmark_catalog.json
-│   └── adversarial_cases.json
-├── scripts/
-│   ├── generate_data.py
-│   ├── agent_investigate.py
-│   ├── run_benchmark.py
-│   ├── run_adversarial_evaluation.py
-│   ├── start_demo.py
-│   ├── runtime_doctor.py
-│   ├── validate_streamlit_runtime.py
-│   ├── validate_openai_runtime.py
-│   ├── build_offline_demo.py
-│   ├── build_offline_demo_video.py
-│   ├── measure_latency.py
-│   ├── build_submission_bundle.py
-│   ├── build_manual_handoff.py
-│   ├── handoff_readiness.py
-│   ├── preflight_submission.py
-│   └── build_pitch_deck.py
-├── submission/
-│   ├── FitzSight_GOAI_Initial_Round.pptx
-│   ├── FitzSight_GOAI_Initial_Round.pdf
-│   ├── FitzSight_Offline_Demo.html
-│   ├── FitzSight_Offline_Demo_Backup.mp4
-│   ├── FitzSight_GOAI_Upload_Bundle.zip
-│   ├── FitzSight_Manual_Handoff.zip
-│   ├── START_HERE_MANUAL.md
-│   ├── MANUAL_SUBMISSION_CHECKLIST.md
-│   ├── RUNTIME_VALIDATION_FOR_USER.md
-│   └── ...
-├── src/fitzsight/
-│   ├── agent/
-│   ├── data/
-│   ├── evidence/
-│   ├── investigation/
-│   ├── providers/
-│   └── tools/
-├── tests/
-└── docs/
+```powershell
+$env:DEEPSEEK_API_KEY = "<api-key>"
+$env:FITZSIGHT_DEEPSEEK_MODEL = "deepseek-v4-flash" # 或 deepseek-v4-pro
+python scripts/agent_investigate.py --planner deepseek --backend sqlite
 ```
 
-Key competition/evaluation files:
+模型严格白名单：`deepseek-v4-flash`（默认）和 `deepseek-v4-pro`。实现直接使用 `httpx` 调用 `https://api.deepseek.com/chat/completions`。
 
-- `src/fitzsight/investigation/lead_quality.py`
-- `evaluation/adversarial_cases.json`
-- `scripts/run_adversarial_evaluation.py`
-- `docs/BENCHMARK_SCENARIOS.md`
-- `docs/ADVERSARIAL_EVALUATION.md`
-- `docs/COMPLIANCE_AND_SAFETY.md`
-- `docs/V0.7_VALIDATION.md`
-- `docs/V0.8_VALIDATION.md`
-- `docs/V0.8_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.10_BENCHMARK_RESULTS.json`
-- `docs/V0.10_ADVERSARIAL_RESULTS.json`
-- `docs/V0.9_DETERMINISTIC_LATENCY.json`
-- `docs/V0.9_RUNTIME_STATUS.json`
-- `docs/OPERATOR_BOUNDARY.md`
-- `docs/V0.10_HANDOFF_READINESS.json`
-- `docs/V0.10_SUBMISSION_PREFLIGHT.json`
-- `docs/V0.10_VALIDATION.md`
+## 测试与检查
 
----
-
-## Validation snapshot
-
-Current v0.9 release-gate state:
-
-```text
-5 / 5 deterministic benchmark scenarios PASS
-8 / 8 adversarial cases PASS
-mean evidence coverage 100%
-verifier violations 0
-
-offline deterministic demo: 5 / 5 verified workflows
-offline MP4 backup: generated from verified outputs
-submission PPTX/PDF: generated from fresh verified Agent metrics
+```powershell
+python -m pytest
+python scripts/final_machine_check.py --skip-streamlit --output docs/V0.13_FINAL_MACHINE_READINESS.json
+python scripts/preflight_submission.py --output docs/V0.13_SUBMISSION_PREFLIGHT.json
 ```
 
-Build-environment Streamlit/OpenAI live checks remain explicitly separate from implementation tests. DuckDB was previously validated in the deployment environment; the build sandbox may still skip its integration test when the dependency is absent.
+默认最终机器检查不会访问 DeepSeek，并报告 `deepseek_live: not_requested`。只有显式添加 `--include-deepseek` 才会发起在线验证。
 
----
+## 中文 PDF 提交物
 
-## License
+- 最终文件：`submission/FitzSight_GOAI_初赛方案_CN.pdf`
+- HTML 可复现源：`submission/deck-cn/index.html`
+- 规格：中文、12 页、16:9、瑞士国际主义 / IKB 蓝
+- 工具：`guizang-ppt-skill`，固定提交 `c91369c449d34755d320a8b81d0734000d99d1ab`
+- 不生成或提交 PPTX；初赛门户只上传最终 PDF。
 
-MIT. See `LICENSE`.
+## 许可与边界
 
-Third-party dependencies remain subject to their own licenses; see `THIRD_PARTY_NOTICES.md`.
+项目代码采用 MIT License。第三方模板、运行时依赖及许可证见 `THIRD_PARTY_NOTICES.md`。FitzSight 只提供分析决策支持，不提供投资建议、授信/适当性/AML 决策，也不执行交易、转账、冻结账户或对客户产生自动不利影响的动作。
 
-## Progress source of truth
+## 在线 Demo 部署
 
-Project status is maintained in:
-
-```text
-AplusNeutrino/My_Blog/docs/PROJFITZGERALD_PROGRESS.md
-```
-
-Repository implementation evidence and tests determine whether tracker tasks may be marked `done`.
+入口为 `streamlit_app.py`。Streamlit Community Cloud 会安装根目录中固定版本的 `requirements.txt`；`DEEPSEEK_API_KEY` 仅通过服务器端 Secrets 配置。公开预设、会话与进程调用额度、确定性分析、安全遥测及部署验收步骤见 [`docs/ONLINE_DEMO_DEPLOYMENT.md`](docs/ONLINE_DEMO_DEPLOYMENT.md)。

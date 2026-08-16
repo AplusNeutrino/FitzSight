@@ -86,7 +86,7 @@ def build(*, backend: str = "sqlite", n_customers: int = 20_000) -> dict:
             follow_up = agent.answer_follow_up(run, FOLLOW_UP)
             payload = {
                 "product": "FitzSight",
-                "version": "0.12.1",
+                "version": "0.13.0",
                 "artifact_type": "verified_hero_product_process_evidence",
                 "persona": "Brokerage / FinTech Operations Analyst",
                 "tagline": "Autonomous investigation. Human decision.",

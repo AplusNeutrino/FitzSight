@@ -151,7 +151,7 @@ This is a deliberate falsification benchmark: a nearby event exists, but FitzSig
 - deterministic analytical Tool Layer
 - append-only Evidence Registry
 - constrained planner contract
-- optional OpenAI Responses structured planner
+- optional DeepSeek V4 structured planner
 - Streamlit demo UI
 
 Planner/model output is untrusted. It cannot generate SQL, arbitrary table access, free-form tool arguments, trades, transfers, account freezes, or customer-contact actions.
@@ -226,5 +226,5 @@ Evidence: `docs/V0.12_HOLDOUT_RESULTS.json`, `docs/V0.12_ABLATION_RESULTS.json`,
 Current competition evidence covers synthetic data, bounded planning/execution, read-only deterministic tools, append-only evidence, fail-closed verification, and source-addressable synthetic document evidence. Enterprise SSO/RBAC, row/field authorization, PII masking, tenant isolation, retention and production observability are deployment-blueprint requirements, not current PoC implementation claims. See `docs/ENTERPRISE_DEPLOYMENT_BOUNDARY.md`.
 ## v0.12.1 competition-asset synchronization
 
-The formal initial-round PPTX/PDF now uses the same current evidence contract as this summary: **one complete CRM/FTD hero investigation + one false-correlation refusal**, with the other three workflows retained as breadth proof. The deck includes runtime-derived hero trace/answer evidence, Evaluation v2 holdout and controlled ablation results, and an explicit implemented-vs-production-blueprint boundary. No slide claims live Streamlit/OpenAI provider validation, portal submission, or production RBAC/PII controls.
+The formal initial-round Chinese PDF-only deck now uses the same current evidence contract as this summary: **one complete CRM/FTD hero investigation + one false-correlation refusal**, with the other three workflows retained as breadth proof. The deck includes runtime-derived hero trace/answer evidence, Evaluation v2 holdout and controlled ablation results, and an explicit implemented-vs-production-blueprint boundary. No slide claims live Streamlit/DeepSeek provider validation, portal submission, or production RBAC/PII controls.
 

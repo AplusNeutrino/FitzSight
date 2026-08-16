@@ -1,6 +1,6 @@
-# FitzSight — GOAI Initial-Round 12-Slide Speaker Notes (v0.12.1)
+# FitzSight — GOAI Initial-Round 12-Slide Speaker Notes (v0.13.0)
 
-> Competition-facing numerical claims are derived from verified deterministic runtime evidence or the checked-in v0.12 evaluation JSON. This deck does not claim live Streamlit or live OpenAI-provider validation.
+> Competition-facing numerical claims are derived from verified deterministic runtime evidence or the checked-in v0.12 evaluation JSON. This deck does not claim live Streamlit or live DeepSeek-provider validation.
 
 ## Slide 1 — FitzSight
 

@@ -32,6 +32,7 @@ def build_command(port: int) -> list[str]:
         "streamlit",
         "run",
         str(ROOT / "streamlit_app.py"),
+        "--global.developmentMode=false",
         "--server.headless=true",
         "--server.address=127.0.0.1",
         f"--server.port={port}",

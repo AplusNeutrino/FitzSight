@@ -62,7 +62,7 @@ Mention the five-scenario benchmark and MIT open-source repository.
 - Hide environment variables, API keys, terminal history containing secrets, personal browser tabs, and notifications.
 - Keep a local copy and a second backup copy.
 - If Streamlit is unavailable, record the deterministic CLI and use `FitzSight_Offline_Demo.html` as the visual backup.
-## v0.12.1 recording priority
+## v0.13.0 recording priority
 
 The primary recording should mirror the formal deck: **CRM/FTD hero → tested failure branch → false-correlation refusal → Evaluation v2 → human-decision boundary**. The other workflows may appear in one short breadth frame only. Capture the real FitzSight UI/trace/evidence/verifier state when live Streamlit is validated; until then, the checked-in runtime-derived hero evidence image and deterministic offline fallback remain the reproducible evidence assets.
 

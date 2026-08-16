@@ -37,11 +37,13 @@ def test_manual_handoff_zip_contains_required_assets(tmp_path: Path) -> None:
         names = set(archive.namelist())
         assert "START_HERE_MANUAL.md" in names
         assert "MANUAL_SUBMISSION_CHECKLIST.md" in names
-        assert "FitzSight_GOAI_Initial_Round.pdf" in names
+        assert "FitzSight_GOAI_初赛方案_CN.pdf" in names
+        assert not any(name.endswith(".pptx") for name in names)
         assert "FitzSight_Offline_Demo_Backup.mp4" in names
         manual = json.loads(archive.read("MANUAL_ACTIONS.json"))
         assert manual["execution_policy"] == "external_submission_user_manual_only"
-        assert manual["automation_boundary"]["gmail_access"] is False
+        assert manual["automation_boundary"]["email_access"] is False
+        assert manual["competition_upload_allowlist"] == ["FitzSight_GOAI_初赛方案_CN.pdf"]
         manifest = json.loads(archive.read("HANDOFF_MANIFEST.json"))
         assert manifest["external_submission_performed"] is False
         assert manifest["network_actions_performed"] is False
@@ -54,7 +56,7 @@ def test_preflight_reports_manual_submission_boundary() -> None:
     assert boundary["mode"] == "user_manual_only"
     assert boundary["external_write_actions_performed"] is False
     assert boundary["portal_upload_or_submit_by_automation"] is False
-    assert boundary["gmail_or_email_access_by_automation"] is False
+    assert boundary["email_access_by_automation"] is False
 
 
 def test_handoff_readiness_is_machine_readable() -> None:
@@ -67,9 +69,7 @@ def test_handoff_readiness_is_machine_readable() -> None:
 
 def test_upload_bundle_declares_no_external_submission(tmp_path: Path) -> None:
     module = _load_script("build_submission_bundle.py")
-    # Exercise its public constants and reproduce the generated manifest contract without network calls.
-    assert "submission/MANUAL_SUBMISSION_CHECKLIST.md" in module.DEFAULT_FILES
-    assert "docs/OPERATOR_BOUNDARY.md" in module.DEFAULT_FILES
+    assert module.DEFAULT_FILES == ("submission/FitzSight_GOAI_初赛方案_CN.pdf",)
     source_text = (ROOT / "scripts" / "build_submission_bundle.py").read_text(encoding="utf-8")
     assert '"external_submission_performed": False' in source_text
     assert '"network_actions_performed": False' in source_text

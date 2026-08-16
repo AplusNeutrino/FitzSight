@@ -1,118 +1,37 @@
-# FitzSight — Final Presentation Machine Checklist
+# FitzSight 最终机器检查清单
 
-**Owner:** User  
-**Execution mode:** Local/manual only
+## 1. 安装与本地检查
 
-This checklist does not authorize portal uploads, email access, or any external-account write.
-
-## 1. Copy the kit
-
-Use `FitzSight_Final_Machine_Kit.zip` on the machine you will actually present from. Extract it to a normal local folder with write permission.
-
-## 2. Install the local demo environment
-
-From the extracted `FitzSight_Final_Machine_Kit` folder:
-
-```bash
-python -m venv .venv
+```powershell
+python -m pip install -r requirements.lock
+python -m pip install -e . --no-deps
+python -m pytest
+python scripts/final_machine_check.py --skip-streamlit --output final_machine_report.json
 ```
 
-Windows:
+必须满足：`local_core_ready=true`、确定性 Agent 为 `verified`、提交预检通过，并且 `deepseek_live.status=not_requested`。
 
-```bat
-.venv\Scripts\activate
-pip install -e ".[demo]"
+## 2. Streamlit 健康检查
+
+```powershell
+python scripts/validate_streamlit_runtime.py
 ```
 
-macOS/Linux:
+在最终演示机器确认本地页面、五类场景、Evidence ID 和失败状态均可见。
 
-```bash
-. .venv/bin/activate
-pip install -e ".[demo]"
+## 3. DeepSeek 在线验证（非本轮发布证据）
+
+默认不运行。只有参赛者明确决定使用真实密钥时才执行：
+
+```powershell
+python scripts/final_machine_check.py --include-deepseek --output final_machine_report_with_deepseek.json
 ```
 
-If you do not want the optional OpenAI SDK/runtime, installing `.[ui]` is enough for Streamlit. The deterministic CLI/offline fallback remains usable without the model provider.
+不要把未运行状态写成在线成功，也不要填入推测延迟。
 
-## 3. One-command readiness check
+## 4. GOAI 人工提交
 
-Windows:
-
-```bat
-RUN_FINAL_CHECKS.bat
-```
-
-macOS/Linux:
-
-```bash
-sh RUN_FINAL_CHECKS.sh
-```
-
-Equivalent direct command:
-
-```bash
-python scripts/final_machine_check.py --output final_machine_report.json
-```
-
-Keep the generated `final_machine_report.json` as local runtime evidence.
-
-Required minimum before presentation:
-
-- `local_core_ready = true`
-- deterministic Agent smoke = PASS
-- submission preflight = PASS
-- handoff readiness = PASS
-
-For the live UI path, also require:
-
-- `streamlit_live.passed = true`
-
-If Streamlit is not available or fails, use the deterministic CLI or offline HTML/video. Do not improvise a different analytical path.
-
-## 4. Optional OpenAI live planner
-
-This is deliberately **not** part of the default final-machine command.
-
-Only if you intentionally configure a stable key/model:
-
-```bash
-python scripts/final_machine_check.py --include-openai --output final_machine_report_with_openai.json
-```
-
-Never put the API key in screenshots, documents, repository files, chat logs, or submission materials.
-
-## 5. Start the demo
-
-Windows:
-
-```bat
-START_DEMO.bat
-```
-
-macOS/Linux:
-
-```bash
-sh START_DEMO.sh
-```
-
-Fallback files:
-
-```text
-submission/FitzSight_Offline_Demo.html
-submission/FitzSight_Offline_Demo_Backup.mp4
-```
-
-## 6. Human rehearsal
-
-Record real timings yourself:
-
-```bash
-python scripts/rehearsal_assistant.py --mode pitch --interactive --output pitch_rehearsal.json
-python scripts/rehearsal_assistant.py --mode demo --interactive --output demo_rehearsal.json
-python scripts/rehearsal_assistant.py --mode qa --interactive --output qa_rehearsal.json
-```
-
-These reports are local evidence only. They do not submit or transmit anything.
-
-## 7. Competition submission remains manual
-
-The actual GOAI portal review/upload/final-submit/confirmation workflow remains entirely user-controlled. Follow `MANUAL_SUBMISSION_CHECKLIST.md` when you are ready.
+- 仅上传 `FitzSight_GOAI_初赛方案_CN.pdf`。
+- 人工检查 12 页、中文字体、文件大小和门户预览。
+- 人工确认最终提交并保存截图、邮件或回执。
+- 自动化脚本不访问、不修改、不提交赛事门户。

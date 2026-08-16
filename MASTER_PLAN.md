@@ -1837,7 +1837,7 @@ Generating report...
 
 可选：
 
-- OpenAI Responses / Agents SDK
+- DeepSeek V4 Chat Completions via httpx
 - LangGraph
 - Pydantic AI
 - 自定义轻量 orchestration
@@ -3405,7 +3405,7 @@ The second benchmark may identify withdrawal pressure, concentration, and nearby
 
 ## D-015 — External model providers remain optional and bounded
 
-The first concrete provider adapter uses the OpenAI Responses API with strict JSON-schema output and `store=False`. The local intent classifier and plan validator remain authoritative. An external model is optional; the deterministic fallback remains the default competition-safe path.
+The first concrete provider adapter uses the DeepSeek V4 Chat Completions API with JSON Output and disabled thinking mode. The local intent classifier and plan validator remain authoritative. An external model is optional; the deterministic fallback remains the default competition-safe path.
 
 ## D-016 — UI is a presentation layer, not an analytical authority
 
@@ -3487,11 +3487,11 @@ The pitch-deck builder generates demo-slide numeric claims from fresh determinis
 
 ## D-031 — Offline demo artifacts are resilience assets, not live-runtime evidence
 
-The self-contained HTML demo and MP4 backup are generated only from verified deterministic Agent outputs and provide a no-cloud presentation fallback. Their existence does not mark Streamlit or OpenAI live runtime validation as complete.
+The self-contained HTML demo and MP4 backup are generated only from verified deterministic Agent outputs and provide a no-cloud presentation fallback. Their existence does not mark Streamlit or DeepSeek live runtime validation as complete.
 
 ## D-032 — Provider telemetry records reproducibility metadata, never secrets or invented cost
 
-A live OpenAI planner validation may record response ID, requested/returned model, token usage and measured planning latency. API keys are never emitted. Provider monetary cost is not hardcoded or estimated without a validated pricing source and actual usage evidence.
+A live DeepSeek planner validation may record response ID, requested/returned model, token usage and measured planning latency. API keys are never emitted. Provider monetary cost is not hardcoded or estimated without a validated pricing source and actual usage evidence.
 
 ---
 
@@ -3511,7 +3511,7 @@ The user should be able to take over with a single portable handoff packet conta
 
 ## D-035 — The final-machine default must remain local and provider-safe
 
-The one-command final-machine check may run deterministic local checks and probe a Streamlit process only through localhost. It must not call a live model provider by default. OpenAI live validation requires an explicit `--include-openai` opt-in and deliberately configured credentials/model access.
+The one-command final-machine check may run deterministic local checks and probe a Streamlit process only through localhost. It must not call a live model provider by default. DeepSeek live validation requires an explicit `--include-deepseek` opt-in and deliberately configured credentials/model access.
 
 ## D-036 — Final-machine readiness and external submission are separate truths
 
@@ -3553,4 +3553,4 @@ SSO, RBAC/ABAC, row/field authorization, PII masking, tenant isolation, retentio
 
 ## v0.12.1 competition-asset synchronization
 
-The published v0.12 core remains the implementation baseline. v0.12.1 synchronizes the formal GOAI presentation layer around one CRM/FTD hero + one false-correlation refusal, includes runtime-derived hero evidence and Evaluation v2, and completes a handbook reviewer gate. This update does not expand the approved intent catalog or planner/tool authority. Live Streamlit/OpenAI validation, portal confirmation and human rehearsal remain evidence-gated outside this plan update.
+The v0.13.0 implementation remains grounded in the published deterministic core. v0.13.0 adds the DeepSeek V4 bounded planner and synchronizes a Chinese 12-page PDF-only GOAI presentation around one CRM/FTD hero + one false-correlation refusal. This update does not expand the approved intent catalog or planner/tool authority. Live Streamlit/DeepSeek validation, portal confirmation and human rehearsal remain evidence-gated outside this plan update.

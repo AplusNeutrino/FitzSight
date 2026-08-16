@@ -100,7 +100,7 @@ class UnsupportedIntentCatalogError(ValueError):
 
 
 def classify_supported_intent(question: str) -> str:
-    """Classify only explicitly approved FitzSight v0.12 intents.
+    """Classify only explicitly approved FitzSight v0.13 intents.
 
     This local classifier is a security/scope boundary. A model cannot expand
     FitzSight into arbitrary financial actions or invent a new workflow.
@@ -153,7 +153,7 @@ def classify_supported_intent(question: str) -> str:
         return FALSE_CORRELATION_INTENT
 
     raise UnsupportedIntentCatalogError(
-        "Question is outside the approved FitzSight v0.12 intent catalog."
+        "Question is outside the approved FitzSight v0.13 intent catalog."
     )
 
 

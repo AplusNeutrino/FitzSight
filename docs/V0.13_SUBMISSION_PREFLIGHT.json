@@ -1,0 +1,29 @@
+{
+  "product": "FitzSight",
+  "version": "0.13.0",
+  "passed": true,
+  "missing_required_files": [],
+  "generated_csv_files": [],
+  "secret_hits": [],
+  "legacy_pptx_files": [],
+  "forbidden_deck_terms": [],
+  "final_pdf": {
+    "path": "submission/FitzSight_GOAI_初赛方案_CN.pdf",
+    "header_ok": true,
+    "pages": 12,
+    "bytes": 1001981,
+    "sha256": "050f7e9e3af31e4bd2dccc7512776df1ca6cfd3e32e8367b4b08609598dabdeb"
+  },
+  "deepseek_live": "not_requested",
+  "manual_submission_boundary": {
+    "mode": "user_manual_only",
+    "external_write_actions_performed": false,
+    "portal_upload_or_submit_by_automation": false,
+    "email_access_by_automation": false
+  },
+  "external_actions_still_required": [
+    "USER MANUAL: upload only FitzSight_GOAI_初赛方案_CN.pdf to the GOAI initial-round portal",
+    "USER MANUAL: review the portal state and complete final submission",
+    "USER MANUAL: retain portal confirmation evidence"
+  ]
+}

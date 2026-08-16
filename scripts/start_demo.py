@@ -58,6 +58,7 @@ def build_command(args: argparse.Namespace) -> tuple[str, list[str]]:
             "streamlit",
             "run",
             str(ROOT / "streamlit_app.py"),
+            "--global.developmentMode=false",
             "--server.headless=true",
             f"--server.port={args.port}",
         ]

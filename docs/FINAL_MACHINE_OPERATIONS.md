@@ -1,30 +1,27 @@
-# FitzSight Final-Machine Operations
+# FitzSight v0.13.0 最终机器操作
 
-FitzSight v0.11 adds a final-machine layer without changing the analytical core or the manual-submission boundary.
+## 默认本地检查
 
-## One command
-
-```bash
+```powershell
 python scripts/final_machine_check.py --output final_machine_report.json
 ```
 
-The default check is local-only except for the Streamlit health probe, which targets `127.0.0.1`. It does not access the GOAI portal, Gmail/email, or an external account.
+默认运行确定性 Agent、提交预检、交接检查与 localhost Streamlit 健康检查；不会请求 DeepSeek。
 
-The OpenAI live planner is never called by the default command. It requires the explicit `--include-openai` flag plus deliberately configured credentials/model access.
+## DeepSeek 显式在线验证
 
-## Portable kit
+只有参赛者明确决定并配置真实密钥时才运行：
 
-`submission/FitzSight_Final_Machine_Kit.zip` is a standalone presentation-machine packet containing the executable FitzSight source/runtime entry points, verified offline assets, the manual handoff packet, and Windows/POSIX launchers.
+```powershell
+python scripts/final_machine_check.py --include-deepseek --output final_machine_report_with_deepseek.json
+```
 
-## Rehearsal evidence
+本轮发布不运行该命令；状态保持 `deepseek_live: not_requested`。
 
-`scripts/rehearsal_assistant.py` records timing evidence locally. A generated timing report is not treated as proof of a rehearsal unless the user actually performed or measured that rehearsal.
+## 演示回退
 
-## Remaining external/manual truth
+1. Live：Streamlit 本地界面。
+2. Local：确定性 CLI。
+3. Video：离线 HTML / H.264 MP4。
 
-The following cannot be closed by local code presence:
-
-- final-machine Streamlit live validation;
-- optional OpenAI live provider validation;
-- actual GOAI portal upload/final submit/confirmation;
-- real timed pitch/demo/Q&A rehearsal.
+GOAI 门户上传、最终提交与回执均为人工操作；初赛只上传 `FitzSight_GOAI_初赛方案_CN.pdf`。

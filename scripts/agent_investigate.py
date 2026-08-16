@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fitzsight.agent.planner import ConstrainedRulePlanner, StructuredJSONPlanner
-from fitzsight.providers.openai_planner import OpenAIResponsesPlanner
+from fitzsight.providers.deepseek_planner import DeepSeekChatPlanner
 from fitzsight.runtime import build_agent_runtime
 
 
@@ -29,15 +29,20 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--planner",
-        choices=["deterministic", "json-file", "openai"],
+        choices=["deterministic", "json-file", "deepseek"],
         default="deterministic",
         help=(
             "Use the reliable local fallback, a pre-generated constrained JSON plan, "
-            "or the optional OpenAI Responses planner."
+            "or the optional DeepSeek V4 planner."
         ),
     )
     parser.add_argument("--plan-json", default=None)
-    parser.add_argument("--model", default=None, help="OpenAI model; otherwise FITZSIGHT_MODEL")
+    parser.add_argument(
+        "--model",
+        choices=["deepseek-v4-flash", "deepseek-v4-pro"],
+        default=None,
+        help="DeepSeek model; otherwise FITZSIGHT_DEEPSEEK_MODEL or deepseek-v4-flash",
+    )
     parser.add_argument("--output", default=None)
     return parser.parse_args()
 
@@ -50,7 +55,7 @@ def build_planner(args: argparse.Namespace):
             raise SystemExit("--plan-json is required with --planner json-file")
         raw = Path(args.plan_json).read_text(encoding="utf-8")
         return StructuredJSONPlanner(lambda _prompt: raw)
-    return OpenAIResponsesPlanner(model=args.model)
+    return DeepSeekChatPlanner(model=args.model)
 
 
 def main() -> None:

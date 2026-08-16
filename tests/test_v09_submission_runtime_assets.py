@@ -29,7 +29,7 @@ def test_offline_backup_video_is_packaged_mp4():
 
 def test_runtime_doctor_never_discloses_api_key(tmp_path: Path):
     env = dict(**__import__("os").environ)
-    env["OPENAI_API_KEY"] = "sk-test-secret-value-that-must-not-appear"
+    env["DEEPSEEK_API_KEY"] = "sk-test-secret-value-that-must-not-appear"
     completed = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "runtime_doctor.py"), "--data-dir", str(tmp_path)],
         cwd=ROOT,
@@ -40,12 +40,12 @@ def test_runtime_doctor_never_discloses_api_key(tmp_path: Path):
     )
     assert "sk-test-secret" not in completed.stdout
     report = json.loads(completed.stdout)
-    assert report["checks"]["openai_api_key"]["detail"] == "configured"
+    assert report["checks"]["deepseek_api_key"]["detail"] == "configured"
     assert report["secrets_disclosed"] is False
 
 
 def test_runtime_validation_scripts_have_safe_dry_runs():
-    for script in ("validate_streamlit_runtime.py", "validate_openai_runtime.py"):
+    for script in ("validate_streamlit_runtime.py", "validate_deepseek_runtime.py"):
         completed = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / script), "--dry-run"],
             cwd=ROOT,
@@ -72,7 +72,4 @@ def test_upload_bundle_is_integrity_checked(tmp_path: Path):
     with zipfile.ZipFile(output) as archive:
         assert archive.testzip() is None
         names = set(archive.namelist())
-        assert "FitzSight_GOAI_Initial_Round.pdf" in names
-        assert "FitzSight_Offline_Demo_Backup.mp4" in names
-        assert "PORTAL_COPY.md" in names
-        assert "UPLOAD_MANIFEST.json" in names
+        assert names == {"FitzSight_GOAI_初赛方案_CN.pdf"}

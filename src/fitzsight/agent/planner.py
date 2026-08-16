@@ -46,20 +46,20 @@ def _classify(question: str) -> str:
         return classify_supported_intent(question)
     except ValueError as exc:
         raise UnsupportedIntentError(
-            "Question is outside the approved FitzSight v0.12 intent catalog."
+            "Question is outside the approved FitzSight v0.13 intent catalog."
         ) from exc
 
 
 def validate_plan(plan: AgentPlan) -> AgentPlan:
-    """Validate planner output against the v0.12 multi-intent policy.
+    """Validate planner output against the v0.13 multi-intent policy.
 
     Planner/model output is untrusted. It may select only one approved intent and
     the exact published high-level action sequence for that intent. It may not
     emit SQL, table names, arbitrary tool parameters, or high-impact actions.
     """
 
-    if plan.plan_version != "0.12":
-        raise PlanValidationError("Unsupported plan_version; expected '0.12'")
+    if plan.plan_version != "0.13":
+        raise PlanValidationError("Unsupported plan_version; expected '0.13'")
     if plan.intent not in INTENT_ACTIONS:
         raise UnsupportedIntentError(f"Unsupported intent: {plan.intent}")
     if not plan.question.strip():
@@ -126,7 +126,7 @@ class ConstrainedRulePlanner:
         intent = _classify(question)
         actions = actions_for_intent(intent)
         plan = AgentPlan(
-            plan_version="0.12",
+            plan_version="0.13",
             intent=intent,
             question=question,
             planner_mode=self.mode,
@@ -209,7 +209,7 @@ class StructuredJSONPlanner:
 
         return validate_plan(
             AgentPlan(
-                plan_version="0.12",
+                plan_version="0.13",
                 intent=payload["intent"],
                 question=question,
                 planner_mode=planner_mode,

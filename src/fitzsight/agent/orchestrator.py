@@ -17,7 +17,7 @@ class FitzSightAgent:
     """Constrained v0.12 five-intent Agent orchestration layer.
 
     The planner may be deterministic, a structured JSON adapter, or the optional
-    OpenAI Responses provider. Execution remains inside deterministic audited
+    optional DeepSeek Chat Completions provider. Execution remains inside deterministic audited
     engines; planner/model output never contains executable SQL or arbitrary
     tool parameters.
     """

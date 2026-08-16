@@ -116,7 +116,7 @@ The primary demo story is now the CRM / FTD hero. Before relying on live Streaml
 8. approved follow-up.
 
 Then use the Asia office-relocation case as the single strongest refusal/falsification story. Other workflows are breadth/Q&A, not equal-weight main-demo sections.
-## v0.12.1 primary judge route — 1 hero + 1 refusal
+## v0.13.0 primary judge route — 1 hero + 1 refusal
 
 1. Open with the Brokerage / FinTech Operations Analyst question: **“Why did European FTD conversion deteriorate after July 15?”**
 2. Show the bounded CRM execution trace: contribution/statistics → conditional latency/anomaly → conditional event check → source-addressable document Evidence → verifier.

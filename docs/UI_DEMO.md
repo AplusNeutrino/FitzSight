@@ -1,62 +1,15 @@
-# FitzSight v0.7 Streamlit Demo
+# FitzSight v0.13.0 UI / Demo
 
-`streamlit_app.py` is a presentation layer over the verified Agent result.
+Streamlit 只展示已核验 Agent 结果，不形成第二条分析路径。
 
-## Preset workflows
+- Planner：Deterministic fallback / DeepSeek V4。
+- DeepSeek 模型：`deepseek-v4-flash` / `deepseek-v4-pro` 严格选择器。
+- 主界面：问题输入、KPI、图表、批准计划、执行轨迹、Evidence ID、Verifier 状态和边界提示。
+- 异常状态：不支持意图、工具失败、证据不足和 Provider 错误均明确展示。
 
-1. CRM / FTD investigation
-2. Net-deposit investigation
-3. Customer Intelligence / segmentation
-4. Americas marketing lead quality
-5. Asia false-correlation guardrail
-
-A custom text box is also exposed, but the local intent gate rejects questions outside the approved catalog.
-
-## Presentation components
-
-- backend selector;
-- deterministic/OpenAI planner selector;
-- question input;
-- verified headline;
-- business KPI cards;
-- intent-specific charts;
-- verified findings;
-- guardrail text;
-- investigation-plan trace table;
-- Evidence cards with ID/tool/status/digest;
-- raw verified metrics expander.
-
-## Trust boundary
-
-The UI does not independently compute KPI definitions, statistical tests, contribution analysis, segmentation, or evidence status. It renders values already produced and verified by the Agent runtime.
-
-## Runtime state
-
-Code and compile validation are complete. A real Streamlit runtime smoke test remains required under the External Runtime Evidence rule before UI runtime tasks can be marked fully done.
-
-```bash
-pip install -e ".[ui]"
+```powershell
 streamlit run streamlit_app.py
+python scripts/validate_streamlit_runtime.py
 ```
 
-## v0.12 hero process evidence
-
-The CRM/FTD presentation trace now renders execution status, branch rationale and Evidence IDs when `investigation.execution_trace` is present. This makes the product process visible rather than showing only the final KPI answer.
-
-For a deterministic judge-facing product-process screen that does not depend on live Streamlit availability, run:
-
-```bash
-python scripts/build_hero_evidence.py
-```
-
-Outputs:
-
-- `docs/V0.12_HERO_RUN.json`
-- `submission/FitzSight_Hero_Run_Evidence.html`
-- `submission/FitzSight_Hero_Run_Evidence.png`
-
-The PNG is rendered from the actual verified runtime JSON, not a manually authored analytical mock.
-
-## v0.12.1 judge-facing route
-
-The main judge-facing UI story is now: CRM/FTD question → bounded branch trace → Evidence IDs/source paragraph → verifier → verified answer → tested insufficient-evidence failure state, followed by one false-correlation refusal. Net deposit, segmentation and marketing are breadth/Q&A views rather than equal hero scenes. UI remains presentation-only and may not recompute business metrics.
+断网时使用确定性 Planner；离线 HTML 和 MP4 作为演示回退，不代表 Provider 在线验证。

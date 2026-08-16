@@ -41,11 +41,11 @@ def test_rehearsal_dry_run_has_no_external_action() -> None:
     assert payload["external_write_actions_performed"] is False
 
 
-def test_final_machine_check_default_does_not_request_openai() -> None:
+def test_final_machine_check_default_does_not_request_deepseek() -> None:
     module = _load_script("final_machine_check.py")
-    report = module.build_report(attempt_streamlit=False, include_openai=False)
+    report = module.build_report(attempt_streamlit=False, include_deepseek=False)
     assert report["local_core_ready"] is True
-    assert report["openai_live"]["status"] == "not_requested"
+    assert report["deepseek_live"]["status"] == "not_requested"
     assert report["external_write_actions_performed"] is False
     assert report["portal_or_email_actions_performed"] is False
 
@@ -61,8 +61,8 @@ def test_final_machine_kit_builds_with_local_only_manifest(tmp_path: Path) -> No
         assert archive.testzip() is None
         manifest = json.loads(archive.read("FitzSight_Final_Machine_Kit/FINAL_MACHINE_KIT_MANIFEST.json"))
         assert manifest["external_submission_performed"] is False
-        assert manifest["gmail_or_email_access_performed"] is False
-        assert manifest["openai_live_validation_is_explicit_opt_in"] is True
+        assert manifest["email_access_performed"] is False
+        assert manifest["deepseek_live_validation_is_explicit_opt_in"] is True
         names = set(archive.namelist())
         assert "FitzSight_Final_Machine_Kit/RUN_FINAL_CHECKS.bat" in names
         assert "FitzSight_Final_Machine_Kit/START_DEMO.sh" in names
@@ -70,6 +70,6 @@ def test_final_machine_kit_builds_with_local_only_manifest(tmp_path: Path) -> No
 
 def test_final_machine_docs_keep_submission_manual() -> None:
     text = (ROOT / "submission" / "FINAL_MACHINE_CHECKLIST.md").read_text(encoding="utf-8").lower()
-    assert "actual goai portal" in text
-    assert "user-controlled" in text
-    assert "--include-openai" in text
+    assert "goai" in text
+    assert "人工" in text or "user-controlled" in text
+    assert "--include-deepseek" in text

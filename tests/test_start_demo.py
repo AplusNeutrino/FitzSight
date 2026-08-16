@@ -26,7 +26,7 @@ def test_cli_command_is_deterministic_and_bounded():
     mode, command = start_demo.build_command(args())
     assert mode == "cli"
     assert command[0] == sys.executable
-    assert command[1].endswith("scripts/agent_investigate.py")
+    assert Path(command[1]).name == "agent_investigate.py"
     assert "--planner" in command
     assert command[command.index("--planner") + 1] == "deterministic"
     assert command[command.index("--backend") + 1] == "sqlite"
@@ -36,7 +36,7 @@ def test_auto_falls_back_to_cli_when_streamlit_missing(monkeypatch):
     monkeypatch.setattr(start_demo, "streamlit_available", lambda: False)
     mode, command = start_demo.build_command(args(mode="auto"))
     assert mode == "cli"
-    assert command[1].endswith("scripts/agent_investigate.py")
+    assert Path(command[1]).name == "agent_investigate.py"
 
 
 def test_ui_command_uses_python_module_streamlit(monkeypatch):

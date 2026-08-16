@@ -1,0 +1,101 @@
+{
+  "product": "FitzSight",
+  "version": "0.13.0",
+  "purpose": "final_machine_local_readiness",
+  "local_core_ready": true,
+  "deterministic_agent_smoke": {
+    "passed": true,
+    "return_code": 0,
+    "final_status": "verified",
+    "verification_passed": true,
+    "planner_mode": "deterministic_fallback",
+    "intent": "crm_routing_ftd_investigation"
+  },
+  "runtime_doctor": {
+    "product": "FitzSight",
+    "runtime_doctor_version": "0.13",
+    "checks": {
+      "python": {
+        "ok": true,
+        "detail": "3.12.13"
+      },
+      "fitzsight_source": {
+        "ok": true,
+        "detail": "C:\\Users\\ZFY\\Documents\\Codex\\2026-08-16\\aplusneutrino-fitzsight-https-github-com-aplusneutrino\\work\\FitzSight\\src\\fitzsight"
+      },
+      "duckdb": {
+        "ok": true,
+        "detail": "installed"
+      },
+      "streamlit": {
+        "ok": true,
+        "detail": "installed"
+      },
+      "deepseek_http_client": {
+        "ok": true,
+        "detail": "installed"
+      },
+      "deepseek_api_key": {
+        "ok": false,
+        "detail": "not configured"
+      },
+      "deepseek_model": {
+        "ok": true,
+        "detail": "deepseek-v4-flash"
+      },
+      "data_directory": {
+        "ok": true,
+        "detail": "C:\\Users\\ZFY\\Documents\\Codex\\2026-08-16\\aplusneutrino-fitzsight-https-github-com-aplusneutrino\\work\\FitzSight\\data\\generated"
+      },
+      "generated_dataset": {
+        "ok": false,
+        "detail": "will be generated automatically by the runtime"
+      },
+      "presentation_assets": {
+        "ok": true,
+        "detail": "Chinese PDF present"
+      }
+    },
+    "core_demo_ready": true,
+    "streamlit_live_ready": true,
+    "deepseek_live_ready": false,
+    "secrets_disclosed": false
+  },
+  "submission_preflight": {
+    "passed": true,
+    "missing_required_files": [],
+    "secret_hits": [],
+    "generated_csv_files": []
+  },
+  "handoff_readiness": {
+    "ready_for_user_takeover": true,
+    "manual_handoff_zip_integrity": true,
+    "final_machine_kit_integrity": true
+  },
+  "streamlit_live": {
+    "runtime": "streamlit",
+    "status": "not_requested",
+    "passed": false,
+    "return_code": null
+  },
+  "deepseek_live": {
+    "runtime": "deepseek_chat_planner",
+    "status": "not_requested",
+    "passed": false,
+    "return_code": null,
+    "note": "Live provider validation was deliberately not requested; offline and mock tests are the release evidence."
+  },
+  "external_write_actions_performed": false,
+  "portal_or_email_actions_performed": false,
+  "network_policy": {
+    "default_run": "local_only_except_localhost_streamlit_health_check",
+    "deepseek_live_requires_explicit_include_deepseek": true
+  },
+  "remaining_user_manual_actions": [
+    "Run this report on the final presentation machine and retain the JSON output",
+    "If Streamlit is installed, require streamlit_live.passed=true before calling the live UI validated",
+    "Only run --include-deepseek if you deliberately choose to validate a configured provider",
+    "Perform timed pitch/demo and Q&A rehearsal",
+    "Perform all competition portal upload/final-submit/confirmation steps manually"
+  ]
+}

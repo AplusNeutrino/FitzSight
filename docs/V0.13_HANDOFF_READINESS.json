@@ -1,0 +1,29 @@
+{
+  "product": "FitzSight",
+  "version": "0.13.0",
+  "automated_artifact_preparation_ready": true,
+  "artifacts": {
+    "portal_copy": true,
+    "final_chinese_pdf": true,
+    "deck_html_source": true,
+    "offline_html": true,
+    "offline_video": true,
+    "manual_checklist": true,
+    "manual_handoff_zip": true,
+    "final_machine_kit": true
+  },
+  "manual_handoff_zip_integrity": true,
+  "final_machine_kit_integrity": true,
+  "competition_upload_allowlist": [
+    "FitzSight_GOAI_初赛方案_CN.pdf"
+  ],
+  "deepseek_live": "not_requested",
+  "external_write_actions_performed": false,
+  "manual_user_actions_remaining": [
+    "Upload the final Chinese PDF in the GOAI portal",
+    "Review and confirm the final portal submission",
+    "Capture the portal confirmation evidence",
+    "Run the local final-machine check and timed rehearsal"
+  ],
+  "ready_for_user_takeover": true
+}

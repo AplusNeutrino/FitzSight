@@ -38,7 +38,7 @@
         "What exactly can the LLM do?",
         "How are hallucinations and causal overclaims blocked?",
         "Why synthetic data and how is ground truth hidden?",
-        "What happens if Streamlit/OpenAI/network fails?",
+        "What happens if Streamlit/DeepSeek/network fails?",
         "What is the compliance boundary?"
       ]
     }
