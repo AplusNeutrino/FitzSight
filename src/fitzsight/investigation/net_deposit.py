@@ -10,6 +10,7 @@ from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
 from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
+from .concentration_claims import ConcentrationBinding, render_concentration
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -237,7 +238,9 @@ class NetDepositInvestigationEngine:
         }
         concentration_record = self.registry.register(
             "withdrawal_customer_concentration",
-            {"region": scenario.region, "period_start": current_start},
+            {"region": scenario.region, "period_start": current_start,
+             "period_end_exclusive": current_end_exclusive, "currency": "USD",
+             "customer_count": scenario.customer_count, "source_evidence_id": current_wd.evidence_id},
             concentration_payload,
         )
 
@@ -350,6 +353,12 @@ class NetDepositInvestigationEngine:
                ('value', 'evidence_id', 'baseline_start', 'baseline_end', 'current_start', 'current_end')},
             deposit_change=deposit_change, withdrawal_change=withdrawal_change,
         )
+        concentration_binding = ConcentrationBinding(
+            value=concentration_share, numerator=top_n_amount, denominator=current_withdrawals,
+            customer_count=scenario.customer_count, period_start=current_start,
+            period_end_exclusive=current_end_exclusive, evidence_id=concentration_record.evidence_id,
+            source_evidence_id=current_wd.evidence_id,
+        )
         claims = (
             Claim(
                 "N-C1",
@@ -376,15 +385,11 @@ class NetDepositInvestigationEngine:
             ),
             Claim(
                 "N-C3",
-                (
-                    f"The largest {scenario.customer_count} European customer withdrawals account for "
-                    f"{concentration_share:.1%} of current-week European withdrawals."
-                    if concentration_share is not None else
-                    "Withdrawal concentration is unavailable because current-week European total withdrawals are not positive."
-                ),
+                render_concentration(concentration_binding),
                 "supported" if concentration_share is not None else "insufficient_evidence",
                 "high",
-                (concentration_query.evidence_id, concentration_record.evidence_id),
+                (concentration_query.evidence_id, concentration_record.evidence_id, current_wd.evidence_id),
+                numeric_binding=concentration_binding,
             ),
             Claim(
                 "N-C4",

@@ -1,6 +1,7 @@
 from dataclasses import replace
 
 import pytest
+from test_concentration_claims import make_claim
 
 from fitzsight.agent.verifier import EvidenceClaimVerifier
 from fitzsight.evidence.registry import EvidenceRegistry
@@ -26,7 +27,7 @@ def fixture():
                    claim.evidence_ids, decomposition)
     result = InvestigationResult('FitzSight', 'test', 'test',
         InvestigationPlan('net_deposit_anomaly_investigation', 'test', ()),
-        (claim, second), {}, {}, ())
+        (claim, second, make_claim(registry)), {}, {}, ())
     return registry, result
 
 
@@ -48,7 +49,7 @@ def test_binding_tampering_rejected_even_with_original_valid_evidence(field, val
     registry, result = fixture()
     claim = result.claims[0]
     changed = replace(claim, numeric_binding=replace(claim.numeric_binding, **{field: value}))
-    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(changed, result.claims[1]))).passed
+    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(changed, result.claims[1], result.claims[2]))).passed
 
 
 @pytest.mark.parametrize('text', ['Net deposits changed by $99.00.', '净入金变化为99%。',
@@ -56,14 +57,14 @@ def test_binding_tampering_rejected_even_with_original_valid_evidence(field, val
 def test_free_text_number_or_unit_tampering_rejected(text):
     registry, result = fixture()
     claim = replace(result.claims[0], text=text)
-    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(claim, result.claims[1]))).passed
+    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(claim, result.claims[1], result.claims[2]))).passed
 
 
 def test_consistently_wrong_value_and_rendering_still_rejected():
     registry, result = fixture()
     b = replace(result.claims[0].numeric_binding, value=99.0)
     c = replace(result.claims[0], numeric_binding=b, text=render_net_change(b))
-    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(c, result.claims[1]))).passed
+    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(c, result.claims[1], result.claims[2]))).passed
 
 
 @pytest.mark.parametrize('change', ['binding', 'claim', 'duplicate', 'source_reference'])
@@ -72,7 +73,7 @@ def test_contract_cannot_be_removed_or_duplicated(change):
     c = result.claims[0]
     claims = {'binding': (replace(c, numeric_binding=None),), 'claim': (),
               'duplicate': (c, c), 'source_reference': (replace(c, evidence_ids=c.evidence_ids[1:]),)}[change]
-    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=claims + (result.claims[1],))).passed
+    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=claims + (result.claims[1], result.claims[2]))).passed
 
 
 def test_internally_consistent_but_wrong_driver_rejected_by_source_recalculation():
@@ -82,7 +83,7 @@ def test_internally_consistent_but_wrong_driver_rejected_by_source_recalculation
     b = replace(result.claims[0].numeric_binding, value=99.0, evidence_id=fake.evidence_id)
     c = replace(result.claims[0], numeric_binding=b, text=render_net_change(b),
                 evidence_ids=result.claims[0].evidence_ids + (fake.evidence_id,))
-    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(c, result.claims[1]))).passed
+    assert not EvidenceClaimVerifier(registry).verify(replace(result, claims=(c, result.claims[1], result.claims[2]))).passed
 
 
 def test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars():
@@ -111,7 +112,7 @@ def test_decomposition_binding_tampering_fails_specific_check(field, value):
     registry, result = fixture()
     c = result.claims[1]
     changed = replace(c, numeric_binding=replace(c.numeric_binding, **{field: value}))
-    report = EvidenceClaimVerifier(registry).verify(replace(result, claims=(result.claims[0], changed)))
+    report = EvidenceClaimVerifier(registry).verify(replace(result, claims=(result.claims[0], changed, result.claims[2])))
     assert not report.passed
     assert any(c.check_id == 'numeric_binding:N-C2' and not c.passed for c in report.checks)
 
@@ -127,7 +128,7 @@ def test_compensating_wrong_components_with_matching_text_and_driver_rejected():
                 evidence_id=fake.evidence_id)
     changed = replace(c, numeric_binding=b, text=render_net_decomposition(b),
                       evidence_ids=c.evidence_ids + (fake.evidence_id,))
-    report = EvidenceClaimVerifier(registry).verify(replace(result, claims=(result.claims[0], changed)))
+    report = EvidenceClaimVerifier(registry).verify(replace(result, claims=(result.claims[0], changed, result.claims[2])))
     assert not report.passed
     assert any(c.check_id == 'numeric_binding:N-C2' and not c.passed for c in report.checks)
 
@@ -144,7 +145,7 @@ def test_decomposition_contract_cannot_be_bypassed(change):
         'wrong_type': (replace(c, numeric_binding=result.claims[0].numeric_binding),),
     }
     assert not EvidenceClaimVerifier(registry).verify(
-        replace(result, claims=(result.claims[0],) + replacements[change])).passed
+        replace(result, claims=(result.claims[0], result.claims[2]) + replacements[change])).passed
 
 
 def test_decomposition_hand_calculation_and_serialization():
@@ -154,3 +155,12 @@ def test_decomposition_hand_calculation_and_serialization():
     assert binding['deposit_change'] == 75 - 100
     assert binding['withdrawal_change'] == 15 - 20
     assert binding['value'] == -25 - (-5)
+
+
+@pytest.mark.parametrize("mode", ["remove", "duplicate"])
+def test_required_concentration_claim(mode):
+    registry, result = fixture()
+    claims = result.claims[:2] if mode == "remove" else result.claims + (result.claims[2],)
+    report = EvidenceClaimVerifier(registry).verify(replace(result, claims=claims))
+    assert not report.passed
+    assert any(c.check_id == "concentration_required" and not c.passed for c in report.checks)

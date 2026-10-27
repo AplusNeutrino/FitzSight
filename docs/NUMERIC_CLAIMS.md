@@ -1,6 +1,6 @@
 # 数值声明迁移：净入金变化与分解契约
 
-本轮只覆盖净入金调查的 **N-C1、N-C2**，不是所有报告数字都已经核验。其他 N-C3—N-C5、转化率、营销和分群声明仍沿用旧检查；M1-02 总项保持进行中。
+本轮只覆盖净入金调查的 **N-C1、N-C2、N-C3**，不是所有报告数字都已经核验。其他 N-C4—N-C5、转化率、营销和分群声明仍沿用旧检查；M1-02 总项保持进行中。
 
 `Claim.numeric_binding` 对 N-C1/N-C2 必须存在，包含指标标识 `net_deposit_change.v1`、数值、金额单位、USD、Europe、四个日期边界和证据 ID/字段。旧 Claim 可不带绑定，以支持逐条迁移，但净入金计划必须分别恰有一个 N-C1 和 N-C2，不能通过删掉绑定/声明逃过检查。
 
@@ -43,3 +43,17 @@ nonpositive_total_withdrawals；声明为 insufficient_evidence，
 集中度诊断为 null、驱动类型为 undetermined。空提款表和全零金额
 通过两后端实际导入测试。该修复不等同 N-C3 数值正确性全面验收。
 详见 [RUN-07](validation/2026-10-28-run07.md)。
+
+## RUN-08：N-C3 来源重算
+
+ConcentrationBinding 绑定比例（ratio，不是百分数）、分子/分母金额、USD、
+Europe、前N客户数、起始时刻与不含末端的结束时刻、集中度证据字段及本期提款
+明细证据。净入金计划必须恰有一个N-C3，绑定不能删除。
+校验按明细customer_id重新聚合，再取金额最大的N个客户，不信任排名SQL的汇总数字。
+分子/分母容差为1e-8，比例为1e-12，均无相对容差；文字必须与模板完全一致。
+正常比例要求supported；零分母要求null、unavailable及insufficient_evidence。
+
+此契约拒绝来源中的负数、非有限值及非USD；完整数据契约与跨币种仍待M2。
+时间窗、区域和客户数与工具参数比较，参数本身未签名，尚未验证SQL过滤、截断、
+请求授权与快照；不将此重算声称为独立源系统对账。其他声明与通用MetricDefinition、
+UI标识仍待办。[本轮证据](validation/2026-10-28-run08.md)。

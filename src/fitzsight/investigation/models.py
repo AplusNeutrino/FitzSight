@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .numeric_claims import NetChangeBinding
+from .concentration_claims import ConcentrationBinding
 
 
 @dataclass(frozen=True)
@@ -30,7 +31,7 @@ class Claim:
     status: str
     confidence: str
     evidence_ids: tuple[str, ...]
-    numeric_binding: NetChangeBinding | None = None
+    numeric_binding: NetChangeBinding | ConcentrationBinding | None = None
 
 
 @dataclass(frozen=True)
