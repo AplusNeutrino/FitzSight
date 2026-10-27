@@ -1,3 +1,5 @@
+> **历史归档（2026-10-27）**：下文为旧网站只读快照；当前仓库的下一阶段任务仅维护在 [M0—M6 路线图](FitzSight_Roadmap_2026-10-26.md)。下文真源规则仅描述旧网站，不覆盖当前计划。
+
 > 只读交付快照：同步自 My_Blog/docs/PROJFITZGERALD_PROGRESS.md（2026-08-16）。唯一可维护真源仍在 My_Blog。
 
 # Project Fitzgerald / FitzSight 进度真源

@@ -1,3 +1,5 @@
+> v0.13 历史发布记录。当前阶段进度见 [路线图](docs/FitzSight_Roadmap_2026-10-26.md)，已验证能力与缺口见 [现状矩阵](docs/PRODUCT_BASELINE.md)。
+
 # FitzSight v0.13.0 实现状态
 
 | 能力 | 状态 | 证据 |
@@ -6,7 +8,7 @@
 | DeepSeek V4 Flash/Pro 规划器 | 已实现 | `src/fitzsight/providers/deepseek_planner.py` |
 | 模型白名单与网络前意图门控 | 已实现 | Provider 单元测试 |
 | 确定性 SQL / 统计 / 异常 / 贡献工具 | 已实现 | `src/fitzsight/tools/`、完整测试 |
-| Evidence Registry 与结论核验 | 已实现 | `src/fitzsight/evidence.py`、`agent/verifier.py` |
+| Evidence Registry 与结论核验 | 已实现 | `src/fitzsight/evidence/registry.py`、`agent/verifier.py` |
 | Streamlit 产品界面 | 已实现 | `streamlit_app.py` |
 | 中文 12 页 PDF-only 初赛稿 | 已实现 | `submission/FitzSight_GOAI_初赛方案_CN.pdf` |
 | DeepSeek 在线调用 | `not_run` | 主动未运行；仅离线与 Mock 契约验证 |

@@ -21,11 +21,14 @@ def test_v12_controlled_ablation_quantifies_verifier_gate_value():
     assert ablated["unsupported_causal_claim_emission_rate"] > 0.0
 
 
-def test_v12_holdout_paraphrases_route_and_saved_runtime_evidence_is_complete():
+def test_v12_holdout_paraphrases_route():
     planner = ConstrainedRulePlanner()
     for case in CASES:
         assert planner.plan(case["question"]).intent == case["intent"]
 
+
+
+def test_v12_saved_holdout_evidence_is_complete():
     path = Path(__file__).resolve().parents[1] / "docs" / "V0.12_HOLDOUT_RESULTS.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload["metrics"]["case_runs"] == 8

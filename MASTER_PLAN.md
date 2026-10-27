@@ -1,3 +1,5 @@
+> **历史归档（2026-10-27）**：本文件保留 GOAI 竞赛阶段原文；正文“唯一主计划”不再适用于下一阶段。当前执行依据为 [M0—M6 路线图](docs/FitzSight_Roadmap_2026-10-26.md)，历史入口见 [归档索引](docs/archive/README.md)。
+
 # GOAI 2026 — Boundless Agents × AI+金融 × 数据分析
 # Master Plan / 项目总计划（GitHub 长期维护版）
 

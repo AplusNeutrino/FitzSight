@@ -20,7 +20,10 @@ jobs:
           python -m pip install -e . --no-deps
       - name: Provider migration audit
         run: python scripts/check_provider_migration.py
-      - name: Test
-        run: python -m pytest
+      - name: Product tests
+        run: python -m pytest --strict-markers -m product
+      - name: Competition artifact tests
+        if: ${{ !cancelled() }}
+        run: python -m pytest --strict-markers -m competition
       - name: Submission preflight
         run: python scripts/preflight_submission.py

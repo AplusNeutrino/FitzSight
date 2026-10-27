@@ -31,3 +31,8 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 testpaths = ["tests"]
+
+markers = [
+    "product: runtime logic, safety, offline provider contracts and executable evaluation",
+    "competition: competition artifacts, packaging, handoff and historical result snapshots",
+]

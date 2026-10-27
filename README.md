@@ -49,10 +49,14 @@ python scripts/agent_investigate.py --planner deepseek --backend sqlite
 
 模型严格白名单：`deepseek-v4-flash`（默认）和 `deepseek-v4-pro`。实现直接使用 `httpx` 调用 `https://api.deepseek.com/chat/completions`。
 
+当前能力和已知缺口见 [产品现状矩阵](docs/PRODUCT_BASELINE.md)，历史竞赛材料见 [归档入口](docs/archive/README.md)。
+
 ## 测试与检查
 
 ```powershell
-python -m pytest
+python -m pytest --strict-markers -m product
+python -m pytest --strict-markers -m competition
+# 不带 -m 时运行全部测试
 python scripts/final_machine_check.py --skip-streamlit --output docs/V0.13_FINAL_MACHINE_READINESS.json
 python scripts/preflight_submission.py --output docs/V0.13_SUBMISSION_PREFLIGHT.json
 ```

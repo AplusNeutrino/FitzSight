@@ -1,3 +1,5 @@
+> v0.13 历史发布记录。当前阶段进度见 [路线图](docs/FitzSight_Roadmap_2026-10-26.md)，已验证能力与缺口见 [现状矩阵](docs/PRODUCT_BASELINE.md)。
+
 # FitzSight 项目进度
 
 ## v0.13.0 已完成
