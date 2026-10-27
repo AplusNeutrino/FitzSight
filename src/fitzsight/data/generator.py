@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
@@ -79,7 +80,7 @@ def _inject_marketing_lead_shift(customers: pd.DataFrame) -> pd.DataFrame:
             minute_offset = (rank * 17) % (24 * 60)
             data.at[idx, "registration_date"] = (
                 pd.Timestamp(scenario.current_start)
-                + pd.Timedelta(days=day_offset, minutes=minute_offset)
+                + timedelta(days=day_offset, minutes=minute_offset)
             )
             data.at[idx, "acquisition_channel"] = scenario.acquisition_channel
 
@@ -226,10 +227,10 @@ def generate_deposits(cfg, rng, customers, activity):
 
     for row in joined[joined.converted_ftd].itertuples(index=False):
         for _ in range(int(rng.integers(1, 5))):
-            timestamp = pd.Timestamp(row.registration_date) + pd.Timedelta(
+            timestamp = pd.Timestamp(row.registration_date) + timedelta(
                 days=int(rng.integers(0, 75))
             )
-            if timestamp > pd.Timestamp(cfg.end_date) + pd.Timedelta(days=1):
+            if timestamp > pd.Timestamp(cfg.end_date) + timedelta(days=1):
                 continue
             rows.append(
                 {
@@ -284,7 +285,7 @@ def _inject_net_deposit_shock(cfg, customers, deposits, rows, next_id):
         # Keep injected withdrawals below the customer's cumulative synthetic
         # deposits while making the weekly shock clearly measurable.
         amount = float(row.amount) * scenario.withdrawal_fraction_of_lifetime_deposits
-        timestamp = pd.Timestamp(scenario.event_date) + pd.Timedelta(
+        timestamp = pd.Timestamp(scenario.event_date) + timedelta(
             hours=9 + rank, minutes=(rank * 7) % 60
         )
         rows.append(
@@ -328,7 +329,7 @@ def generate_withdrawals(cfg, rng, customers, deposits):
                     "withdrawal_id": f"W{withdrawal_id:07d}",
                     "customer_id": row.customer_id,
                     "timestamp": pd.Timestamp(cfg.start_date)
-                    + pd.Timedelta(days=int(rng.integers(30, max_day + 1))),
+                    + timedelta(days=int(rng.integers(30, max_day + 1))),
                     "amount": round(float(row.amount * rng.uniform(0.05, 0.35)), 2),
                     "currency": "USD",
                     "status": "completed",
@@ -353,10 +354,10 @@ def generate_trades(cfg, rng, customers, activity):
 
     for row in joined.itertuples(index=False):
         for _ in range(int(rng.integers(1, 12))):
-            timestamp = pd.Timestamp(row.registration_date) + pd.Timedelta(
+            timestamp = pd.Timestamp(row.registration_date) + timedelta(
                 days=int(rng.integers(1, 100))
             )
-            if timestamp > pd.Timestamp(cfg.end_date) + pd.Timedelta(days=1):
+            if timestamp > pd.Timestamp(cfg.end_date) + timedelta(days=1):
                 continue
             volume = float(
                 rng.lognormal(np.log(scale[str(row.customer_segment_gt)]), 0.7)

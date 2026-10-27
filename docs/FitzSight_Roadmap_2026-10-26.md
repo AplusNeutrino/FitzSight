@@ -148,7 +148,9 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 | 稳定编号 | 范围（验收以第五节为准） | 状态 | 当前证据或缺口 |
 |---|---|---|---|
 | M0-01 | 固定远程基线、隔离锁定安装、全量测试 | 已完成 | 本轮验证记录；144 passed，未等同五流程演示 |
-| M0-02 | 五流程离线演示、新用户复现命令 | 待办 | 自动测试不代替独立演示验收 |
+| M0-02 | 五流程离线演示、新用户复现命令 | 进行中 | CLI 已实跑；UI 与独立人工复现未验收 |
+| M0-02a | 五类真实 CLI 子进程、两后端与复现说明 | 已完成 | RUN-20261027-02：10/10，合成数据、确定性规划器 |
+| M0-02b | Streamlit 交互与独立新用户复现 | 待人工验收 | 不用 CLI 结果代替人工界面体验 |
 | M0-03 | 产品/竞赛测试分组、现状矩阵、旧规划归档和入口、范围/架构说明 | 待办 | 需逐项对照当前实现 |
 | M1-01 | InvestigationRequest、参数白名单、三个区域/三组时期、demo 配置 | 待办 | 固定地区/时间 P0 未解决 |
 | M1-02 | MetricDefinition、Claim、数值/单位/时期/证据绑定及反例 | 待办 | 错数字仍可能通过既有核验 |
@@ -180,3 +182,15 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 - 新问题：ISSUE-001，991361 条 generator.py timedelta 弃用警告（尚未解决）；ISSUE-002，连续变量非有限/常量输入未统一处理；ISSUE-003，稀疏差值区间不可用，已明确 null 和方法，不声称区间验收完成。
 - 剩余与下一批：优先完成 M0-02 五流程独立离线演示及 M0-03 现状矩阵，检查并修复 ISSUE-001；随后推进 M1-02 数值绑定和 M1-04 import 缺表 P0。保持每批有独立验收，不扩展可选项目。
 - 当前不存在只能等待人工的全局阻塞；保留定时任务继续推进。M0—M6 整体未完成，人工事项未代验收。
+
+
+### RUN-20261027-02（北京时间 2026-10-27 15:21）
+
+- 起点：重新读取远程 main `eeda4e457a76476eda40b450fdd62b4b6470919c`，独立 checkout；核对 README、完整本计划、PROJECT_PROGRESS、IMPLEMENTATION_STATUS、最近提交与实现。无未合并 PR，未发现 AGENTS.md 或前轮未完成的远程编辑。
+- 批次范围：M0-02a 与 ISSUE-001；预算两小时以内。步骤：保存旧生成器指纹 → 修复标量时间运算 → 检验数据不变和弃用警告 → 运行五类 CLI/两后端 → 全量测试 → 写回证据及提交。不扩大为 M0 或 M1 整体完成。
+- 验收及完成：三种种子七表（21/21）修复前后 CSV SHA-256 一致；生成器在弃用警告转错误条件下通过；五类真实 CLI 在 SQLite、DuckDB 共 10/10 通过。CLI 核验通过不代表数值绑定已实现。
+- 涉及文件：`src/fitzsight/data/generator.py`、`tests/test_generator.py`、`scripts/check_offline_flows.py`、README、`docs/OFFLINE_DEMO_CHECK.md`、本计划及 `docs/validation/2026-10-27-run02*`、`2026-10-27-offline-flows.json`、`2026-10-27-generator-fingerprints.json`。
+- 验证：生成器 3 passed；全量 `pytest -q -W error::DeprecationWarning` 为 145 passed / 0 failed / 0 errors / 0 skipped，100.56 秒，无警告摘要。隔离 CPython 3.12.14、NumPy 2.5.2、pandas 2.3.3、SciPy 1.18.0、DuckDB 1.5.5；pip check 无冲突。[完整记录](validation/2026-10-27-run02.md)。未测试付费模型、真实业务收益、部署或 UI 交互。
+- 问题更新：ISSUE-001 已在锁定环境解决，改用标准库 timedelta，不屏蔽警告；证据为新回归测试、21 个生成表指纹及严格全量通过。前轮 991361 警告记录保留。ISSUE-002/003 和其余 P0 未解决，本轮无新增阻塞。
+- 提交依据：本记录与修改同提交，标题 `fix: preserve demo data while removing timedelta warnings`；父提交为上述最新 main，推送使用 expected_sha 并发检查，禁止强推。
+- 下一批：M0-03 产品/竞赛测试分类、现状矩阵及旧规划归档入口；随后 M1-04 导入隔离与 M1-02 数值绑定。M0-02b 和其他个人掌握/盲审/反馈保留待人工验收；还有可自动推进任务，不暂停。

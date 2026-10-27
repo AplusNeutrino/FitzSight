@@ -1,0 +1,92 @@
+{
+  "123": {
+    "salespeople": {
+      "rows": 20,
+      "sha256": "63abf383b3e5cffc4527c73075b21206ff715a6c5eda2a93f93f9e1948c7310b"
+    },
+    "customers": {
+      "rows": 1000,
+      "sha256": "f0d3275cf0242ced9dcf34981b33918933376c72853d110b329bd94fd36da243"
+    },
+    "sales_activity": {
+      "rows": 1000,
+      "sha256": "2093c065fb6eba1b1ad724d34dc2b528bcfed4b8cead9cd9686613791882f878"
+    },
+    "deposits": {
+      "rows": 485,
+      "sha256": "20505fbb26ab50348c80fe5721e02c790026c48bf5ca23f96d3f5f17292374d3"
+    },
+    "withdrawals": {
+      "rows": 166,
+      "sha256": "3bae6127b39dcc229f0354d4254e824c8c3c259e9a582097959091a944ca8e6f"
+    },
+    "trades": {
+      "rows": 1107,
+      "sha256": "21f5ec6741543cfbdb516cd6d8013c35a4527d3df0b7b6f52e3b7a0c75d27d69"
+    },
+    "business_events": {
+      "rows": 5,
+      "sha256": "db1b70ed22c4dabcbb060263158d7354ed1633087f5149b2e41103e05d85b531"
+    }
+  },
+  "20260811": {
+    "salespeople": {
+      "rows": 20,
+      "sha256": "eac519d4a4ad268bcf254f449ee4b6f47ca370346281f34065dc625f4f2fe83f"
+    },
+    "customers": {
+      "rows": 1000,
+      "sha256": "28f0a15aa875318b95027482f22d6c546392dffab385d59d4c566bf9bbab9345"
+    },
+    "sales_activity": {
+      "rows": 1000,
+      "sha256": "e1b2836907a9f51ffa1bcad156e1adf149a9134937995ffe9e55bd94a6cdd23e"
+    },
+    "deposits": {
+      "rows": 417,
+      "sha256": "3c365dfba7362e2796052132af1dd86cc25fde5158c956f0fb429ce96340d4c5"
+    },
+    "withdrawals": {
+      "rows": 144,
+      "sha256": "d0f9532108e30f6dda7701b1e22cc89628a5e47ec1562623ba31965a12bec228"
+    },
+    "trades": {
+      "rows": 996,
+      "sha256": "3b52d473c4515d28adff85e4597da9f75bce93346c3cc4b95f5eef8378bb63b8"
+    },
+    "business_events": {
+      "rows": 5,
+      "sha256": "db1b70ed22c4dabcbb060263158d7354ed1633087f5149b2e41103e05d85b531"
+    }
+  },
+  "20260812": {
+    "salespeople": {
+      "rows": 20,
+      "sha256": "3fcf90e30b42c707e6d1b5775a87a047447f3cb31419ed5fa775edd45c383ec9"
+    },
+    "customers": {
+      "rows": 1000,
+      "sha256": "0b7d1f0a023b344ad20626a935404569175c9df862744acbc6de079231226e66"
+    },
+    "sales_activity": {
+      "rows": 1000,
+      "sha256": "c2d61bd3fc85b5ed74a3c76e98475513f6a722760f07f49fb14704e20c9f7829"
+    },
+    "deposits": {
+      "rows": 414,
+      "sha256": "a4a0b38114a9c8efa1eeeb59886d99c04046e007eea44141bcbc25e5d52f5537"
+    },
+    "withdrawals": {
+      "rows": 143,
+      "sha256": "20ac288db160fe4480e95025fafbd72171199c540a46735a6379f932127496d4"
+    },
+    "trades": {
+      "rows": 966,
+      "sha256": "516bf72191e7936720a42be4f887b1015d9ecb1552bd99d193fd97a635d2be5b"
+    },
+    "business_events": {
+      "rows": 5,
+      "sha256": "db1b70ed22c4dabcbb060263158d7354ed1633087f5149b2e41103e05d85b531"
+    }
+  }
+}

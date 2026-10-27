@@ -31,6 +31,8 @@ python -m pip install -e . --no-deps
 python scripts/agent_investigate.py --backend sqlite
 ```
 
+五类流程在 SQLite / DuckDB 上的独立 CLI 检查及证据边界见 [离线演示复现](docs/OFFLINE_DEMO_CHECK.md)。
+
 Streamlit：
 
 ```powershell
