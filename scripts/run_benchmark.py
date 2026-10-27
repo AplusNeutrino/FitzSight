@@ -132,6 +132,7 @@ def main():
 
     for scenario in catalog["scenarios"]:
         store, _registry, agent = build_agent_runtime(
+            data_mode="demo",
             data_dir=Path(args.data_dir), backend=args.backend, planner=ConstrainedRulePlanner()
         )
         started = time.perf_counter()

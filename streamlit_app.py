@@ -234,7 +234,9 @@ if run:
             planner = DeepSeekChatPlanner(model=model, api_key=deepseek_api_key)
         else:
             planner = ConstrainedRulePlanner()
+        # This UI is a synthetic demo; imports are available via the CLI.
         store, registry, agent = build_agent_runtime(
+            data_mode="demo",
             data_dir=ROOT / "data" / "generated",
             backend=backend,
             planner=planner,

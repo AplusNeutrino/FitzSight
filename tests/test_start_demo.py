@@ -27,6 +27,7 @@ def test_cli_command_is_deterministic_and_bounded():
     assert mode == "cli"
     assert command[0] == sys.executable
     assert Path(command[1]).name == "agent_investigate.py"
+    assert command[command.index("--data-mode") + 1] == "demo"
     assert "--planner" in command
     assert command[command.index("--planner") + 1] == "deterministic"
     assert command[command.index("--backend") + 1] == "sqlite"

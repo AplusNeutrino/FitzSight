@@ -61,6 +61,7 @@ def run_holdout(*, backend: str = "sqlite", n_customers: int = 10_000) -> dict:
         for seed in HOLDOUT_SEEDS:
             data_dir = temp_root / str(seed)
             store, _registry, agent = build_agent_runtime(
+                data_mode="demo",
                 data_dir=data_dir,
                 backend=backend,
                 planner=ConstrainedRulePlanner(),

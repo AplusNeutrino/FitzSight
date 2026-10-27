@@ -20,6 +20,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the FitzSight v0.9 five-intent Agent investigation."
     )
+    parser.add_argument("--data-mode", choices=["demo", "import"], default="import",
+                        help="import never generates data; demo may initialize an empty directory")
     parser.add_argument("--question", default=DEFAULT_QUESTION)
     parser.add_argument("--data-dir", default=str(ROOT / "data" / "generated"))
     parser.add_argument(
@@ -63,6 +65,7 @@ def main() -> None:
     data_dir = Path(args.data_dir)
     store, _registry, agent = build_agent_runtime(
         data_dir=data_dir,
+        data_mode=args.data_mode,
         backend=args.backend,
         planner=build_planner(args),
     )
@@ -70,6 +73,7 @@ def main() -> None:
         result = agent.run(args.question).to_dict()
         result["runtime"] = {
             "backend": store.backend,
+            "data_mode": args.data_mode,
             "data_dir": str(data_dir.resolve()),
         }
     finally:

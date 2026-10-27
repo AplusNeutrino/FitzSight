@@ -35,10 +35,10 @@ python scripts/check_offline_flows.py --output /tmp/fitzsight-offline-flows.json
 问题全文及本次结果见 [离线记录](validation/2026-10-27-offline-flows.json)。需要查看完整调查输出，可单独运行：
 
 ```bash
-python scripts/agent_investigate.py --planner deterministic --backend duckdb --data-dir /tmp/fitzsight-synthetic-demo --question "Why did European net deposits fall in the week starting August 3?" --output /tmp/fitzsight-net-deposits.json
+python scripts/agent_investigate.py --planner deterministic --data-mode demo --backend duckdb --data-dir /tmp/fitzsight-synthetic-demo --question "Why did European net deposits fall in the week starting August 3?" --output /tmp/fitzsight-net-deposits.json
 ```
 
-当前 runtime 在缺表时会自动生成合成数据，这是待修 P0（M1-04）。上述命令只能使用专门的演示目录，不能指向真实数据目录。
+runtime/CLI 默认 import，缺表失败且不写入；本页演示命令显式选择 demo，只允许初始化空目录。已有非空目录缺表也会拒绝生成，详见 [数据模式](DATA_MODES.md)。
 
 ## 证据边界
 

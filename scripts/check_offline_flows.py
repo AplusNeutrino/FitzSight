@@ -37,7 +37,7 @@ def main() -> int:
             for intent, question in CASES:
                 started = time.perf_counter()
                 command = [sys.executable, str(ROOT / 'scripts/agent_investigate.py'),
-                           '--planner', 'deterministic', '--backend', backend,
+                           '--planner', 'deterministic', '--data-mode', 'demo', '--backend', backend,
                            '--data-dir', str(data_dir), '--question', question]
                 row = {'backend': backend, 'intent': intent, 'question': question}
                 try:

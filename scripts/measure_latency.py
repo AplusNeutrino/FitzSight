@@ -46,6 +46,7 @@ def main() -> int:
     # Warm the reproducible synthetic dataset once so timed runs represent Agent/runtime work,
     # not CSV generation.
     warm_store, _registry, _agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=data_dir,
         backend=args.backend,
         planner=ConstrainedRulePlanner(),
@@ -61,6 +62,7 @@ def main() -> int:
         for _ in range(args.repeats):
             started = time.perf_counter()
             store, _registry, agent = build_agent_runtime(
+                data_mode="demo",
                 data_dir=data_dir,
                 backend=args.backend,
                 planner=ConstrainedRulePlanner(),

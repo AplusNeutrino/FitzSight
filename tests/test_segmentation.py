@@ -12,6 +12,7 @@ QUESTION = (
 
 def test_customer_segmentation_tool_uses_observable_features_only(tmp_path: Path):
     store, registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=tmp_path / "data",
         backend="sqlite",
         planner=ConstrainedRulePlanner(),

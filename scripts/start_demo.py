@@ -66,6 +66,8 @@ def build_command(args: argparse.Namespace) -> tuple[str, list[str]]:
     return actual, [
         sys.executable,
         str(ROOT / "scripts" / "agent_investigate.py"),
+        "--data-mode",
+        "demo",
         "--backend",
         args.backend,
         "--planner",

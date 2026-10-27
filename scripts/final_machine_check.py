@@ -47,6 +47,8 @@ def _deterministic_agent_smoke() -> dict[str, object]:
         output = Path(tmp) / "agent.json"
         report, code = _run_json_script(
             "agent_investigate.py",
+            "--data-mode",
+            "demo",
             "--backend",
             "sqlite",
             "--data-dir",

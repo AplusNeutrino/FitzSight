@@ -29,6 +29,7 @@ def test_marketing_and_false_correlation_intents_run_end_to_end(tmp_path: Path):
     data_dir = tmp_path / "data"
 
     store, _registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=data_dir,
         backend="sqlite",
         planner=ConstrainedRulePlanner(),
@@ -49,6 +50,7 @@ def test_marketing_and_false_correlation_intents_run_end_to_end(tmp_path: Path):
         store.close()
 
     store, _registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=data_dir,
         backend="sqlite",
         planner=ConstrainedRulePlanner(),

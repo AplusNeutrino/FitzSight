@@ -157,7 +157,7 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 | M1-03 | 统计边界、零分母、非有限值与适用状态 | 进行中 | 子任务如下 |
 | M1-03a | 二项计数全零/全一/稀疏/非法输入 | 已完成 | 39 项统计测试；明确 null 区间，常规公式兼容 |
 | M1-03b | 连续样本非有限值/常量/小样本；调用链无法计算语义 | 待办 | 本轮未修改 continuous_two_sample |
-| M1-04 | 显式 demo/import、导入缺表失败 | 待办 | 自动生成合成数据 P0 未解决 |
+| M1-04 | 显式 demo/import、导入缺表失败 | 已完成 | RUN-20261027-04：默认 import 无生成，demo 空目录初始化；文件保护及 CLI 回归 |
 | M1-H | 本人讲解比例/百分点、分母、权重、因果并手写 SQL | 待人工验收 | 不由自动测试代替 |
 | M2-01 | 第五节 M2 全部数据管道任务及对账/恢复验收 | 待办 | 依赖 M1 口径；执行前拆分子编号 |
 | M3-01 | 三条金融调查案例、资金语义/观察窗/分解/分群与独立复算 | 待办 | 依赖 M1/M2 |
@@ -206,3 +206,16 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 - 问题更新：旧 MASTER_PLAN 与网站快照自称唯一真源的歧义已通过归档头注和入口解决，历史正文 2/2 保留校验通过。新发现限制：marker 分类不等于最小依赖隔离，收集仍导入全部模块；已在矩阵披露，本轮不新增依赖重构任务。原有数值绑定、连续样本、稀疏区间、导入模式缺口保持未完成。
 - 提交依据：标题 `test: separate product checks from competition artifacts`，以本轮最新 main 为父提交，expected_sha 并发保护，禁止强推；代码与本记录同提交。
 - 下一批：M1-04 显式 demo/import 与缺表不写入回归，随后 M1-02 数值/单位/时期绑定；保持离线，不自动启用付费模型。人工学习、盲审、同行反馈与职业结果不代验收。仍有自动推进事项，继续任务。
+
+
+### RUN-20261027-04（北京时间 2026-10-27 19:23）
+
+- 起点：重新读取远程 main `b42784a3b613983b46aef9a165b244b88bedbeaa`，独立 checkout；阅读 README、本计划全文、旧进度记录、runtime/store、CLI/UI 和调用点；无未合并 PR，未发现 AGENTS.md 或前轮远程重叠工作。
+- 批次 M1-04，预算两小时以内：分离模式 → 显式迁移演示入口 → 增加文件保护与 CLI 测试 → 全量和两后端五流程 → 更新文档和提交。验收包括六张表逐一缺失拒绝、默认导入不创建/覆盖文件、非空残缺 demo 拒绝生成、完整 bundle 可读取且字节不变。
+- 完成：runtime/CLI 默认 import；显式 demo 只初始化不存在/空目录，完整目录原样读取；加载失败关闭连接；CLI 输出模式；Streamlit/启动器/竞赛评测入口显式 demo。M1-04 生成边界验收已完成，不等于 M2 导入质量/契约验收或 M1 整体完成。
+- 涉及文件：`src/fitzsight/runtime.py`、`scripts/agent_investigate.py`、`start_demo.py`、`final_machine_check.py`、`check_offline_flows.py`、既有 build/evaluation/benchmark/latency/validate 调用脚本、`streamlit_app.py`、新 `tests/test_runtime_data_modes.py` 与相关演示测试夹具、README、DATA_MODES/OFFLINE_DEMO_CHECK/PRODUCT_BASELINE、本计划及 run04 验证文件。
+- 验证：针对性 20 passed（4.30 秒）；最终全量 163 passed / 0 failed / 0 errors / 0 skipped（62.70 秒），strict markers 与弃用警告转错误，无警告摘要；五类实际 CLI × SQLite/DuckDB 10/10。锁定 CPython 3.12.14、pytest 9.1.1、NumPy 2.5.2、pandas 2.3.3、SciPy 1.18.0、DuckDB 1.5.5；pip check 无冲突。[完整证据](validation/2026-10-27-run04.md)。全部合成/离线，mock 和通过的旧核验器不代表真实收益或数值绑定已完成。
+- 问题解决证据：第三节“runtime 缺表自动生成 CSV”P0 由 M1-04 修复，原描述保留为历史；缺失文件、损坏文件、已有字节保护、CLI 缺表非零退出均有测试。新披露限制：demo 初始化不是多进程事务发布，使用单进程专用目录；独立 schema/质量/来源校验仍待 M2。没有新增全局阻塞。
+- 兼容性：旧调用若依赖隐式生成，须明确 `data_mode="demo"` / `--data-mode demo`；已迁移仓库演示调用并通过回归。[迁移说明](DATA_MODES.md)。历史验证命令不改写。
+- 提交依据：`fix: separate import runtime from synthetic demo generation`；以本轮最新 main 为父提交，expected_sha 并发检查、不强推。代码和进度同提交。
+- 下一批：M1-02 从核心指标 Claim 的数值/单位/证据字段绑定和错数字反例入手，再推进参数化及连续样本边界。人工复现、盲审、学习讲解、反馈和职业结果保持待人工验收；仍有自动推进任务，继续执行。

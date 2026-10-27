@@ -76,6 +76,7 @@ code{{background:#edf0f5;padding:2px 5px;border-radius:4px}} .guard{{border-left
 def build(*, backend: str = "sqlite", n_customers: int = 20_000) -> dict:
     with tempfile.TemporaryDirectory(prefix="fitzsight_v012_hero_") as temp:
         store, registry, agent = build_agent_runtime(
+            data_mode="demo",
             data_dir=Path(temp) / "data",
             backend=backend,
             planner=ConstrainedRulePlanner(),

@@ -8,6 +8,7 @@ QUESTION = "Why did European net deposits fall in the week starting August 3?"
 
 def test_net_deposit_intent_runs_end_to_end_and_verifies(tmp_path: Path):
     store, registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=tmp_path / "data",
         backend="sqlite",
         planner=ConstrainedRulePlanner(),

@@ -114,6 +114,7 @@ def run_suite(data_dir: Path, backend: str):
     })
 
     store, _registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner()
     )
     try:

@@ -9,6 +9,7 @@ from fitzsight.ui.presenter import build_presentation
 def test_presenter_builds_kpi_chart_trace_and_evidence_for_all_intents(tmp_path: Path):
     for _label, question in DEMO_QUESTIONS.items():
         store, _registry, agent = build_agent_runtime(
+            data_mode="demo",
             data_dir=tmp_path,
             backend="sqlite",
             planner=ConstrainedRulePlanner(),
@@ -33,6 +34,7 @@ def test_presenter_builds_kpi_chart_trace_and_evidence_for_all_intents(tmp_path:
 def test_presenter_is_json_safe_for_submission_assets(tmp_path: Path):
     question = next(iter(DEMO_QUESTIONS.values()))
     store, _registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=tmp_path,
         backend="sqlite",
         planner=ConstrainedRulePlanner(),

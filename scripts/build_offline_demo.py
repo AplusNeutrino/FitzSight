@@ -174,6 +174,7 @@ def build_demo(*, data_dir: Path, backend: str) -> tuple[str, dict]:
     sections: list[str] = []
     for label, question in DEMO_QUESTIONS.items():
         store, _registry, agent = build_agent_runtime(
+            data_mode="demo",
             data_dir=data_dir,
             backend=backend,
             planner=ConstrainedRulePlanner(),

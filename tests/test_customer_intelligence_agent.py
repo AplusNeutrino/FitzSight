@@ -39,6 +39,7 @@ def test_structured_planner_accepts_customer_intelligence_intent():
 
 def test_customer_intelligence_agent_runs_and_verifies(tmp_path: Path):
     store, registry, agent = build_agent_runtime(
+        data_mode="demo",
         data_dir=tmp_path / "data",
         backend="sqlite",
         planner=ConstrainedRulePlanner(),

@@ -25,11 +25,13 @@ python -m pip install -e . --no-deps
 
 ## 运行
 
-确定性 CLI（默认，不访问外部模型）：
+确定性合成演示 CLI（不访问外部模型，显式 demo 模式）：
 
 ```powershell
-python scripts/agent_investigate.py --backend sqlite
+python scripts/agent_investigate.py --data-mode demo --backend sqlite
 ```
+
+导入已有 CSV 使用 `--data-mode import --data-dir <目录>`；runtime 和 CLI 默认 import，缺表即失败，不再自动补模拟数据。详见 [数据模式及迁移说明](docs/DATA_MODES.md)。
 
 五类流程在 SQLite / DuckDB 上的独立 CLI 检查及证据边界见 [离线演示复现](docs/OFFLINE_DEMO_CHECK.md)。
 
@@ -44,7 +46,7 @@ DeepSeek V4 可选规划器：
 ```powershell
 $env:DEEPSEEK_API_KEY = "<api-key>"
 $env:FITZSIGHT_DEEPSEEK_MODEL = "deepseek-v4-flash" # 或 deepseek-v4-pro
-python scripts/agent_investigate.py --planner deepseek --backend sqlite
+python scripts/agent_investigate.py --data-mode demo --planner deepseek --backend sqlite
 ```
 
 模型严格白名单：`deepseek-v4-flash`（默认）和 `deepseek-v4-pro`。实现直接使用 `httpx` 调用 `https://api.deepseek.com/chat/completions`。

@@ -26,24 +26,37 @@ def build_agent_runtime(
     backend: str,
     planner: Planner,
     generator_config: GeneratorConfig | None = None,
+    data_mode: str = "import",
 ):
-    """Build the audited v0.9 runtime and return ``(store, registry, agent)``."""
+    """Build a runtime; imports never generate or overwrite source data.
 
+    Demo generation is explicitly opt-in and only allowed in an empty directory.
+    Existing complete bundles are read as-is in either mode.
+    """
+    if data_mode not in {"demo", "import"}:
+        raise ValueError("data_mode must be 'demo' or 'import'")
+    if data_mode == "import" and generator_config is not None:
+        raise ValueError("generator_config is only valid in demo mode")
     data_dir = Path(data_dir)
-    required = (
-        data_dir / "customers.csv",
-        data_dir / "sales_activity.csv",
-        data_dir / "deposits.csv",
-        data_dir / "withdrawals.csv",
-        data_dir / "trades.csv",
-        data_dir / "business_events.csv",
+    required_names = (
+        "customers.csv", "sales_activity.csv", "deposits.csv",
+        "withdrawals.csv", "trades.csv", "business_events.csv",
     )
-    if not all(path.exists() for path in required):
+    missing = [name for name in required_names if not (data_dir / name).is_file()]
+    if missing:
+        if data_mode == "import":
+            raise FileNotFoundError("Import data is incomplete; missing files: " + ", ".join(missing))
+        if data_dir.exists() and (not data_dir.is_dir() or any(data_dir.iterdir())):
+            raise ValueError("Demo generation requires an empty directory; existing files will not be overwritten")
         write_csv_bundle(data_dir, generator_config or GeneratorConfig())
 
     registry = EvidenceRegistry()
     store = AnalyticsStore(data_dir, backend=backend)
-    store.load_csv_directory()
+    try:
+        store.load_csv_directory()
+    except Exception:
+        store.close()
+        raise
 
     schema_tool = SchemaInspectorTool(store, registry)
     sql_tool = ReadOnlySQLTool(store, registry, max_rows=25_000)
