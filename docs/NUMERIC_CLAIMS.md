@@ -33,3 +33,13 @@ withdrawal_change。两个分量都须分别与分解证据及四份 SQL 结果�
 [RUN-06](validation/2026-10-27-run06.md) 包括手算 (75-100)-(15-20)=-20，
 以及同时把两个分量增加100、修改分解证据和展示文字后仍拒绝的反例。
 本轮继续沿用上文信任边界，未建立通用指标目录或生产数据校验。
+
+
+## 零分母语义（RUN-07）
+
+N-C3 尚未迁移到数值绑定，但提款总额不为正时不再显示0%：
+比例为 null，calculation_status 为 unavailable，原因是
+nonpositive_total_withdrawals；声明为 insufficient_evidence，
+集中度诊断为 null、驱动类型为 undetermined。空提款表和全零金额
+通过两后端实际导入测试。该修复不等同 N-C3 数值正确性全面验收。
+详见 [RUN-07](validation/2026-10-28-run07.md)。

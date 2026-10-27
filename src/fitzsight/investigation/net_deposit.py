@@ -91,13 +91,13 @@ class NetDepositInvestigationEngine:
         start_s, end_exclusive = self._period_bounds(start, end)
         deposit_sql = (
             "SELECT c.region, COUNT(DISTINCT c.customer_id) AS customer_count, "
-            "COALESCE(SUM(d.amount), 0) AS deposits "
+            "COALESCE(SUM(CAST(d.amount AS DOUBLE)), 0) AS deposits "
             "FROM customers c LEFT JOIN deposits d ON d.customer_id = c.customer_id "
             f"AND d.status = 'completed' AND d.timestamp >= '{start_s}' AND d.timestamp < '{end_exclusive}' "
             "GROUP BY c.region ORDER BY c.region"
         )
         withdrawal_sql = (
-            "SELECT c.region, COALESCE(SUM(w.amount), 0) AS withdrawals "
+            "SELECT c.region, COALESCE(SUM(CAST(w.amount AS DOUBLE)), 0) AS withdrawals "
             "FROM customers c LEFT JOIN withdrawals w ON w.customer_id = c.customer_id "
             f"AND w.status = 'completed' AND w.timestamp >= '{start_s}' AND w.timestamp < '{end_exclusive}' "
             "GROUP BY c.region ORDER BY c.region"
@@ -212,7 +212,7 @@ class NetDepositInvestigationEngine:
             scenario.current_start, scenario.current_end
         )
         concentration_sql = (
-            "SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount "
+            "SELECT w.customer_id, c.assigned_team, SUM(CAST(w.amount AS DOUBLE)) AS withdrawal_amount "
             "FROM withdrawals w JOIN customers c ON c.customer_id = w.customer_id "
             "WHERE w.status = 'completed' AND c.region = 'Europe' "
             f"AND w.timestamp >= '{current_start}' AND w.timestamp < '{current_end_exclusive}' "
@@ -224,13 +224,15 @@ class NetDepositInvestigationEngine:
         top_n = ranked[: scenario.customer_count]
         top_n_amount = float(sum(float(row["withdrawal_amount"]) for row in top_n))
         concentration_share = (
-            top_n_amount / current_withdrawals if current_withdrawals > 0 else 0.0
+            top_n_amount / current_withdrawals if current_withdrawals > 0 else None
         )
         concentration_payload = {
             "customer_count": scenario.customer_count,
             "top_customer_withdrawal_amount": top_n_amount,
             "current_total_withdrawals": current_withdrawals,
             "share_of_current_withdrawals": concentration_share,
+            "calculation_status": "computed" if concentration_share is not None else "unavailable",
+            "unavailable_reason": None if concentration_share is not None else "nonpositive_total_withdrawals",
             "top_customers": top_n,
         }
         concentration_record = self.registry.register(
@@ -285,7 +287,7 @@ class NetDepositInvestigationEngine:
 
         withdrawal_pressure = withdrawal_change > 0
         decline = net_change < 0
-        concentrated = concentration_share >= 0.35
+        concentrated = concentration_share >= 0.35 if concentration_share is not None else None
         europe_worse_than_control = (
             regional_payload["europe_change"] < regional_payload["other_region_median_change"]
         )
@@ -303,11 +305,13 @@ class NetDepositInvestigationEngine:
                 if decline and withdrawal_pressure and concentrated
                 else "insufficient_evidence"
             ),
-            "driver_type": "observed_withdrawal_concentration",
+            "driver_type": "observed_withdrawal_concentration" if concentrated else "undetermined",
             "causal_language_guardrail": (
                 "The evidence supports concentrated high-value withdrawals as an observed driver of the synthetic "
                 "net-deposit deterioration. It does not establish why those customers withdrew or justify an "
                 "investment, compliance, or customer-risk conclusion without additional evidence."
+                if concentrated else
+                "The evidence does not establish concentrated withdrawals as a driver or a causal explanation."
             ),
         }
 
@@ -375,8 +379,10 @@ class NetDepositInvestigationEngine:
                 (
                     f"The largest {scenario.customer_count} European customer withdrawals account for "
                     f"{concentration_share:.1%} of current-week European withdrawals."
+                    if concentration_share is not None else
+                    "Withdrawal concentration is unavailable because current-week European total withdrawals are not positive."
                 ),
-                "supported",
+                "supported" if concentration_share is not None else "insufficient_evidence",
                 "high",
                 (concentration_query.evidence_id, concentration_record.evidence_id),
             ),

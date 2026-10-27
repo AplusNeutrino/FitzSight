@@ -1,0 +1,214 @@
+..F.F                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-duckdb] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_zero_withdrawal_denominat1')
+backend = 'duckdb', empty = False
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        # Modify actual synthetic CSVs, then exercise import, SQL, engine and verifier.
+        path = data_dir / "withdrawals.csv"
+        withdrawals = pd.read_csv(path)
+        if empty:
+            withdrawals = withdrawals.iloc[:0]
+        else:
+            withdrawals["amount"] = 0.0
+        withdrawals.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            concentration = investigation["metrics"]["customer_concentration"]
+            assert concentration["current_total_withdrawals"] == 0
+            assert concentration["share_of_current_withdrawals"] is None
+            assert concentration["calculation_status"] == "unavailable"
+            assert concentration["unavailable_reason"] == "nonpositive_total_withdrawals"
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C3")
+            assert claim["status"] == "insufficient_evidence"
+            assert "unavailable" in claim["text"] and "%" not in claim["text"]
+            assert investigation["diagnosis"]["withdrawal_concentration_high"] is None
+            assert investigation["diagnosis"]["driver_type"] == "undetermined"
+            assert result["verification"]["passed"] is True
+>           json.dumps(result, allow_nan=False)
+
+tests/test_net_deposit_agent.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py:258: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.encoder.JSONEncoder object at 0x7f30f6dd8230>
+o = datetime.date(2026, 8, 5)
+
+    def default(self, o):
+        """Implement this method in a subclass such that it returns
+        a serializable object for ``o``, or calls the base implementation
+        (to raise a ``TypeError``).
+    
+        For example, to support arbitrary iterators, you could
+        implement default like this::
+    
+            def default(self, o):
+                try:
+                    iterable = iter(o)
+                except TypeError:
+                    pass
+                else:
+                    return list(iterable)
+                # Let the base class default method raise the TypeError
+                return super().default(o)
+    
+        """
+>       raise TypeError(f'Object of type {o.__class__.__name__} '
+                        f'is not JSON serializable')
+E       TypeError: Object of type date is not JSON serializable
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py:180: TypeError
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-duckdb] _
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f30f6ded520>
+sql = "SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount FROM withdrawals w JOIN customers c ON c.cu... w.timestamp < '2026-08-10' GROUP BY w.customer_id, c.assigned_team ORDER BY withdrawal_amount DESC, w.customer_id ASC"
+compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+>           columns, rows = self.store.execute(wrapped)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/fitzsight/tools/sql.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.data.store.AnalyticsStore object at 0x7f30f6def410>
+sql = 'SELECT * FROM (SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount FROM withdrawals w JOIN cust...customer_id, c.assigned_team ORDER BY withdrawal_amount DESC, w.customer_id ASC) AS __fitzsight_safe_query LIMIT 25001'
+
+    def execute(self, sql: str) -> tuple[list[str], list[tuple[Any, ...]]]:
+>       cursor = self._conn.execute(sql)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       _duckdb.BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.
+E       	Candidate functions:
+E       	sum(DECIMAL) -> DECIMAL
+E       	sum(BOOLEAN) -> HUGEINT
+E       	sum(SMALLINT) -> HUGEINT
+E       	sum(INTEGER) -> HUGEINT
+E       	sum(BIGINT) -> HUGEINT
+E       	sum(HUGEINT) -> HUGEINT
+E       	sum(DOUBLE) -> DOUBLE
+E       	sum(BIGNUM) -> BIGNUM
+E       
+E       
+E       LINE 1: SELECT * FROM (SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount FROM withdrawals w JOIN...
+E                                                                     ^
+
+src/fitzsight/data/store.py:159: BinderException
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_zero_withdrawal_denominat3')
+backend = 'duckdb', empty = True
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        # Modify actual synthetic CSVs, then exercise import, SQL, engine and verifier.
+        path = data_dir / "withdrawals.csv"
+        withdrawals = pd.read_csv(path)
+        if empty:
+            withdrawals = withdrawals.iloc[:0]
+        else:
+            withdrawals["amount"] = 0.0
+        withdrawals.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        try:
+>           result = agent.run(QUESTION).to_dict()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests/test_net_deposit_agent.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/fitzsight/agent/orchestrator.py:50: in run
+    investigation = self.engine.investigate(question)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/fitzsight/investigation/router.py:61: in investigate
+    return self._engine(question).investigate(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/fitzsight/investigation/net_deposit.py:222: in investigate
+    concentration_query = self.sql_tool.run(concentration_sql)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f30f6ded520>
+sql = "SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount FROM withdrawals w JOIN customers c ON c.cu... w.timestamp < '2026-08-10' GROUP BY w.customer_id, c.assigned_team ORDER BY withdrawal_amount DESC, w.customer_id ASC"
+compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+            columns, rows = self.store.execute(wrapped)
+        except Exception as exc:  # backend errors become explicit failed evidence
+            payload = {"error": type(exc).__name__, "message": str(exc)}
+            record = self.registry.register(
+                "read_only_sql",
+                {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows},
+                payload,
+                status="error",
+            )
+>           raise RuntimeError(f"SQL execution failed [{record.evidence_id}]: {exc}") from exc
+E           RuntimeError: SQL execution failed [E0011]: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.
+E           	Candidate functions:
+E           	sum(DECIMAL) -> DECIMAL
+E           	sum(BOOLEAN) -> HUGEINT
+E           	sum(SMALLINT) -> HUGEINT
+E           	sum(INTEGER) -> HUGEINT
+E           	sum(BIGINT) -> HUGEINT
+E           	sum(HUGEINT) -> HUGEINT
+E           	sum(DOUBLE) -> DOUBLE
+E           	sum(BIGNUM) -> BIGNUM
+E           
+E           
+E           LINE 1: SELECT * FROM (SELECT w.customer_id, c.assigned_team, SUM(w.amount) AS withdrawal_amount FROM withdrawals w JOIN...
+E                                                                         ^
+
+src/fitzsight/tools/sql.py:100: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-duckdb]
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-duckdb]
+2 failed, 3 passed in 26.23s

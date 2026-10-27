@@ -1,0 +1,67 @@
+...............................................FFFF..................... [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-sqlite] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_zero_withdrawal_denominat0')
+backend = 'sqlite', empty = False
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+>       store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: build_agent_runtime() missing 1 required keyword-only argument: 'planner'
+
+tests/test_net_deposit_agent.py:54: TypeError
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-duckdb] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_zero_withdrawal_denominat1')
+backend = 'duckdb', empty = False
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+>       store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: build_agent_runtime() missing 1 required keyword-only argument: 'planner'
+
+tests/test_net_deposit_agent.py:54: TypeError
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-sqlite] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_zero_withdrawal_denominat2')
+backend = 'sqlite', empty = True
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+>       store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: build_agent_runtime() missing 1 required keyword-only argument: 'planner'
+
+tests/test_net_deposit_agent.py:54: TypeError
+_ test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-duckdb] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_zero_withdrawal_denominat3')
+backend = 'duckdb', empty = True
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+>       store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: build_agent_runtime() missing 1 required keyword-only argument: 'planner'
+
+tests/test_net_deposit_agent.py:54: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-sqlite]
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-duckdb]
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-sqlite]
+FAILED tests/test_net_deposit_agent.py::test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-duckdb]
+4 failed, 215 passed in 67.50s (0:01:07)
