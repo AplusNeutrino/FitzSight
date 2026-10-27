@@ -1,0 +1,131 @@
+........................................................................ [ 50%]
+........................................................................ [100%]
+=============================== warnings summary ===============================
+tests/test_agent_orchestrator.py: 1700 warnings
+tests/test_agent_verifier.py: 2550 warnings
+tests/test_contribution.py: 850 warnings
+tests/test_customer_intelligence_agent.py: 850 warnings
+tests/test_generator.py: 477 warnings
+tests/test_investigation.py: 850 warnings
+tests/test_kpi_tools.py: 545 warnings
+tests/test_net_deposit_agent.py: 850 warnings
+tests/test_net_deposit_scenario.py: 850 warnings
+tests/test_scenario_crm_routing.py: 850 warnings
+tests/test_segmentation.py: 850 warnings
+tests/test_store_tools.py: 546 warnings
+tests/test_ui_presenter.py: 1700 warnings
+tests/test_v07_lead_quality_intents.py: 850 warnings
+tests/test_v12_hero_journey.py: 1700 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:82: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    + pd.Timedelta(days=day_offset, minutes=minute_offset)
+
+tests/test_agent_orchestrator.py: 10808 warnings
+tests/test_agent_verifier.py: 16212 warnings
+tests/test_contribution.py: 5404 warnings
+tests/test_customer_intelligence_agent.py: 10706 warnings
+tests/test_generator.py: 1734 warnings
+tests/test_investigation.py: 5404 warnings
+tests/test_kpi_tools.py: 1519 warnings
+tests/test_net_deposit_agent.py: 10706 warnings
+tests/test_net_deposit_scenario.py: 10706 warnings
+tests/test_scenario_crm_routing.py: 10706 warnings
+tests/test_segmentation.py: 10706 warnings
+tests/test_store_tools.py: 1548 warnings
+tests/test_ui_presenter.py: 21412 warnings
+tests/test_v07_lead_quality_intents.py: 10706 warnings
+tests/test_v12_hero_journey.py: 10808 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:229: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    timestamp = pd.Timestamp(row.registration_date) + pd.Timedelta(
+
+tests/test_agent_orchestrator.py: 10808 warnings
+tests/test_agent_verifier.py: 16212 warnings
+tests/test_contribution.py: 5404 warnings
+tests/test_customer_intelligence_agent.py: 10706 warnings
+tests/test_generator.py: 1734 warnings
+tests/test_investigation.py: 5404 warnings
+tests/test_kpi_tools.py: 1519 warnings
+tests/test_net_deposit_agent.py: 10706 warnings
+tests/test_net_deposit_scenario.py: 10706 warnings
+tests/test_scenario_crm_routing.py: 10706 warnings
+tests/test_segmentation.py: 10706 warnings
+tests/test_store_tools.py: 1548 warnings
+tests/test_ui_presenter.py: 21412 warnings
+tests/test_v07_lead_quality_intents.py: 10706 warnings
+tests/test_v12_hero_journey.py: 10808 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:232: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    if timestamp > pd.Timestamp(cfg.end_date) + pd.Timedelta(days=1):
+
+tests/test_agent_orchestrator.py: 2788 warnings
+tests/test_agent_verifier.py: 4182 warnings
+tests/test_contribution.py: 1394 warnings
+tests/test_customer_intelligence_agent.py: 2746 warnings
+tests/test_generator.py: 465 warnings
+tests/test_investigation.py: 1394 warnings
+tests/test_kpi_tools.py: 364 warnings
+tests/test_net_deposit_agent.py: 2746 warnings
+tests/test_net_deposit_scenario.py: 2746 warnings
+tests/test_scenario_crm_routing.py: 2746 warnings
+tests/test_segmentation.py: 2746 warnings
+tests/test_store_tools.py: 384 warnings
+tests/test_ui_presenter.py: 5492 warnings
+tests/test_v07_lead_quality_intents.py: 2746 warnings
+tests/test_v12_hero_journey.py: 2788 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:331: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    + pd.Timedelta(days=int(rng.integers(30, max_day + 1))),
+
+tests/test_agent_orchestrator.py: 22 warnings
+tests/test_agent_verifier.py: 33 warnings
+tests/test_contribution.py: 11 warnings
+tests/test_customer_intelligence_agent.py: 11 warnings
+tests/test_generator.py: 33 warnings
+tests/test_investigation.py: 11 warnings
+tests/test_kpi_tools.py: 11 warnings
+tests/test_net_deposit_agent.py: 11 warnings
+tests/test_net_deposit_scenario.py: 11 warnings
+tests/test_scenario_crm_routing.py: 11 warnings
+tests/test_segmentation.py: 11 warnings
+tests/test_store_tools.py: 33 warnings
+tests/test_ui_presenter.py: 22 warnings
+tests/test_v07_lead_quality_intents.py: 11 warnings
+tests/test_v12_hero_journey.py: 22 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:287: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    timestamp = pd.Timestamp(scenario.event_date) + pd.Timedelta(
+
+tests/test_agent_orchestrator.py: 25726 warnings
+tests/test_agent_verifier.py: 38589 warnings
+tests/test_contribution.py: 12863 warnings
+tests/test_customer_intelligence_agent.py: 25426 warnings
+tests/test_generator.py: 4143 warnings
+tests/test_investigation.py: 12863 warnings
+tests/test_kpi_tools.py: 3493 warnings
+tests/test_net_deposit_agent.py: 25426 warnings
+tests/test_net_deposit_scenario.py: 25426 warnings
+tests/test_scenario_crm_routing.py: 25426 warnings
+tests/test_segmentation.py: 25426 warnings
+tests/test_store_tools.py: 3780 warnings
+tests/test_ui_presenter.py: 50852 warnings
+tests/test_v07_lead_quality_intents.py: 25426 warnings
+tests/test_v12_hero_journey.py: 25726 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:356: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    timestamp = pd.Timestamp(row.registration_date) + pd.Timedelta(
+
+tests/test_agent_orchestrator.py: 25726 warnings
+tests/test_agent_verifier.py: 38589 warnings
+tests/test_contribution.py: 12863 warnings
+tests/test_customer_intelligence_agent.py: 25426 warnings
+tests/test_generator.py: 4143 warnings
+tests/test_investigation.py: 12863 warnings
+tests/test_kpi_tools.py: 3493 warnings
+tests/test_net_deposit_agent.py: 25426 warnings
+tests/test_net_deposit_scenario.py: 25426 warnings
+tests/test_scenario_crm_routing.py: 25426 warnings
+tests/test_segmentation.py: 25426 warnings
+tests/test_store_tools.py: 3780 warnings
+tests/test_ui_presenter.py: 50852 warnings
+tests/test_v07_lead_quality_intents.py: 25426 warnings
+tests/test_v12_hero_journey.py: 25726 warnings
+  /workspace/scratch/5afae2a314bc/FitzSight-run-20261027/src/fitzsight/data/generator.py:359: DeprecationWarning: The 'generic' unit for NumPy timedelta is deprecated, and will raise an error in the future. This includes implicit conversion of bare integers (e.g. `+ 1`).Please use a specific unit instead.
+    if timestamp > pd.Timestamp(cfg.end_date) + pd.Timedelta(days=1):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+144 passed, 991361 warnings in 76.28s (0:01:16)
