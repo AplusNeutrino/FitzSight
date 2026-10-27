@@ -9,6 +9,7 @@ from fitzsight.data.scenarios import NET_DEPOSIT_SCENARIO
 from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
+from .numeric_claims import NetChangeBinding, render_net_change
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -75,13 +76,16 @@ class NetDepositInvestigationEngine:
             safe_region = region.replace("'", "''")
             region_clause = f" AND c.region = '{safe_region}'"
         sql = (
-            f"SELECT t.customer_id, t.timestamp, t.amount, c.region, c.assigned_team "
+            f"SELECT t.customer_id, t.timestamp, t.amount, t.currency, c.region, c.assigned_team "
             f"FROM {table} AS t JOIN customers AS c ON c.customer_id = t.customer_id "
             f"WHERE t.status = 'completed' "
             f"AND t.timestamp >= '{start_s}' AND t.timestamp < '{end_exclusive}'"
             f"{region_clause} ORDER BY t.timestamp, t.customer_id"
         )
-        return self.sql_tool.run(sql)
+        result = self.sql_tool.run(sql)
+        if any(row["currency"] != "USD" for row in result.data["rows"]):
+            raise ValueError("Net-deposit demo requires USD cash flows; currency conversion is not implemented")
+        return result
 
     def _regional_net_per_customer(self, start: date, end: date):
         start_s, end_exclusive = self._period_bounds(start, end)
@@ -131,8 +135,8 @@ class NetDepositInvestigationEngine:
         schema_evidence = []
         required_by_table = {
             "customers": {"customer_id", "region", "assigned_team"},
-            "deposits": {"customer_id", "timestamp", "amount", "status"},
-            "withdrawals": {"customer_id", "timestamp", "amount", "status"},
+            "deposits": {"customer_id", "timestamp", "amount", "currency", "status"},
+            "withdrawals": {"customer_id", "timestamp", "amount", "currency", "status"},
             "business_events": {"event_id", "date", "event_type", "region", "description"},
         }
         for table, required in required_by_table.items():
@@ -190,6 +194,9 @@ class NetDepositInvestigationEngine:
         driver_record = self.registry.register(
             "net_deposit_driver_decomposition",
             {
+                "currency": "USD",
+                "source_evidence_ids": [baseline_dep.evidence_id, baseline_wd.evidence_id,
+                                        current_dep.evidence_id, current_wd.evidence_id],
                 "region": scenario.region,
                 "baseline_start": scenario.baseline_start.isoformat(),
                 "baseline_end": scenario.baseline_end.isoformat(),
@@ -327,14 +334,17 @@ class NetDepositInvestigationEngine:
             "nearby_business_events": matching_events,
         }
 
+        net_binding = NetChangeBinding(
+            value=net_change, evidence_id=driver_record.evidence_id,
+            baseline_start=scenario.baseline_start.isoformat(),
+            baseline_end=scenario.baseline_end.isoformat(),
+            current_start=scenario.current_start.isoformat(),
+            current_end=scenario.current_end.isoformat(),
+        )
         claims = (
             Claim(
                 "N-C1",
-                (
-                    f"European net deposits changed by ${net_change:,.2f} week over week "
-                    f"({scenario.baseline_start.isoformat()}–{scenario.baseline_end.isoformat()} versus "
-                    f"{scenario.current_start.isoformat()}–{scenario.current_end.isoformat()})."
-                ),
+                render_net_change(net_binding),
                 "supported",
                 "high",
                 (
@@ -344,6 +354,7 @@ class NetDepositInvestigationEngine:
                     current_wd.evidence_id,
                     driver_record.evidence_id,
                 ),
+                numeric_binding=net_binding,
             ),
             Claim(
                 "N-C2",

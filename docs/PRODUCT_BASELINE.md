@@ -13,7 +13,7 @@
 | 离线执行 | `agent/catalog.py`、`runtime.py`；[十次真实 CLI](validation/2026-10-27-offline-flows.json) | 固定地区/日期，未达 M1-01 参数化验收 |
 | SQL 与计算 | `tools/sql.py`、`tools/contribution.py`；SQL 安全、贡献分解测试 | 不能由只读查询推导金融口径已完备；M1 指标定义、M3 业务复算待办 |
 | 比例统计 | `tools/statistics.py`；39 项统计测试 | 稀疏差值区间为 null；连续样本边界未统一，M1-03b |
-| 证据与核验 | `evidence/registry.py`、`agent/verifier.py`；ID、状态、摘要和有限措辞检查 | 未绑定声明中的数值/单位/时间；内存记录不是持久化防篡改审计，M1-02/M4 |
+| 证据与核验 | `evidence/registry.py`、`agent/verifier.py`；ID、状态、摘要和有限措辞检查 | N-C1 已绑定金额/单位/窗口并重算；其他声明未迁移；内存记录非持久化防篡改审计，M1-02/M4 |
 | 数据生成 | `data/generator.py`；[21 表指纹](validation/2026-10-27-generator-fingerprints.json)，弃用警告已修复 | M1-04 已拆分 demo/import：默认导入缺表失败，演示只初始化空目录；见 DATA_MODES.md |
 | 数据存储 | `data/store.py`，SQLite/DuckDB 实跑 | 未完成分层、批次清单、水位、对账及恢复；M2 |
 | UI | `streamlit_app.py`、`ui/presenter.py`，presenter 单元测试 | 单元测试不代表浏览器交互或陌生人复现；M0-02b 人工验收 |
@@ -56,3 +56,5 @@ flowchart TD
 图示默认离线路径。Provider 仅为可选规划器。计划中的指标语义层、结构化数值声明、导入质量层、持久化审计和 API 尚未补齐。迁移顺序遵循主计划，已完成 import 模式边界，下一步优先数值绑定，沿用现有工具与单机数据库。
 
 旧规划入口见 [归档索引](archive/README.md)。
+
+数值迁移范围与限制见 [N-C1 契约](NUMERIC_CLAIMS.md)，不能将单条声明验收外推到整份报告。

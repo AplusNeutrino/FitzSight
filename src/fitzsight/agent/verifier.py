@@ -4,6 +4,7 @@ import re
 
 from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.investigation.models import InvestigationResult
+from fitzsight.investigation.numeric_claims import verify_net_change
 from .models import VerificationCheck, VerificationReport
 
 
@@ -29,10 +30,19 @@ class EvidenceClaimVerifier:
             if not passed:
                 violations.append(message)
 
+        if result.plan.intent == "net_deposit_anomaly_investigation":
+            add("net_change_required", sum(c.claim_id == "N-C1" for c in result.claims) == 1,
+                "Net-deposit investigation must contain exactly one N-C1 numeric claim")
+
         referenced: set[str] = set()
         verified_claims = 0
         for claim in result.claims:
             claim_ok = True
+            if claim.claim_id == "N-C1" or claim.numeric_binding is not None:
+                numeric_ok = claim.claim_id == "N-C1" and verify_net_change(claim, self.registry)
+                add(f"numeric_binding:{claim.claim_id}", numeric_ok,
+                    f"{claim.claim_id}: numeric binding/text/source validation {'passed' if numeric_ok else 'failed'}")
+                claim_ok = numeric_ok
             if claim.status not in {"supported", "supported_with_guardrail", "insufficient_evidence"}:
                 claim_ok = False
                 add(f"claim_status:{claim.claim_id}", False, f"{claim.claim_id}: unsupported claim status {claim.status!r}")

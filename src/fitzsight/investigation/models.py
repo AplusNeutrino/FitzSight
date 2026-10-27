@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from .numeric_claims import NetChangeBinding
+
 
 @dataclass(frozen=True)
 class PlanStep:
@@ -28,6 +30,7 @@ class Claim:
     status: str
     confidence: str
     evidence_ids: tuple[str, ...]
+    numeric_binding: NetChangeBinding | None = None
 
 
 @dataclass(frozen=True)

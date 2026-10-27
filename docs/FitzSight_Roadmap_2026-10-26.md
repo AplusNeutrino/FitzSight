@@ -153,7 +153,9 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 | M0-02b | Streamlit 交互与独立新用户复现 | 待人工验收 | 不用 CLI 结果代替人工界面体验 |
 | M0-03 | 产品/竞赛测试分组、现状矩阵、旧规划归档和入口、范围/架构说明 | 已完成 | RUN-20261027-03；123 产品 + 23 竞赛；现状矩阵与原位归档 |
 | M1-01 | InvestigationRequest、参数白名单、三个区域/三组时期、demo 配置 | 待办 | 固定地区/时间 P0 未解决 |
-| M1-02 | MetricDefinition、Claim、数值/单位/时期/证据绑定及反例 | 待办 | 错数字仍可能通过既有核验 |
+| M1-02 | MetricDefinition、Claim、数值/单位/时期/证据绑定及反例 | 进行中 | N-C1 首条迁移；其他声明和通用指标定义仍待完成 |
+| M1-02a | 净入金 N-C1 金额、单位、窗口、证据及模板校验 | 已完成 | RUN-20261027-05：28 契约测试及实际双后端校验 |
+| M1-02b | 其余核心金额/比例声明、MetricDefinition 与 UI 标识 | 待办 | 不外推单条验收为完整数值核验 |
 | M1-03 | 统计边界、零分母、非有限值与适用状态 | 进行中 | 子任务如下 |
 | M1-03a | 二项计数全零/全一/稀疏/非法输入 | 已完成 | 39 项统计测试；明确 null 区间，常规公式兼容 |
 | M1-03b | 连续样本非有限值/常量/小样本；调用链无法计算语义 | 待办 | 本轮未修改 continuous_two_sample |
@@ -219,3 +221,16 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 - 兼容性：旧调用若依赖隐式生成，须明确 `data_mode="demo"` / `--data-mode demo`；已迁移仓库演示调用并通过回归。[迁移说明](DATA_MODES.md)。历史验证命令不改写。
 - 提交依据：`fix: separate import runtime from synthetic demo generation`；以本轮最新 main 为父提交，expected_sha 并发检查、不强推。代码和进度同提交。
 - 下一批：M1-02 从核心指标 Claim 的数值/单位/证据字段绑定和错数字反例入手，再推进参数化及连续样本边界。人工复现、盲审、学习讲解、反馈和职业结果保持待人工验收；仍有自动推进任务，继续执行。
+
+
+### RUN-20261027-05（北京时间 2026-10-27 21:20）
+
+- 基线：重新 fetch main `f5f85b6e3ba54502b541f75dcb4146044b99f915` 后独立 checkout，已读 README、计划全文、旧进度记录与 Claim/核验器/净入金实现。无未合并 PR，未发现 AGENTS.md 或前轮重叠远程工作。
+- 批次 M1-02a，预算两小时以内：迁移 N-C1 → 绑定金额/单位/币种/区域/时间窗/证据字段 → 从四份 SQL 结果重算 → 模板文字一致性与反例 → 回归和提交。范围限定单条声明；M1-02 总项及原数值错配 P0 仍进行中，不削弱其余验收要求。
+- 完成及验收：增加 NetChangeBinding 与规范渲染；错金额、单位、币种、窗口、字段、引用、中文错误文字、删除绑定/声明、重复声明、非有限/布尔/字符串/极大数均被相应用例拒绝；内部自洽但错误的分解也被原 SQL 结果重算拦截。现金流查询发现非 USD 拒绝，不做虚假汇率换算。
+- 涉及文件：`investigation/numeric_claims.py`、`investigation/models.py`、`investigation/net_deposit.py`、`agent/verifier.py`（均在 src/fitzsight 下）、`tests/test_numeric_claims.py`、NUMERIC_CLAIMS、PRODUCT_BASELINE、本计划及 run05 验证记录。
+- 验证：首轮数值+真实引擎 27 passed；补充边界后数值契约 28 passed；最终全量 191 passed / 0 failed / 0 errors / 0 skipped（244.01 秒），strict markers/弃用警告转错误，无警告摘要。双后端五类实际 CLI 10/10，SQLite/DuckDB 的 `numeric_binding:N-C1` 明确执行通过。[完整证据](validation/2026-10-27-run05.md)。
+- 环境：旧临时 venv 的 Python 入口丢失，首个命令退出127、未执行测试；新建隔离环境按 requirements.lock 安装成功，pip check 无冲突。CPython 3.12.14、pytest 9.1.1、NumPy 2.5.2、pandas 2.3.3、SciPy 1.18.0、DuckDB 1.5.5。手算/合成数据与 Mock 不代表生产收益；未启用付费模型。
+- 问题更新：N-C1 的“有效证据 ID + 错数字/文字”路径已修复；通用反例及其他声明仍未迁移，不关闭整个 P0。新明确边界：工具参数未签名、SQL 过滤/截断/源数据质量不是本轮校验对象；见 [契约说明](NUMERIC_CLAIMS.md)。环境问题已通过重建解决，无全局阻塞。
+- 提交依据：`feat: bind net deposit change claim to numeric evidence`，以最新 main 为父提交，expected_sha 并发检查、不强推；进度和代码同提交。
+- 下一批 M1-02b：继续迁移其余净入金金额/比例声明，补通用 MetricDefinition 与 UI 标识；之后推进参数化和连续样本边界。人工复现、盲审、本人讲解、同行反馈和职业结果仍待人工验收；保留持续任务。
