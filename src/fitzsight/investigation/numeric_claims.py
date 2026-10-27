@@ -1,4 +1,4 @@
-"""First bounded numeric contract: the legacy synthetic USD net-change claim.
+"""Bounded numeric contracts: the legacy synthetic USD net-change claim.
 
 This is deliberately not a generic metric catalog. Other claims still need
 migration; matching these fields does not validate upstream business semantics.
@@ -23,6 +23,21 @@ class NetChangeBinding:
     region: str = 'Europe'
 
 
+
+@dataclass(frozen=True, kw_only=True)
+class NetDecompositionBinding(NetChangeBinding):
+    deposit_change: float
+    withdrawal_change: float
+    metric_id: str = 'net_deposit_decomposition.v1'
+
+
+def render_net_decomposition(binding: NetDecompositionBinding) -> str:
+    return (
+        f"Deposits changed by ${binding.deposit_change:,.2f}, while withdrawals changed by "
+        f"${binding.withdrawal_change:,.2f}; the decomposition exactly reconstructs the net-deposit movement."
+    )
+
+
 def render_net_change(binding: NetChangeBinding) -> str:
     return (
         f"European net deposits changed by ${binding.value:,.2f} week over week "
@@ -39,12 +54,22 @@ def finite_number(value):
 
 
 def verify_net_change(claim, registry) -> bool:
-    """Fail closed on malformed bindings; tolerance only covers float arithmetic."""
+    return _verify_cashflow(claim, registry, decomposition=False)
+
+
+def verify_net_decomposition(claim, registry) -> bool:
+    return _verify_cashflow(claim, registry, decomposition=True)
+
+
+def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
+    """Fail closed; both components must match sources, not merely cancel out."""
     b = claim.numeric_binding
-    if not isinstance(b, NetChangeBinding):
+    expected_type = NetDecompositionBinding if decomposition else NetChangeBinding
+    if type(b) is not expected_type:
         return False
     if (b.metric_id, b.evidence_field, b.unit, b.currency, b.region) != (
-        'net_deposit_change.v1', 'net_change', 'currency_amount', 'USD', 'Europe'
+        ('net_deposit_decomposition.v1' if decomposition else 'net_deposit_change.v1'),
+        'net_change', 'currency_amount', 'USD', 'Europe'
     ) or not finite_number(b.value):
         return False
     try:
@@ -75,7 +100,18 @@ def verify_net_change(claim, registry) -> bool:
                 return False
             sums.append(sum(r['amount'] for r in rows))
         recomputed = (sums[2] - sums[3]) - (sums[0] - sums[1])
-        return (math.isclose(b.value, recomputed, rel_tol=0, abs_tol=1e-8)
-                and claim.text == render_net_change(b))
+        if not math.isclose(b.value, recomputed, rel_tol=0, abs_tol=1e-8):
+            return False
+        if decomposition:
+            for field, value in (('deposit_change', sums[2] - sums[0]),
+                                 ('withdrawal_change', sums[3] - sums[1])):
+                bound = getattr(b, field)
+                recorded = record.result[field]
+                if not (finite_number(bound) and finite_number(recorded)
+                        and math.isclose(bound, recorded, rel_tol=0, abs_tol=1e-8)
+                        and math.isclose(bound, value, rel_tol=0, abs_tol=1e-8)):
+                    return False
+            return claim.text == render_net_decomposition(b)
+        return claim.text == render_net_change(b)
     except (KeyError, TypeError, ValueError, AttributeError, OverflowError):
         return False

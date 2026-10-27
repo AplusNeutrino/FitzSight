@@ -4,7 +4,7 @@ import re
 
 from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.investigation.models import InvestigationResult
-from fitzsight.investigation.numeric_claims import verify_net_change
+from fitzsight.investigation.numeric_claims import verify_net_change, verify_net_decomposition
 from .models import VerificationCheck, VerificationReport
 
 
@@ -34,12 +34,16 @@ class EvidenceClaimVerifier:
             add("net_change_required", sum(c.claim_id == "N-C1" for c in result.claims) == 1,
                 "Net-deposit investigation must contain exactly one N-C1 numeric claim")
 
+            add("net_decomposition_required", sum(c.claim_id == "N-C2" for c in result.claims) == 1,
+                "Net-deposit investigation must contain exactly one N-C2 numeric claim")
+
         referenced: set[str] = set()
         verified_claims = 0
         for claim in result.claims:
             claim_ok = True
-            if claim.claim_id == "N-C1" or claim.numeric_binding is not None:
-                numeric_ok = claim.claim_id == "N-C1" and verify_net_change(claim, self.registry)
+            if claim.claim_id in {"N-C1", "N-C2"} or claim.numeric_binding is not None:
+                validator = {"N-C1": verify_net_change, "N-C2": verify_net_decomposition}.get(claim.claim_id)
+                numeric_ok = validator is not None and validator(claim, self.registry)
                 add(f"numeric_binding:{claim.claim_id}", numeric_ok,
                     f"{claim.claim_id}: numeric binding/text/source validation {'passed' if numeric_ok else 'failed'}")
                 claim_ok = numeric_ok

@@ -9,7 +9,7 @@ from fitzsight.data.scenarios import NET_DEPOSIT_SCENARIO
 from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
-from .numeric_claims import NetChangeBinding, render_net_change
+from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -341,6 +341,11 @@ class NetDepositInvestigationEngine:
             current_start=scenario.current_start.isoformat(),
             current_end=scenario.current_end.isoformat(),
         )
+        decomposition_binding = NetDecompositionBinding(
+            **{field: getattr(net_binding, field) for field in
+               ('value', 'evidence_id', 'baseline_start', 'baseline_end', 'current_start', 'current_end')},
+            deposit_change=deposit_change, withdrawal_change=withdrawal_change,
+        )
         claims = (
             Claim(
                 "N-C1",
@@ -358,13 +363,12 @@ class NetDepositInvestigationEngine:
             ),
             Claim(
                 "N-C2",
-                (
-                    f"Deposits changed by ${deposit_change:,.2f}, while withdrawals changed by "
-                    f"${withdrawal_change:,.2f}; the decomposition exactly reconstructs the net-deposit movement."
-                ),
+                render_net_decomposition(decomposition_binding),
                 "supported",
                 "high",
-                (driver_record.evidence_id,),
+                (baseline_dep.evidence_id, baseline_wd.evidence_id,
+                 current_dep.evidence_id, current_wd.evidence_id, driver_record.evidence_id),
+                numeric_binding=decomposition_binding,
             ),
             Claim(
                 "N-C3",
