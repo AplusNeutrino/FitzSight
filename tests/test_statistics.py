@@ -103,13 +103,13 @@ def test_invalid_continuous_sample_never_registers_success(method, side, bad):
 def test_continuous_numeric_iterables_preserve_results(method):
     registry = EvidenceRegistry()
     tool = StatisticalTestTool(registry)
-    a, b = [1,2,4,5], [3,5,6,8]
+    a, b = [1,2,4,5], [3,6,7,8]
     ordinary = tool.continuous_two_sample(a,b,method=method).data
     iterable = tool.continuous_two_sample((np.float64(x) for x in a),
         np.asarray(b,dtype=np.int64),method=method).data
     assert ordinary == iterable
     assert ordinary["n_a"] == ordinary["n_b"] == 4
-    assert ordinary["mean_a"] == 3 and ordinary["mean_b"] == 5.5
+    assert ordinary["mean_a"] == 3 and ordinary["mean_b"] == 6
     assert 0 <= ordinary["p_value"] <= 1
     json.dumps(iterable,allow_nan=False)
     assert len(registry.records()) == 2
@@ -123,3 +123,38 @@ def test_unknown_continuous_method_does_not_consume_samples_or_register():
     with pytest.raises(ValueError, match="method must be"):
         StatisticalTestTool(registry).continuous_two_sample(sample(),sample(),method="other")
     assert not registry.records()
+
+
+@pytest.mark.parametrize("method,a,b,reason", [
+    ("welch_t",[1],[2,3],"insufficient_sample_size"),
+    ("welch_t",[1,2],[3],"insufficient_sample_size"),
+    ("welch_t",[1,1],[1,1],"constant_samples"),
+    ("welch_t",[1,1],[2,2],"constant_samples"),
+    ("mannwhitney",[1,1],[1,1],"constant_samples"),
+    ("mannwhitney",[1,2,4,5],[3,5,6,8],"small_samples_with_ties"),
+    ("welch_t",[1e308,-1e308],[1e307,-1e307],"numerical_instability"),
+])
+def test_unavailable_inference_is_null_not_false(method,a,b,reason):
+    registry = EvidenceRegistry()
+    data = StatisticalTestTool(registry).continuous_two_sample(a,b,method=method).data
+    assert data["inference_status"] == "unavailable"
+    assert data["unavailable_reason"] == reason
+    assert data["p_value"] is data["statistic"] is data["significant_at_0_05"] is None
+    json.dumps(data,allow_nan=False)
+    assert len(registry.records()) == 1
+
+
+def test_small_untied_rank_test_preserves_exact_probability():
+    data = StatisticalTestTool(EvidenceRegistry()).continuous_two_sample([1,2],[3,4]).data
+    assert data["inference_status"] == "computed"
+    assert data["p_value_method"] == "exact"
+    assert data["statistic"] == 0
+    assert data["p_value"] == pytest.approx(1/3)
+    assert data["significant_at_0_05"] is False
+
+
+def test_summary_overflow_is_null_even_when_rank_inference_computable():
+    data = StatisticalTestTool(EvidenceRegistry()).continuous_two_sample([1e308,1.1e308],[1.2e308,1.3e308]).data
+    assert data["mean_a"] is None and data["median_a"] is None
+    assert data["inference_status"] == "computed"
+    json.dumps(data,allow_nan=False)

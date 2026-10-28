@@ -227,7 +227,7 @@ class DeterministicInvestigationEngine:
         event_trigger = bool(
             drilldown_trigger
             and response_change > 0
-            and response_test.data["p_value"] < 0.05
+            and response_test.data["significant_at_0_05"] is True
         )
         event_branch_record = self.registry.register(
             "agent.branch_decision",
@@ -312,7 +312,7 @@ class DeterministicInvestigationEngine:
             "affected_response_time_increased": response_change > 0,
             "effect_stronger_than_control": affected_change_pp < control_change_pp,
             "conversion_shift_significant": proportion_test.data["p_value"] < 0.05,
-            "response_shift_significant": response_test.data["p_value"] < 0.05,
+            "response_shift_significant": response_test.data["significant_at_0_05"],
             "matching_operational_event_found": bool(matching_events),
             "top_negative_team_contributor": None if most_negative is None else most_negative["segment"],
             "post_change_response_anomaly_count": response_anomaly_data["anomaly_count"],

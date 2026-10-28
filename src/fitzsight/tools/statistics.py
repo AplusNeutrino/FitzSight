@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 from numbers import Integral, Real
 from typing import Iterable
 
@@ -132,26 +133,50 @@ class StatisticalTestTool:
 
         a = sample(values_a, label_a)
         b = sample(values_b, label_b)
-        if method == "mannwhitney":
-            statistic, p_value = mannwhitneyu(a, b, alternative="two-sided")
-        elif method == "welch_t":
-            statistic, p_value = ttest_ind(a, b, equal_var=False)
-        else:
-            raise ValueError("method must be 'mannwhitney' or 'welch_t'")
-
+        reason = None
+        statistic = p_value = None
+        if method == "welch_t" and min(len(a), len(b)) < 2:
+            reason = "insufficient_sample_size"
+        elif np.all(a == a[0]) and np.all(b == b[0]) and (method == "welch_t" or a[0] == b[0]):
+            reason = "constant_samples"
+        elif method == "mannwhitney" and min(len(a), len(b)) < 10 and len(np.unique(np.concatenate((a,b)))) < len(a)+len(b):
+            # Do not label a small tied-sample asymptotic result as exact.
+            reason = "small_samples_with_ties"
+        p_method = "welch_t" if method == "welch_t" else (
+            "exact" if min(len(a),len(b)) <= 8 and len(np.unique(np.concatenate((a,b)))) == len(a)+len(b)
+            else "asymptotic")
+        summaries = {}
+        for name, values in (("a", a), ("b", b)):
+            for label, operation in (("median", np.median), ("mean", np.mean)):
+                try:
+                    with np.errstate(over="raise", invalid="raise", divide="raise"):
+                        value = float(operation(values))
+                    summaries[f"{label}_{name}"] = value if math.isfinite(value) else None
+                except FloatingPointError:
+                    summaries[f"{label}_{name}"] = None
+        if reason is None:
+            try:
+                with warnings.catch_warnings(), np.errstate(over="raise", invalid="raise", divide="raise"):
+                    warnings.simplefilter("error", RuntimeWarning)
+                    if method == "mannwhitney":
+                        statistic, p_value = mannwhitneyu(a, b, alternative="two-sided", method=p_method)
+                    else:
+                        statistic, p_value = ttest_ind(a, b, equal_var=False)
+                statistic, p_value = float(statistic), float(p_value)
+                if not (math.isfinite(statistic) and math.isfinite(p_value) and 0 <= p_value <= 1):
+                    reason = "nonfinite_test_result"
+            except (FloatingPointError, RuntimeWarning, OverflowError):
+                reason = "numerical_instability"
+        if reason is not None:
+            statistic = p_value = None
         payload = {
-            "test": method,
-            "label_a": label_a,
-            "label_b": label_b,
-            "n_a": int(len(a)),
-            "n_b": int(len(b)),
-            "median_a": float(np.median(a)),
-            "median_b": float(np.median(b)),
-            "mean_a": float(np.mean(a)),
-            "mean_b": float(np.mean(b)),
-            "statistic": float(statistic),
-            "p_value": float(p_value),
-            "significant_at_0_05": float(p_value) < 0.05,
+            "test": method, "label_a": label_a, "label_b": label_b,
+            "n_a": int(len(a)), "n_b": int(len(b)), **summaries,
+            "statistic": statistic, "p_value": p_value,
+            "inference_status": "unavailable" if reason else "computed",
+            "unavailable_reason": reason,
+            "p_value_method": None if reason else p_method,
+            "significant_at_0_05": None if reason else p_value < 0.05,
         }
         params = {"method": method, "label_a": label_a, "label_b": label_b}
         record = self.registry.register("statistical_test.continuous_two_sample", params, payload)
