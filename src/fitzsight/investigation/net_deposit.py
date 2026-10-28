@@ -12,6 +12,7 @@ from fitzsight.tools.sql import ReadOnlySQLTool
 from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
 from .concentration_claims import ConcentrationBinding, render_concentration
 from .regional_claims import RegionAmounts, RegionalBinding, render_regional
+from .event_claims import EventBinding, event_query, render_event
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -291,11 +292,7 @@ class NetDepositInvestigationEngine:
 
         event_start = (scenario.event_date - timedelta(days=2)).isoformat()
         event_end = (scenario.event_date + timedelta(days=2) + timedelta(days=1)).isoformat()
-        event_sql = (
-            "SELECT event_id, date, event_type, region, affected_team, description "
-            "FROM business_events WHERE region = 'Europe' "
-            f"AND date >= '{event_start}' AND date < '{event_end}' ORDER BY date"
-        )
+        event_sql = event_query(event_start, event_end)
         events = self.sql_tool.run(event_sql)
         matching_events = [
             row
@@ -386,6 +383,9 @@ class NetDepositInvestigationEngine:
             evidence_id=regional_record.evidence_id,
             source_evidence_ids=(*baseline_region_evidence, *current_region_evidence),
         )
+        event_binding = EventBinding(events.evidence_id,
+            tuple(sorted(row["event_id"] for row in matching_events)),
+            period_start=event_start, period_end_exclusive=event_end)
         claims = (
             Claim(
                 "N-C1",
@@ -432,13 +432,7 @@ class NetDepositInvestigationEngine:
             ),
             Claim(
                 "N-C5",
-                (
-                    "A high-value withdrawal-cluster event is present in the nearby operational event log. "
-                    "The log records an operational event, not evidence of why individual customers withdrew."
-                    if matching_events else
-                    "No matching high-value withdrawal-cluster event was found in the nearby European "
-                    "operational event log. This does not establish that no event occurred or why customers withdrew."
-                ),
+                render_event(event_binding),
                 "supported_with_guardrail" if matching_events else "insufficient_evidence",
                 "high" if matching_events else "low",
                 (
@@ -446,6 +440,7 @@ class NetDepositInvestigationEngine:
                     concentration_record.evidence_id,
                     driver_record.evidence_id,
                 ),
+                event_binding=event_binding,
             ),
         )
 

@@ -18,6 +18,8 @@ def test_net_deposit_intent_runs_end_to_end_and_verifies(tmp_path: Path):
         assert result["plan"]["intent"] == NET_DEPOSIT_INTENT
         assert result["verification"]["passed"] is True
         assert result["verification"]["verified_claims"] == 5
+        assert any(c["check_id"] == "event_binding:N-C5" and c["passed"]
+                   for c in result["verification"]["checks"])
         assert result["final_answer"]["status"] == "verified"
         assert result["investigation"]["diagnosis"]["net_deposit_declined"] is True
         assert result["investigation"]["diagnosis"]["withdrawal_pressure_increased"] is True

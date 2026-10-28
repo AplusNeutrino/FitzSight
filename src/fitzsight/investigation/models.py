@@ -6,6 +6,7 @@ from typing import Any
 from .numeric_claims import NetChangeBinding
 from .concentration_claims import ConcentrationBinding
 from .regional_claims import RegionalBinding
+from .event_claims import EventBinding
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class Claim:
     confidence: str
     evidence_ids: tuple[str, ...]
     numeric_binding: NetChangeBinding | ConcentrationBinding | RegionalBinding | None = None
+    event_binding: EventBinding | None = None
 
 
 @dataclass(frozen=True)

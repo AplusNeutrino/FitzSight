@@ -7,6 +7,7 @@ from fitzsight.investigation.models import InvestigationResult
 from fitzsight.investigation.numeric_claims import verify_net_change, verify_net_decomposition
 from fitzsight.investigation.concentration_claims import verify_concentration
 from fitzsight.investigation.regional_claims import verify_regional
+from fitzsight.investigation.event_claims import verify_event
 from .models import VerificationCheck, VerificationReport
 
 
@@ -45,6 +46,9 @@ class EvidenceClaimVerifier:
             add("regional_required", sum(c.claim_id == "N-C4" for c in result.claims) == 1,
                 "Net-deposit investigation must contain exactly one N-C4 numeric claim")
 
+            add("event_required", sum(c.claim_id == "N-C5" for c in result.claims) == 1,
+                "Net-deposit investigation must contain exactly one N-C5 event claim")
+
         referenced: set[str] = set()
         verified_claims = 0
         for claim in result.claims:
@@ -55,6 +59,11 @@ class EvidenceClaimVerifier:
                 add(f"numeric_binding:{claim.claim_id}", numeric_ok,
                     f"{claim.claim_id}: numeric binding/text/source validation {'passed' if numeric_ok else 'failed'}")
                 claim_ok = numeric_ok
+            if claim.claim_id == "N-C5" or claim.event_binding is not None:
+                event_ok = verify_event(claim, self.registry)
+                add(f"event_binding:{claim.claim_id}", event_ok,
+                    f"{claim.claim_id}: event binding/text/source validation {event_ok}")
+                claim_ok = claim_ok and event_ok
             if claim.status not in {"supported", "supported_with_guardrail", "insufficient_evidence"}:
                 claim_ok = False
                 add(f"claim_status:{claim.claim_id}", False, f"{claim.claim_id}: unsupported claim status {claim.status!r}")

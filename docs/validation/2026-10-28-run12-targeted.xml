@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="117" time="252.515" timestamp="2026-10-28T02:15:49.834077-07:00" hostname="434020bcd7ec"><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows0]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows1]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows2]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows3]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows4]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows5]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_recompute_matches_from_full_rows[rows6]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[region-Asia]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[event_type-OTHER]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[period_start-2026-08-04]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[period_end_exclusive-2026-08-09]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[metric_id-other]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[evidence_id-E9999]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[matched_event_ids-value6]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[matched_event_ids-value7]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[matched_event_ids-value8]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_binding_tampering_rejected[matched_event_ids-True]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes0]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes1]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes2]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes3]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes4]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_claim_tampering_rejected[changes5]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[truncated]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[count]" time="0.001" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[compact]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[duplicate]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[bad_date]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[missing_field]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[wrong_tool]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[wrong_sql]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[failed]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_invalid_source_fails_closed[digest]" time="0.000" /><testcase classname="tests.test_event_claims" name="test_consistent_false_absence_and_text_rejected_by_source" time="0.000" /><testcase classname="tests.test_event_claims" name="test_net_investigation_requires_one_valid_event_claim[delete]" time="0.002" /><testcase classname="tests.test_event_claims" name="test_net_investigation_requires_one_valid_event_claim[duplicate]" time="0.002" /><testcase classname="tests.test_event_claims" name="test_net_investigation_requires_one_valid_event_claim[binding]" time="0.004" /><testcase classname="tests.test_event_claims" name="test_net_investigation_requires_one_valid_event_claim[text]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_hand_calculated_net_change_accepts_and_serializes_binding" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-99.0]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-nan]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-inf]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-True]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-99]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[unit-percent]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[currency-EUR]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[metric_id-conversion_rate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_field-deposit_change]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[region-Asia]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[baseline_start-2026-07-28]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[baseline_end-2026-08-01]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[current_start-2026-08-04]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[current_end-2026-08-10]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_id-E0001]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_id-E9999]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[Net deposits changed by $99.00.]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[\u51c0\u5165\u91d1\u53d8\u5316\u4e3a99%\u3002]" time="0.003" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[Net deposits changed by \u20ac20.00.]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_consistently_wrong_value_and_rendering_still_rejected" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[binding]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[claim]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[source_reference]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_internally_consistent_but_wrong_driver_rejected_by_source_recalculation" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-99.0]" time="0.003" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-99.0]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-nan]" time="0.003" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-inf]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-True]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-99]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[value-0]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[unit-percent]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[currency-EUR]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[region-Asia]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[baseline_start-2026-07-28]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[current_end-2026-08-10]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[metric_id-net_deposit_change.v1]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[evidence_field-deposit_change]" time="0.004" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[evidence_id-E9999]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_compensating_wrong_components_with_matching_text_and_driver_rejected" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[binding]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[claim]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[source_reference]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[text]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[wrong_type]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_hand_calculation_and_serialization" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_required_concentration_claim[remove]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_required_concentration_claim[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_required_regional_claim[remove]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_required_regional_claim[duplicate]" time="0.005" /><testcase classname="tests.test_net_deposit_agent" name="test_net_deposit_intent_runs_end_to_end_and_verifies" time="5.982"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_net_deposit_intent_runs_e0')
+
+    def test_net_deposit_intent_runs_end_to_end_and_verifies(tmp_path: Path):
+        store, registry, agent = build_agent_runtime(
+            data_mode="demo",
+            data_dir=tmp_path / "data",
+            backend="sqlite",
+            planner=ConstrainedRulePlanner(),
+        )
+        try:
+            result = agent.run(QUESTION).to_dict()
+            assert result["plan"]["intent"] == NET_DEPOSIT_INTENT
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:19: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-sqlite]" time="5.515"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_zero_withdrawal_denominat0')
+backend = 'sqlite', empty = False
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        # Modify actual synthetic CSVs, then exercise import, SQL, engine and verifier.
+        path = data_dir / "withdrawals.csv"
+        withdrawals = pd.read_csv(path)
+        if empty:
+            withdrawals = withdrawals.iloc[:0]
+        else:
+            withdrawals["amount"] = 0.0
+        withdrawals.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            concentration = investigation["metrics"]["customer_concentration"]
+            assert concentration["current_total_withdrawals"] == 0
+            assert concentration["share_of_current_withdrawals"] is None
+            assert concentration["calculation_status"] == "unavailable"
+            assert concentration["unavailable_reason"] == "nonpositive_total_withdrawals"
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C3")
+            assert claim["status"] == "insufficient_evidence"
+            assert "unavailable" in claim["text"] and "%" not in claim["text"]
+            assert investigation["diagnosis"]["withdrawal_concentration_high"] is None
+            assert investigation["diagnosis"]["driver_type"] == "undetermined"
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:80: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[False-duckdb]" time="6.630" /><testcase classname="tests.test_net_deposit_agent" name="test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-sqlite]" time="5.319"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_zero_withdrawal_denominat2')
+backend = 'sqlite', empty = True
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("empty", [False, True])
+    def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, backend, empty):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        # Modify actual synthetic CSVs, then exercise import, SQL, engine and verifier.
+        path = data_dir / "withdrawals.csv"
+        withdrawals = pd.read_csv(path)
+        if empty:
+            withdrawals = withdrawals.iloc[:0]
+        else:
+            withdrawals["amount"] = 0.0
+        withdrawals.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir, backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            concentration = investigation["metrics"]["customer_concentration"]
+            assert concentration["current_total_withdrawals"] == 0
+            assert concentration["share_of_current_withdrawals"] is None
+            assert concentration["calculation_status"] == "unavailable"
+            assert concentration["unavailable_reason"] == "nonpositive_total_withdrawals"
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C3")
+            assert claim["status"] == "insufficient_evidence"
+            assert "unavailable" in claim["text"] and "%" not in claim["text"]
+            assert investigation["diagnosis"]["withdrawal_concentration_high"] is None
+            assert investigation["diagnosis"]["driver_type"] == "undetermined"
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:80: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_zero_withdrawal_denominator_is_unavailable_not_zero_percent[True-duckdb]" time="6.161" /><testcase classname="tests.test_net_deposit_agent" name="test_missing_regional_comparison_is_not_filled_with_zero[target_only-sqlite]" time="9.844"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_missing_regional_comparis0')
+backend = 'sqlite', selection = 'target_only'
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("selection", ["target_only", "controls_only"])
+    def test_missing_regional_comparison_is_not_filled_with_zero(tmp_path, backend, selection):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        path = data_dir / "customers.csv"
+        customers = pd.read_csv(path)
+        mask = customers["region"].eq("Europe")
+        customers[mask if selection == "target_only" else ~mask].to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                              backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            regional = investigation["metrics"]["regional_control"]
+            assert regional["calculation_status"] == "unavailable"
+            if selection == "target_only":
+                assert regional["other_region_median_change"] is None
+                assert regional["control_region_count"] == 0
+                assert regional["europe_change"] is not None
+                assert regional["unavailable_reason"] == "missing_control_regions"
+            else:
+                assert regional["europe_change"] is None
+                assert regional["other_region_median_change"] is not None
+                assert regional["unavailable_reason"] == "missing_target_region"
+            assert investigation["diagnosis"]["europe_worse_than_other_region_median"] is None
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C4")
+            assert claim["status"] == "insufficient_evidence"
+            assert "unavailable" in claim["text"] and "$" not in claim["text"]
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:117: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_missing_regional_comparison_is_not_filled_with_zero[target_only-duckdb]" time="16.615" /><testcase classname="tests.test_net_deposit_agent" name="test_missing_regional_comparison_is_not_filled_with_zero[controls_only-sqlite]" time="13.637"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_missing_regional_comparis2')
+backend = 'sqlite', selection = 'controls_only'
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("selection", ["target_only", "controls_only"])
+    def test_missing_regional_comparison_is_not_filled_with_zero(tmp_path, backend, selection):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        path = data_dir / "customers.csv"
+        customers = pd.read_csv(path)
+        mask = customers["region"].eq("Europe")
+        customers[mask if selection == "target_only" else ~mask].to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                              backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            regional = investigation["metrics"]["regional_control"]
+            assert regional["calculation_status"] == "unavailable"
+            if selection == "target_only":
+                assert regional["other_region_median_change"] is None
+                assert regional["control_region_count"] == 0
+                assert regional["europe_change"] is not None
+                assert regional["unavailable_reason"] == "missing_control_regions"
+            else:
+                assert regional["europe_change"] is None
+                assert regional["other_region_median_change"] is not None
+                assert regional["unavailable_reason"] == "missing_target_region"
+            assert investigation["diagnosis"]["europe_worse_than_other_region_median"] is None
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C4")
+            assert claim["status"] == "insufficient_evidence"
+            assert "unavailable" in claim["text"] and "$" not in claim["text"]
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:117: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_missing_regional_comparison_is_not_filled_with_zero[controls_only-duckdb]" time="13.519" /><testcase classname="tests.test_net_deposit_agent" name="test_real_zero_regional_change_remains_computable[sqlite]" time="12.869"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_zero_regional_change0')
+backend = 'sqlite'
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    def test_real_zero_regional_change_remains_computable(tmp_path, backend):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        for table in ("deposits", "withdrawals"):
+            path = data_dir / f"{table}.csv"
+            rows = pd.read_csv(path)
+            rows["amount"] = 0.0
+            rows.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                              backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            regional = investigation["metrics"]["regional_control"]
+            assert regional["europe_change"] == 0
+            assert regional["other_region_median_change"] == 0
+            assert regional["calculation_status"] == "computed"
+            assert regional["unavailable_reason"] is None
+            assert regional["control_region_count"] &gt; 0
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C4")
+            assert claim["status"] == "supported" and "$0.00" in claim["text"]
+            assert investigation["diagnosis"]["europe_worse_than_other_region_median"] is False
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:148: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_real_zero_regional_change_remains_computable[duckdb]" time="16.189" /><testcase classname="tests.test_net_deposit_agent" name="test_non_usd_control_region_cannot_be_labeled_dollars[sqlite]" time="16.101" /><testcase classname="tests.test_net_deposit_agent" name="test_non_usd_control_region_cannot_be_labeled_dollars[duckdb]" time="20.677" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[empty-sqlite]" time="18.040" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[empty-duckdb]" time="14.098" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[wrong_type-sqlite]" time="8.262"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_event_claim_matches_impor2')
+backend = 'sqlite', event_case = 'wrong_type'
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("event_case", ["empty", "wrong_type", "wrong_region", "outside_window", "present_zero_cashflow"])
+    def test_event_claim_matches_imported_log_without_driver_overclaim(tmp_path, backend, event_case):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        path = data_dir / "business_events.csv"
+        events = pd.read_csv(path)
+        # Retain a valid schema and use one controlled event for each counterexample.
+        events = events.iloc[:1].copy()
+        events["region"] = "Europe"
+        events["event_type"] = "HIGH_VALUE_WITHDRAWAL_CLUSTER"
+        events["date"] = "2026-08-05"
+        if event_case == "empty":
+            events = events.iloc[:0]
+        elif event_case == "wrong_type":
+            events["event_type"] = "UNRELATED_EVENT"
+        elif event_case == "wrong_region":
+            events["region"] = "Asia"
+        elif event_case == "outside_window":
+            events["date"] = "2026-08-08"  # Exclusive upper boundary.
+        else:
+            for table in ("deposits", "withdrawals"):
+                cash_path = data_dir / f"{table}.csv"
+                cash = pd.read_csv(cash_path)
+                cash["amount"] = 0.0
+                cash.to_csv(cash_path, index=False)
+        events.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                              backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C5")
+            present = event_case == "present_zero_cashflow"
+            assert investigation["diagnosis"]["matching_operational_event_found"] is present
+            assert bool(investigation["metrics"]["nearby_business_events"]) is present
+            assert claim["status"] == ("supported_with_guardrail" if present else "insufficient_evidence")
+            assert claim["confidence"] == ("high" if present else "low")
+            assert "supported observed driver" not in claim["text"]
+            if present:
+                assert "event is present" in claim["text"]
+                assert investigation["diagnosis"]["root_cause_status"] == "insufficient_evidence"
+            else:
+                assert "No matching" in claim["text"]
+                assert "event is present" not in claim["text"]
+                assert "does not establish that no event occurred" in claim["text"]
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:224: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[wrong_type-duckdb]" time="8.937" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[wrong_region-sqlite]" time="7.576" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[wrong_region-duckdb]" time="9.182" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[outside_window-sqlite]" time="8.048" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[outside_window-duckdb]" time="10.097" /><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[present_zero_cashflow-sqlite]" time="8.381"><failure message="assert False is True">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_event_claim_matches_impor8')
+backend = 'sqlite', event_case = 'present_zero_cashflow'
+
+    @pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+    @pytest.mark.parametrize("event_case", ["empty", "wrong_type", "wrong_region", "outside_window", "present_zero_cashflow"])
+    def test_event_claim_matches_imported_log_without_driver_overclaim(tmp_path, backend, event_case):
+        data_dir = tmp_path / "data"
+        store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+        store.close()
+        path = data_dir / "business_events.csv"
+        events = pd.read_csv(path)
+        # Retain a valid schema and use one controlled event for each counterexample.
+        events = events.iloc[:1].copy()
+        events["region"] = "Europe"
+        events["event_type"] = "HIGH_VALUE_WITHDRAWAL_CLUSTER"
+        events["date"] = "2026-08-05"
+        if event_case == "empty":
+            events = events.iloc[:0]
+        elif event_case == "wrong_type":
+            events["event_type"] = "UNRELATED_EVENT"
+        elif event_case == "wrong_region":
+            events["region"] = "Asia"
+        elif event_case == "outside_window":
+            events["date"] = "2026-08-08"  # Exclusive upper boundary.
+        else:
+            for table in ("deposits", "withdrawals"):
+                cash_path = data_dir / f"{table}.csv"
+                cash = pd.read_csv(cash_path)
+                cash["amount"] = 0.0
+                cash.to_csv(cash_path, index=False)
+        events.to_csv(path, index=False)
+        store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                              backend=backend, planner=ConstrainedRulePlanner())
+        try:
+            result = agent.run(QUESTION).to_dict()
+            investigation = result["investigation"]
+            claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C5")
+            present = event_case == "present_zero_cashflow"
+            assert investigation["diagnosis"]["matching_operational_event_found"] is present
+            assert bool(investigation["metrics"]["nearby_business_events"]) is present
+            assert claim["status"] == ("supported_with_guardrail" if present else "insufficient_evidence")
+            assert claim["confidence"] == ("high" if present else "low")
+            assert "supported observed driver" not in claim["text"]
+            if present:
+                assert "event is present" in claim["text"]
+                assert investigation["diagnosis"]["root_cause_status"] == "insufficient_evidence"
+            else:
+                assert "No matching" in claim["text"]
+                assert "event is present" not in claim["text"]
+                assert "does not establish that no event occurred" in claim["text"]
+&gt;           assert result["verification"]["passed"] is True
+E           assert False is True
+
+tests/test_net_deposit_agent.py:224: AssertionError</failure></testcase><testcase classname="tests.test_net_deposit_agent" name="test_event_claim_matches_imported_log_without_driver_overclaim[present_zero_cashflow-duckdb]" time="8.699" /></testsuite></testsuites>
