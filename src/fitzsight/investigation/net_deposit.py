@@ -11,6 +11,7 @@ from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
 from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
 from .concentration_claims import ConcentrationBinding, render_concentration
+from .regional_claims import RegionAmounts, RegionalBinding, render_regional
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -92,19 +93,23 @@ class NetDepositInvestigationEngine:
         start_s, end_exclusive = self._period_bounds(start, end)
         deposit_sql = (
             "SELECT c.region, COUNT(DISTINCT c.customer_id) AS customer_count, "
-            "COALESCE(SUM(CAST(d.amount AS DOUBLE)), 0) AS deposits "
+            "COALESCE(SUM(CAST(d.amount AS DOUBLE)), 0) AS deposits, "
+            "SUM(CASE WHEN d.customer_id IS NOT NULL AND (d.currency IS NULL OR d.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
             "FROM customers c LEFT JOIN deposits d ON d.customer_id = c.customer_id "
             f"AND d.status = 'completed' AND d.timestamp >= '{start_s}' AND d.timestamp < '{end_exclusive}' "
             "GROUP BY c.region ORDER BY c.region"
         )
         withdrawal_sql = (
-            "SELECT c.region, COALESCE(SUM(CAST(w.amount AS DOUBLE)), 0) AS withdrawals "
+            "SELECT c.region, COALESCE(SUM(CAST(w.amount AS DOUBLE)), 0) AS withdrawals, "
+            "SUM(CASE WHEN w.customer_id IS NOT NULL AND (w.currency IS NULL OR w.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
             "FROM customers c LEFT JOIN withdrawals w ON w.customer_id = c.customer_id "
             f"AND w.status = 'completed' AND w.timestamp >= '{start_s}' AND w.timestamp < '{end_exclusive}' "
             "GROUP BY c.region ORDER BY c.region"
         )
         deposits = self.sql_tool.run(deposit_sql)
         withdrawals = self.sql_tool.run(withdrawal_sql)
+        if any(row["invalid_currency_count"] for result in (deposits, withdrawals) for row in result.data["rows"]):
+            raise ValueError("Regional net-deposit comparison requires USD cash flows")
         withdrawal_by_region = {
             row["region"]: float(row["withdrawals"] or 0.0)
             for row in withdrawals.data["rows"]
@@ -276,6 +281,10 @@ class NetDepositInvestigationEngine:
             {
                 "baseline_start": scenario.baseline_start.isoformat(),
                 "current_start": scenario.current_start.isoformat(),
+                "baseline_end": scenario.baseline_end.isoformat(),
+                "current_end": scenario.current_end.isoformat(),
+                "region": scenario.region, "currency": "USD",
+                "source_evidence_ids": [*baseline_region_evidence, *current_region_evidence],
             },
             regional_payload,
         )
@@ -366,6 +375,17 @@ class NetDepositInvestigationEngine:
             period_end_exclusive=current_end_exclusive, evidence_id=concentration_record.evidence_id,
             source_evidence_id=current_wd.evidence_id,
         )
+        def amounts(regions):
+            return tuple(RegionAmounts(r, v["customer_count"], v["deposits"], v["withdrawals"])
+                         for r, v in sorted(regions.items()))
+        regional_binding = RegionalBinding(
+            value=europe_change, control_value=control_median_change,
+            baseline=amounts(baseline_regions), current=amounts(current_regions),
+            baseline_start=scenario.baseline_start.isoformat(), baseline_end=scenario.baseline_end.isoformat(),
+            current_start=scenario.current_start.isoformat(), current_end=scenario.current_end.isoformat(),
+            evidence_id=regional_record.evidence_id,
+            source_evidence_ids=(*baseline_region_evidence, *current_region_evidence),
+        )
         claims = (
             Claim(
                 "N-C1",
@@ -400,14 +420,7 @@ class NetDepositInvestigationEngine:
             ),
             Claim(
                 "N-C4",
-                (
-                    f"Europe's weekly net-deposit movement per registered customer was "
-                    f"${regional_payload['europe_change']:,.2f}, versus a median of "
-                    f"${regional_payload['other_region_median_change']:,.2f} across the other regions."
-                    if regional_comparison_available else
-                    "Regional net-deposit comparison is unavailable because the target region "
-                    "or comparable control regions have no calculable per-customer change."
-                ),
+                render_regional(regional_binding),
                 "supported" if regional_comparison_available else "insufficient_evidence",
                 "medium",
                 (
@@ -415,6 +428,7 @@ class NetDepositInvestigationEngine:
                     *current_region_evidence,
                     regional_record.evidence_id,
                 ),
+                numeric_binding=regional_binding,
             ),
             Claim(
                 "N-C5",

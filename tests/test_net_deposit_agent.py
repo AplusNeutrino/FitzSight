@@ -146,3 +146,26 @@ def test_real_zero_regional_change_remains_computable(tmp_path, backend):
         assert result["verification"]["passed"] is True
     finally:
         store.close()
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+def test_non_usd_control_region_cannot_be_labeled_dollars(tmp_path, backend):
+    data_dir = tmp_path / "data"
+    store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                      backend=backend, planner=ConstrainedRulePlanner())
+    store.close()
+    customers = pd.read_csv(data_dir / "customers.csv")
+    controls = set(customers.loc[customers["region"] != "Europe", "customer_id"])
+    path = data_dir / "deposits.csv"
+    deposits = pd.read_csv(path)
+    mask = deposits["customer_id"].isin(controls)
+    assert mask.any()
+    deposits.loc[mask, "currency"] = "EUR"
+    deposits.to_csv(path, index=False)
+    store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+    try:
+        with pytest.raises(ValueError, match="Regional.*requires USD"):
+            agent.run(QUESTION)
+    finally:
+        store.close()

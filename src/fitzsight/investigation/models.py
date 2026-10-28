@@ -5,6 +5,7 @@ from typing import Any
 
 from .numeric_claims import NetChangeBinding
 from .concentration_claims import ConcentrationBinding
+from .regional_claims import RegionalBinding
 
 
 @dataclass(frozen=True)
@@ -31,7 +32,7 @@ class Claim:
     status: str
     confidence: str
     evidence_ids: tuple[str, ...]
-    numeric_binding: NetChangeBinding | ConcentrationBinding | None = None
+    numeric_binding: NetChangeBinding | ConcentrationBinding | RegionalBinding | None = None
 
 
 @dataclass(frozen=True)
