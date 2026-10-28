@@ -83,3 +83,43 @@ def test_numpy_counts_normalized_and_large_sample_formula_unchanged():
     assert data["p_value_method"] == "two_proportion_z"
     assert data["difference_95ci_pp"][0] < -9 < data["difference_95ci_pp"][1]
     json.dumps(data, allow_nan=False)
+
+
+@pytest.mark.parametrize("method", ["mannwhitney", "welch_t"])
+@pytest.mark.parametrize("side", ["a", "b"])
+@pytest.mark.parametrize("bad", [[], [float("nan"), 2], [float("inf"), 2],
+    [-float("inf"), 2], [None, 2], [True, 2], [np.bool_(False), 2], ["1", 2],
+    [[1], [2]], [1+2j, 2], [10**1000, 2], None, 1.0])
+def test_invalid_continuous_sample_never_registers_success(method, side, bad):
+    registry = EvidenceRegistry()
+    samples = dict(values_a=[1,2,3], values_b=[2,3,4])
+    samples[f"values_{side}"] = bad
+    with pytest.raises(ValueError, match="Invalid continuous sample"):
+        StatisticalTestTool(registry).continuous_two_sample(**samples, method=method)
+    assert not registry.records()
+
+
+@pytest.mark.parametrize("method", ["mannwhitney", "welch_t"])
+def test_continuous_numeric_iterables_preserve_results(method):
+    registry = EvidenceRegistry()
+    tool = StatisticalTestTool(registry)
+    a, b = [1,2,4,5], [3,5,6,8]
+    ordinary = tool.continuous_two_sample(a,b,method=method).data
+    iterable = tool.continuous_two_sample((np.float64(x) for x in a),
+        np.asarray(b,dtype=np.int64),method=method).data
+    assert ordinary == iterable
+    assert ordinary["n_a"] == ordinary["n_b"] == 4
+    assert ordinary["mean_a"] == 3 and ordinary["mean_b"] == 5.5
+    assert 0 <= ordinary["p_value"] <= 1
+    json.dumps(iterable,allow_nan=False)
+    assert len(registry.records()) == 2
+
+
+def test_unknown_continuous_method_does_not_consume_samples_or_register():
+    registry = EvidenceRegistry()
+    def sample():
+        raise AssertionError("invalid method must be rejected before reading samples")
+        yield 1
+    with pytest.raises(ValueError, match="method must be"):
+        StatisticalTestTool(registry).continuous_two_sample(sample(),sample(),method="other")
+    assert not registry.records()

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from numbers import Integral
+from numbers import Integral, Real
 from typing import Iterable
 
 import numpy as np
@@ -112,10 +112,26 @@ class StatisticalTestTool:
         label_a: str = "A",
         label_b: str = "B",
     ) -> ToolResult:
-        a = np.asarray(list(values_a), dtype=float)
-        b = np.asarray(list(values_b), dtype=float)
-        if len(a) == 0 or len(b) == 0:
-            raise ValueError("Both samples must be non-empty")
+        if method not in ("mannwhitney", "welch_t"):
+            raise ValueError("method must be 'mannwhitney' or 'welch_t'")
+
+        def sample(values: Iterable[float], label: str) -> np.ndarray:
+            # Validate before float conversion: otherwise booleans, strings and
+            # nested arrays can silently become plausible observations.
+            try:
+                raw = list(values)
+                if not raw or any(isinstance(x, (bool, np.bool_)) or not isinstance(x, Real)
+                                  for x in raw):
+                    raise ValueError("expected a non-empty one-dimensional real sample")
+                array = np.asarray(raw, dtype=float)
+                if array.ndim != 1 or not np.isfinite(array).all():
+                    raise ValueError("expected finite scalar observations")
+                return array
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise ValueError(f"Invalid continuous sample for {label}: {exc}") from exc
+
+        a = sample(values_a, label_a)
+        b = sample(values_b, label_b)
         if method == "mannwhitney":
             statistic, p_value = mannwhitneyu(a, b, alternative="two-sided")
         elif method == "welch_t":
