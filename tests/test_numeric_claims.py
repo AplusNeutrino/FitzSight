@@ -93,7 +93,9 @@ def test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars():
     from types import SimpleNamespace
     from fitzsight.investigation.net_deposit import NetDepositInvestigationEngine
     class SQL:
-        def run(self, sql):
+        def run(self, sql, *, parameters):
+            assert parameters == ['2026-07-27', '2026-08-03', 'Europe']
+            assert 'c.region = ?' in sql
             return SimpleNamespace(data={'rows': [{'amount': 100, 'currency': 'EUR'}]})
     engine = NetDepositInvestigationEngine(schema_tool=None, sql_tool=SQL(), registry=EvidenceRegistry())
     with pytest.raises(ValueError, match='requires USD'):

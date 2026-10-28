@@ -73,19 +73,22 @@ class NetDepositInvestigationEngine:
         start: date,
         end: date,
     ):
+        if table not in {"deposits", "withdrawals"}:
+            raise ValueError("Unsupported cash-flow table")
         start_s, end_exclusive = self._period_bounds(start, end)
+        parameters = [start_s, end_exclusive]
         region_clause = ""
         if region is not None:
-            safe_region = region.replace("'", "''")
-            region_clause = f" AND c.region = '{safe_region}'"
+            region_clause = " AND c.region = ?"
+            parameters.append(region)
         sql = (
             f"SELECT t.customer_id, t.timestamp, t.amount, t.currency, c.region, c.assigned_team "
             f"FROM {table} AS t JOIN customers AS c ON c.customer_id = t.customer_id "
             f"WHERE t.status = 'completed' "
-            f"AND t.timestamp >= '{start_s}' AND t.timestamp < '{end_exclusive}'"
+            "AND t.timestamp >= ? AND t.timestamp < ?"
             f"{region_clause} ORDER BY t.timestamp, t.customer_id"
         )
-        result = self.sql_tool.run(sql)
+        result = self.sql_tool.run(sql, parameters=parameters)
         if any(row["currency"] != "USD" for row in result.data["rows"]):
             raise ValueError("Net-deposit demo requires USD cash flows; currency conversion is not implemented")
         return result
@@ -97,18 +100,18 @@ class NetDepositInvestigationEngine:
             "COALESCE(SUM(CAST(d.amount AS DOUBLE)), 0) AS deposits, "
             "SUM(CASE WHEN d.customer_id IS NOT NULL AND (d.currency IS NULL OR d.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
             "FROM customers c LEFT JOIN deposits d ON d.customer_id = c.customer_id "
-            f"AND d.status = 'completed' AND d.timestamp >= '{start_s}' AND d.timestamp < '{end_exclusive}' "
+            "AND d.status = 'completed' AND d.timestamp >= ? AND d.timestamp < ? "
             "GROUP BY c.region ORDER BY c.region"
         )
         withdrawal_sql = (
             "SELECT c.region, COALESCE(SUM(CAST(w.amount AS DOUBLE)), 0) AS withdrawals, "
             "SUM(CASE WHEN w.customer_id IS NOT NULL AND (w.currency IS NULL OR w.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
             "FROM customers c LEFT JOIN withdrawals w ON w.customer_id = c.customer_id "
-            f"AND w.status = 'completed' AND w.timestamp >= '{start_s}' AND w.timestamp < '{end_exclusive}' "
+            "AND w.status = 'completed' AND w.timestamp >= ? AND w.timestamp < ? "
             "GROUP BY c.region ORDER BY c.region"
         )
-        deposits = self.sql_tool.run(deposit_sql)
-        withdrawals = self.sql_tool.run(withdrawal_sql)
+        deposits = self.sql_tool.run(deposit_sql, parameters=(start_s, end_exclusive))
+        withdrawals = self.sql_tool.run(withdrawal_sql, parameters=(start_s, end_exclusive))
         if any(row["invalid_currency_count"] for result in (deposits, withdrawals) for row in result.data["rows"]):
             raise ValueError("Regional net-deposit comparison requires USD cash flows")
         withdrawal_by_region = {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
@@ -77,23 +78,40 @@ class ReadOnlySQLTool:
         self,
         sql: str,
         *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
         compact_evidence: bool = False,
         evidence_preview_rows: int = 20,
     ) -> ToolResult:
         if evidence_preview_rows < 0:
             raise ValueError("evidence_preview_rows must be non-negative")
         safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) <= value < 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
         wrapped = (
             "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
             f"LIMIT {self.max_rows + 1}"
         )
         try:
-            columns, rows = self.store.execute(wrapped)
+            columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
         except Exception as exc:  # backend errors become explicit failed evidence
             payload = {"error": type(exc).__name__, "message": str(exc)}
             record = self.registry.register(
                 "read_only_sql",
-                {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows},
+                context,
                 payload,
                 status="error",
             )
@@ -126,9 +144,7 @@ class ReadOnlySQLTool:
         record = self.registry.register(
             "read_only_sql",
             {
-                "sql": safe_sql,
-                "backend": self.store.backend,
-                "max_rows": self.max_rows,
+                **context,
                 "compact_evidence": compact_evidence,
             },
             evidence_payload,

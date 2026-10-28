@@ -155,8 +155,10 @@ class AnalyticsStore:
             for row in rows
         ]
 
-    def execute(self, sql: str) -> tuple[list[str], list[tuple[Any, ...]]]:
-        cursor = self._conn.execute(sql)
+    def execute(
+        self, sql: str, parameters: tuple[Any, ...] | None = None,
+    ) -> tuple[list[str], list[tuple[Any, ...]]]:
+        cursor = self._conn.execute(sql) if parameters is None else self._conn.execute(sql, parameters)
         description = cursor.description or []
         columns = [item[0] for item in description]
         rows = cursor.fetchall()

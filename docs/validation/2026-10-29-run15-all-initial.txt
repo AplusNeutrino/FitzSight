@@ -1,0 +1,58 @@
+........................................................................ [ 16%]
+........................................................................ [ 33%]
+........................F............................................... [ 50%]
+........................................................................ [ 66%]
+........................................................................ [ 83%]
+.......................................................................  [100%]
+=================================== FAILURES ===================================
+____ test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars _____
+
+    def test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars():
+        from datetime import date
+        from types import SimpleNamespace
+        from fitzsight.investigation.net_deposit import NetDepositInvestigationEngine
+        class SQL:
+            def run(self, sql):
+                return SimpleNamespace(data={'rows': [{'amount': 100, 'currency': 'EUR'}]})
+        engine = NetDepositInvestigationEngine(schema_tool=None, sql_tool=SQL(), registry=EvidenceRegistry())
+        with pytest.raises(ValueError, match='requires USD'):
+>           engine._money_rows('deposits', region='Europe', start=date(2026, 7, 27), end=date(2026, 8, 2))
+
+tests/test_numeric_claims.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.investigation.net_deposit.NetDepositInvestigationEngine object at 0x7f54ef03fdd0>
+table = 'deposits', region = 'Europe', start = datetime.date(2026, 7, 27)
+end = datetime.date(2026, 8, 2)
+
+    def _money_rows(
+        self,
+        table: str,
+        *,
+        region: str | None,
+        start: date,
+        end: date,
+    ):
+        if table not in {"deposits", "withdrawals"}:
+            raise ValueError("Unsupported cash-flow table")
+        start_s, end_exclusive = self._period_bounds(start, end)
+        parameters = [start_s, end_exclusive]
+        region_clause = ""
+        if region is not None:
+            region_clause = " AND c.region = ?"
+            parameters.append(region)
+        sql = (
+            f"SELECT t.customer_id, t.timestamp, t.amount, t.currency, c.region, c.assigned_team "
+            f"FROM {table} AS t JOIN customers AS c ON c.customer_id = t.customer_id "
+            f"WHERE t.status = 'completed' "
+            "AND t.timestamp >= ? AND t.timestamp < ?"
+            f"{region_clause} ORDER BY t.timestamp, t.customer_id"
+        )
+>       result = self.sql_tool.run(sql, parameters=parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars.<locals>.SQL.run() got an unexpected keyword argument 'parameters'
+
+src/fitzsight/investigation/net_deposit.py:91: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_numeric_claims.py::test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars
+1 failed, 430 passed in 194.20s (0:03:14)
