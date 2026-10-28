@@ -434,8 +434,10 @@ class NetDepositInvestigationEngine:
                 "N-C5",
                 (
                     "A high-value withdrawal-cluster event is present in the nearby operational event log. "
-                    "Together with the measured withdrawal concentration, this is a supported observed driver, "
-                    "not evidence of why individual customers withdrew."
+                    "The log records an operational event, not evidence of why individual customers withdrew."
+                    if matching_events else
+                    "No matching high-value withdrawal-cluster event was found in the nearby European "
+                    "operational event log. This does not establish that no event occurred or why customers withdrew."
                 ),
                 "supported_with_guardrail" if matching_events else "insufficient_evidence",
                 "high" if matching_events else "low",

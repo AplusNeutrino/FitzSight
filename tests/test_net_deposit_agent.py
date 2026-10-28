@@ -169,3 +169,56 @@ def test_non_usd_control_region_cannot_be_labeled_dollars(tmp_path, backend):
             agent.run(QUESTION)
     finally:
         store.close()
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+@pytest.mark.parametrize("event_case", ["empty", "wrong_type", "wrong_region", "outside_window", "present_zero_cashflow"])
+def test_event_claim_matches_imported_log_without_driver_overclaim(tmp_path, backend, event_case):
+    data_dir = tmp_path / "data"
+    store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                      backend=backend, planner=ConstrainedRulePlanner())
+    store.close()
+    path = data_dir / "business_events.csv"
+    events = pd.read_csv(path)
+    # Retain a valid schema and use one controlled event for each counterexample.
+    events = events.iloc[:1].copy()
+    events["region"] = "Europe"
+    events["event_type"] = "HIGH_VALUE_WITHDRAWAL_CLUSTER"
+    events["date"] = "2026-08-05"
+    if event_case == "empty":
+        events = events.iloc[:0]
+    elif event_case == "wrong_type":
+        events["event_type"] = "UNRELATED_EVENT"
+    elif event_case == "wrong_region":
+        events["region"] = "Asia"
+    elif event_case == "outside_window":
+        events["date"] = "2026-08-08"  # Exclusive upper boundary.
+    else:
+        for table in ("deposits", "withdrawals"):
+            cash_path = data_dir / f"{table}.csv"
+            cash = pd.read_csv(cash_path)
+            cash["amount"] = 0.0
+            cash.to_csv(cash_path, index=False)
+    events.to_csv(path, index=False)
+    store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+    try:
+        result = agent.run(QUESTION).to_dict()
+        investigation = result["investigation"]
+        claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C5")
+        present = event_case == "present_zero_cashflow"
+        assert investigation["diagnosis"]["matching_operational_event_found"] is present
+        assert bool(investigation["metrics"]["nearby_business_events"]) is present
+        assert claim["status"] == ("supported_with_guardrail" if present else "insufficient_evidence")
+        assert claim["confidence"] == ("high" if present else "low")
+        assert "supported observed driver" not in claim["text"]
+        if present:
+            assert "event is present" in claim["text"]
+            assert investigation["diagnosis"]["root_cause_status"] == "insufficient_evidence"
+        else:
+            assert "No matching" in claim["text"]
+            assert "event is present" not in claim["text"]
+            assert "does not establish that no event occurred" in claim["text"]
+        assert result["verification"]["passed"] is True
+    finally:
+        store.close()
