@@ -79,3 +79,70 @@ def test_zero_withdrawal_denominator_is_unavailable_not_zero_percent(tmp_path, b
         json.dumps(concentration, allow_nan=False)
     finally:
         store.close()
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+@pytest.mark.parametrize("selection", ["target_only", "controls_only"])
+def test_missing_regional_comparison_is_not_filled_with_zero(tmp_path, backend, selection):
+    data_dir = tmp_path / "data"
+    store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                      backend=backend, planner=ConstrainedRulePlanner())
+    store.close()
+    path = data_dir / "customers.csv"
+    customers = pd.read_csv(path)
+    mask = customers["region"].eq("Europe")
+    customers[mask if selection == "target_only" else ~mask].to_csv(path, index=False)
+    store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+    try:
+        result = agent.run(QUESTION).to_dict()
+        investigation = result["investigation"]
+        regional = investigation["metrics"]["regional_control"]
+        assert regional["calculation_status"] == "unavailable"
+        if selection == "target_only":
+            assert regional["other_region_median_change"] is None
+            assert regional["control_region_count"] == 0
+            assert regional["europe_change"] is not None
+            assert regional["unavailable_reason"] == "missing_control_regions"
+        else:
+            assert regional["europe_change"] is None
+            assert regional["other_region_median_change"] is not None
+            assert regional["unavailable_reason"] == "missing_target_region"
+        assert investigation["diagnosis"]["europe_worse_than_other_region_median"] is None
+        claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C4")
+        assert claim["status"] == "insufficient_evidence"
+        assert "unavailable" in claim["text"] and "$" not in claim["text"]
+        assert result["verification"]["passed"] is True
+        json.dumps(regional, allow_nan=False)
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "duckdb"])
+def test_real_zero_regional_change_remains_computable(tmp_path, backend):
+    data_dir = tmp_path / "data"
+    store, _, _ = build_agent_runtime(data_mode="demo", data_dir=data_dir,
+                                      backend=backend, planner=ConstrainedRulePlanner())
+    store.close()
+    for table in ("deposits", "withdrawals"):
+        path = data_dir / f"{table}.csv"
+        rows = pd.read_csv(path)
+        rows["amount"] = 0.0
+        rows.to_csv(path, index=False)
+    store, _, agent = build_agent_runtime(data_mode="import", data_dir=data_dir,
+                                          backend=backend, planner=ConstrainedRulePlanner())
+    try:
+        result = agent.run(QUESTION).to_dict()
+        investigation = result["investigation"]
+        regional = investigation["metrics"]["regional_control"]
+        assert regional["europe_change"] == 0
+        assert regional["other_region_median_change"] == 0
+        assert regional["calculation_status"] == "computed"
+        assert regional["unavailable_reason"] is None
+        assert regional["control_region_count"] > 0
+        claim = next(c for c in investigation["claims"] if c["claim_id"] == "N-C4")
+        assert claim["status"] == "supported" and "$0.00" in claim["text"]
+        assert investigation["diagnosis"]["europe_worse_than_other_region_median"] is False
+        assert result["verification"]["passed"] is True
+    finally:
+        store.close()

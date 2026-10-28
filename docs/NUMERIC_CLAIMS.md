@@ -57,3 +57,16 @@ Europe、前N客户数、起始时刻与不含末端的结束时刻、集中度�
 时间窗、区域和客户数与工具参数比较，参数本身未签名，尚未验证SQL过滤、截断、
 请求授权与快照；不将此重算声称为独立源系统对账。其他声明与通用MetricDefinition、
 UI标识仍待办。[本轮证据](validation/2026-10-28-run08.md)。
+
+
+## RUN-09：N-C4 缺失比较语义
+
+欧洲变化不存在或没有可计算的其他地区变化时，比较结果为 unavailable，
+缺失金额为 null，原因分别为 missing_target_region / missing_control_regions；
+诊断比较为 null，N-C4 为 insufficient_evidence，不再自动补0美元。
+control_region_count 记录实际参与中位数的地区数。真实零变化仍为 computed。
+
+这是数值绑定之前的口径修复，N-C4 仍没有完整结构化绑定。
+注册客户分母仍来自当前客户表，未引入历史快照或期末注册时间过滤；
+非有限值、跨币种、缺失地区键、关联完整性仍须后续数据契约处理。
+[本轮证据](validation/2026-10-28-run09.md)。

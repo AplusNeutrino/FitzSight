@@ -121,7 +121,7 @@ class NetDepositInvestigationEngine:
                 "deposits": dep,
                 "withdrawals": wd,
                 "net_deposits": net,
-                "net_deposits_per_customer": net / customers if customers else 0.0,
+                "net_deposits_per_customer": net / customers if customers else None,
             }
         return output, (deposits.evidence_id, withdrawals.evidence_id)
 
@@ -252,17 +252,23 @@ class NetDepositInvestigationEngine:
         )
         regional_changes = {}
         for region in sorted(set(baseline_regions) | set(current_regions)):
-            before = baseline_regions.get(region, {}).get("net_deposits_per_customer", 0.0)
-            after = current_regions.get(region, {}).get("net_deposits_per_customer", 0.0)
-            regional_changes[region] = float(after) - float(before)
+            before = baseline_regions.get(region, {}).get("net_deposits_per_customer")
+            after = current_regions.get(region, {}).get("net_deposits_per_customer")
+            regional_changes[region] = float(after) - float(before) if before is not None and after is not None else None
 
         other_changes = [
-            value for region, value in regional_changes.items() if region != scenario.region
+            value for region, value in regional_changes.items() if region != scenario.region and value is not None
         ]
-        control_median_change = float(median(other_changes)) if other_changes else 0.0
+        control_median_change = float(median(other_changes)) if other_changes else None
+        europe_change = regional_changes.get(scenario.region)
+        regional_comparison_available = europe_change is not None and control_median_change is not None
         regional_payload = {
             "net_deposit_per_customer_change": regional_changes,
-            "europe_change": regional_changes.get(scenario.region, 0.0),
+            "europe_change": europe_change,
+            "calculation_status": "computed" if regional_comparison_available else "unavailable",
+            "unavailable_reason": ("missing_target_region" if europe_change is None else
+                                   "missing_control_regions" if control_median_change is None else None),
+            "control_region_count": len(other_changes),
             "other_region_median_change": control_median_change,
         }
         regional_record = self.registry.register(
@@ -293,6 +299,7 @@ class NetDepositInvestigationEngine:
         concentrated = concentration_share >= 0.35 if concentration_share is not None else None
         europe_worse_than_control = (
             regional_payload["europe_change"] < regional_payload["other_region_median_change"]
+            if regional_comparison_available else None
         )
 
         diagnosis = {
@@ -397,8 +404,11 @@ class NetDepositInvestigationEngine:
                     f"Europe's weekly net-deposit movement per registered customer was "
                     f"${regional_payload['europe_change']:,.2f}, versus a median of "
                     f"${regional_payload['other_region_median_change']:,.2f} across the other regions."
+                    if regional_comparison_available else
+                    "Regional net-deposit comparison is unavailable because the target region "
+                    "or comparable control regions have no calculable per-customer change."
                 ),
-                "supported",
+                "supported" if regional_comparison_available else "insufficient_evidence",
                 "medium",
                 (
                     *baseline_region_evidence,
