@@ -148,7 +148,7 @@ class NetDepositInvestigationEngine:
             "customers": {"customer_id", "region", "assigned_team"},
             "deposits": {"customer_id", "timestamp", "amount", "currency", "status"},
             "withdrawals": {"customer_id", "timestamp", "amount", "currency", "status"},
-            "business_events": {"event_id", "date", "event_type", "region", "description"},
+            "business_events": {"event_id", "date", "event_type", "region", "affected_team", "description"},
         }
         for table, required in required_by_table.items():
             result = self.schema_tool.run(table)
