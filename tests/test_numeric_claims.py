@@ -7,6 +7,7 @@ from test_event_claims import make_event
 
 from fitzsight.agent.verifier import EvidenceClaimVerifier
 from fitzsight.evidence.registry import EvidenceRegistry
+from fitzsight.metrics import net_deposit_definitions
 from fitzsight.investigation.models import Claim, InvestigationPlan, InvestigationResult
 from fitzsight.investigation.numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
 
@@ -18,7 +19,7 @@ def fixture():
     context = dict(baseline_start='2026-07-27', baseline_end='2026-08-02',
                    current_start='2026-08-03', current_end='2026-08-09')
     driver = registry.register('net_deposit_driver_decomposition',
-        dict(context, region='Europe', currency='USD', source_evidence_ids=[s.evidence_id for s in sources]),
+        dict(context, region='Europe', currency='USD', metric_definitions=net_deposit_definitions(), source_evidence_ids=[s.evidence_id for s in sources]),
         {'net_change': -20.0, 'deposit_change': -25.0, 'withdrawal_change': -5.0})
     binding = NetChangeBinding(value=-20.0, evidence_id=driver.evidence_id, **context)
     claim = Claim('N-C1', render_net_change(binding), 'supported', 'high',

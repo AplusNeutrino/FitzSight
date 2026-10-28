@@ -154,7 +154,9 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 | M0-03 | 产品/竞赛测试分组、现状矩阵、旧规划归档和入口、范围/架构说明 | 已完成 | RUN-20261027-03；123 产品 + 23 竞赛；现状矩阵与原位归档 |
 | M1-01 | InvestigationRequest、参数白名单、三个区域/三组时期、demo 配置 | 进行中 | M1-01a绑定查询基础完成；固定地区/时间P0尚未解决 |
 | M1-01a | 双后端原生SQL绑定、参数证据、净入金金额/区域查询迁移 | 已完成 | RUN-20261029-15；不等同完整请求参数化 |
-| M1-01b | 首条净入金请求/指标目录、演示配置分离及三个区域/三组时期 | 待办 | 须同步迁移N-C1—N-C5固定窗口/地区核验，保留原验收 |
+| M1-01b | 首条净入金请求/指标目录、演示配置分离及三个区域/三组时期 | 进行中 | b-1净入金金额目录完成；请求和跨场景验收仍待办 |
+| M1-01b-1 | 版本化净入金金额目录、证据快照及N-C1/N-C2口径核验 | 已完成 | RUN-20261029-16；仅三项金额定义，不代表数据治理完成 |
+| M1-01b-2 | InvestigationRequest、demo分离、整链及固定Claim约束迁移 | 待办 | 必须保留三个区域/三组时期及篡改验收，不只放开查询 |
 | M1-02 | MetricDefinition、Claim、数值/单位/时期/证据绑定及反例 | 进行中 | N-C1—N-C4 已迁移；其他声明和通用指标定义仍待完成 |
 | M1-02a | 净入金 N-C1 金额、单位、窗口、证据及模板校验 | 已完成 | RUN-20261027-05：28 契约测试及实际双后端校验 |
 | M1-02b | 其余核心金额/比例声明、MetricDefinition 与 UI 标识 | 进行中 | N-C1—N-C4 已迁移；其他意图声明及通用指标/UI 仍待办 |
@@ -385,3 +387,18 @@ PR3 参数化首个场景：将净入金调查改为受约束的区域/期间请
 - 最终全量431 passed（184.40秒），JUnit失败/错误/跳过均0，strict markers及弃用警告转错误，无警告摘要。M1-01a范围验收完成；M1-01和核心M0—M6仍未整体完成。
 
 - 续接收尾（北京时间2026-10-29 03:16）：重新确认远程main未变、PR为空，接续已验证批次，不重复开发。源码/测试/说明文档diff检查通过；原始失败日志含pytest输出尾随空格，原样保留。
+
+
+### RUN-20261029-16（北京时间 2026-10-29 05:14启动）
+
+- 起点：远程main `c11fb954c3440b88943942b6f58edc29df95b234`；重新fetch独立worktree，读取README、完整计划/台账、PROJECT_PROGRESS、IMPLEMENTATION_STATUS、近期提交、上轮验证记录和相关源码。无AGENTS.md、未合并PR或前轮远程重叠工作。
+- 批次M1-01b-1，两小时以内：明确现有金额口径 → 不可变版本目录 → 驱动证据定义快照 → N-C1/N-C2核验 → 定义篡改/独立手算双后端 → 全量回归与提交。本批先稳定请求参数化依赖的指标定义，不宣称已实现InvestigationRequest。
+- 完成：net_deposits.v1、net_deposit_change.v1、net_deposit_decomposition.v1三项定义，含分子/分母、流水键及尚未去重政策、时间归属、状态、单位、币种、版本和局限。未知/无版本ID拒绝；JSON快照独立，不影响不可变目录。证据必须携带完整批准定义，N-C1/N-C2拒绝定义缺失/重复/篡改，原独立来源金额重算不削弱。
+- 验证过程：首轮2 failed、84 passed（1.63秒），新双后端夹具漏了事件SQL必需的affected_team列；补齐后针对性86 passed（1.28秒），所有警告转错误。失败txt/XML保留。手算基线100−20=80、本期75−15=60、变化−20，pending1000排除，实际SQLite/DuckDB导入执行并通过核验。全量结果另记及[验证记录](validation/2026-10-29-run16.md)。
+- 文件：src/fitzsight/metrics/{__init__,catalog}.py、investigation/net_deposit.py、numeric_claims.py；tests/test_metric_catalog.py、test_numeric_claims.py；METRIC_CATALOG、NUMERIC_CLAIMS、本计划和run16验证文件。
+- 环境：复用隔离venv并检查pip check无冲突；PYTHONPATH=src确认来自本轮worktree。CPython3.12.14、pytest9.1.1、NumPy2.5.2、pandas2.3.3、SciPy1.18.0、DuckDB1.5.5。手工/合成/既有Mock不代表生产收益；未重跑CLI/UI，未调用付费模型/云资源、交易或联系他人。
+- 问题更新：N-C1/N-C2缺少版本化口径快照的问题已解决；旧无快照证据不能静默标为新契约通过，需重新执行。目录不强制去重/历史快照/时区/内部划转分类，不关闭M2/M3或参数化P0。新记ISSUE-004：事件schema预检未列affected_team，缺列会在后续SQL失败而非预检拒绝；本轮夹具补全，统一schema/数据契约待补，无全局阻塞。
+- 提交依据：`feat: version net deposit metric definitions and verify evidence snapshots`；以上main为父提交，expected_sha并发检查、不强推，代码和计划同提交。
+- 下一批：M1-01b-2请求模型及demo配置，协调N-C1—N-C5地区/窗口核验；其他指标目录/UI、ISSUE-003/004继续待办。本人学习、盲审、陌生人复现、同行反馈和职业结果保持待人工验收。仍有自动可推进工作，不暂停，不宣称整体完成。
+
+- 最终全量461 passed（170.62秒），JUnit失败/错误/跳过均0，无警告摘要；strict markers及弃用警告转错误。M1-01b-1范围完成，M1整体及后续里程碑仍未完成。

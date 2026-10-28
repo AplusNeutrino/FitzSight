@@ -7,6 +7,7 @@ from typing import Any
 
 from fitzsight.data.scenarios import NET_DEPOSIT_SCENARIO
 from fitzsight.evidence.registry import EvidenceRegistry
+from fitzsight.metrics import get_metric, net_deposit_definitions
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
 from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
@@ -201,10 +202,12 @@ class NetDepositInvestigationEngine:
             "withdrawal_change": withdrawal_change,
             "identity_check": net_change - (deposit_change - withdrawal_change),
         }
+        metric = get_metric("net_deposits.v1")
         driver_record = self.registry.register(
             "net_deposit_driver_decomposition",
             {
-                "currency": "USD",
+                "currency": metric.currency,
+                "metric_definitions": net_deposit_definitions(),
                 "source_evidence_ids": [baseline_dep.evidence_id, baseline_wd.evidence_id,
                                         current_dep.evidence_id, current_wd.evidence_id],
                 "region": scenario.region,

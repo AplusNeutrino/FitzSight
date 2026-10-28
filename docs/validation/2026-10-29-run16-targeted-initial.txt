@@ -1,0 +1,297 @@
+............................FF.......................................... [ 83%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_ test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[sqlite] _
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a92072f0>
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) <= value < 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+>           columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/fitzsight/tools/sql.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.data.store.AnalyticsStore object at 0x7f12a91c4920>
+sql = "SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date) AS __fitzsight_safe_query LIMIT 5001"
+parameters = None
+
+    def execute(
+        self, sql: str, parameters: tuple[Any, ...] | None = None,
+    ) -> tuple[list[str], list[tuple[Any, ...]]]:
+>       cursor = self._conn.execute(sql) if parameters is None else self._conn.execute(sql, parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such column: affected_team
+
+src/fitzsight/data/store.py:161: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_engine_records_def0')
+backend = 'sqlite'
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    def test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic(tmp_path, backend):
+        pd.DataFrame([
+            {'customer_id': 'A', 'region': 'Europe', 'assigned_team': 'Team A'},
+            {'customer_id': 'B', 'region': 'Asia', 'assigned_team': 'Team B'},
+        ]).to_csv(tmp_path / 'customers.csv', index=False)
+        for table, amounts in [('deposits', [100, 75]), ('withdrawals', [20, 15])]:
+            rows = []
+            for i, (timestamp, amount) in enumerate(zip(['2026-07-27', '2026-08-03'], amounts)):
+                rows.append({table[:-1] + '_id': str(i), 'customer_id': 'A', 'timestamp': timestamp,
+                             'amount': amount, 'currency': 'USD', 'status': 'completed'})
+            rows.append({table[:-1] + '_id': 'excluded', 'customer_id': 'A', 'timestamp': '2026-08-03',
+                         'amount': 1000, 'currency': 'USD', 'status': 'pending'})
+            pd.DataFrame(rows).to_csv(tmp_path / (table + '.csv'), index=False)
+        pd.DataFrame(columns=['event_id', 'date', 'event_type', 'region', 'description']).to_csv(tmp_path / 'business_events.csv', index=False)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry), registry=registry)
+>           result = engine.investigate('Why did European net deposits decline this week?')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_metric_catalog.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/fitzsight/investigation/net_deposit.py:302: in investigate
+    events = self.sql_tool.run(event_sql)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a92072f0>
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) <= value < 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+            columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+        except Exception as exc:  # backend errors become explicit failed evidence
+            payload = {"error": type(exc).__name__, "message": str(exc)}
+            record = self.registry.register(
+                "read_only_sql",
+                context,
+                payload,
+                status="error",
+            )
+>           raise RuntimeError(f"SQL execution failed [{record.evidence_id}]: {exc}") from exc
+E           RuntimeError: SQL execution failed [E0017]: no such column: affected_team
+
+src/fitzsight/tools/sql.py:118: RuntimeError
+_ test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[duckdb] _
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a9dd6270>
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) <= value < 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+>           columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/fitzsight/tools/sql.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.data.store.AnalyticsStore object at 0x7f12a8687950>
+sql = "SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date) AS __fitzsight_safe_query LIMIT 5001"
+parameters = None
+
+    def execute(
+        self, sql: str, parameters: tuple[Any, ...] | None = None,
+    ) -> tuple[list[str], list[tuple[Any, ...]]]:
+>       cursor = self._conn.execute(sql) if parameters is None else self._conn.execute(sql, parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       _duckdb.BinderException: Binder Error: Referenced column "affected_team" not found in FROM clause!
+E       Candidate bindings: "event_type", "date", "event_id", "description"
+E       
+E       LINE 1: SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region...
+E                                                                         ^
+
+src/fitzsight/data/store.py:161: BinderException
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_engine_records_def1')
+backend = 'duckdb'
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    def test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic(tmp_path, backend):
+        pd.DataFrame([
+            {'customer_id': 'A', 'region': 'Europe', 'assigned_team': 'Team A'},
+            {'customer_id': 'B', 'region': 'Asia', 'assigned_team': 'Team B'},
+        ]).to_csv(tmp_path / 'customers.csv', index=False)
+        for table, amounts in [('deposits', [100, 75]), ('withdrawals', [20, 15])]:
+            rows = []
+            for i, (timestamp, amount) in enumerate(zip(['2026-07-27', '2026-08-03'], amounts)):
+                rows.append({table[:-1] + '_id': str(i), 'customer_id': 'A', 'timestamp': timestamp,
+                             'amount': amount, 'currency': 'USD', 'status': 'completed'})
+            rows.append({table[:-1] + '_id': 'excluded', 'customer_id': 'A', 'timestamp': '2026-08-03',
+                         'amount': 1000, 'currency': 'USD', 'status': 'pending'})
+            pd.DataFrame(rows).to_csv(tmp_path / (table + '.csv'), index=False)
+        pd.DataFrame(columns=['event_id', 'date', 'event_type', 'region', 'description']).to_csv(tmp_path / 'business_events.csv', index=False)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry), registry=registry)
+>           result = engine.investigate('Why did European net deposits decline this week?')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_metric_catalog.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/fitzsight/investigation/net_deposit.py:302: in investigate
+    events = self.sql_tool.run(event_sql)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a9dd6270>
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date >= '2026-08-03' AND date < '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -> ToolResult:
+        if evidence_preview_rows < 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) <= value < 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+            columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+        except Exception as exc:  # backend errors become explicit failed evidence
+            payload = {"error": type(exc).__name__, "message": str(exc)}
+            record = self.registry.register(
+                "read_only_sql",
+                context,
+                payload,
+                status="error",
+            )
+>           raise RuntimeError(f"SQL execution failed [{record.evidence_id}]: {exc}") from exc
+E           RuntimeError: SQL execution failed [E0017]: Binder Error: Referenced column "affected_team" not found in FROM clause!
+E           Candidate bindings: "event_type", "date", "event_id", "description"
+E           
+E           LINE 1: SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region...
+E                                                                             ^
+
+src/fitzsight/tools/sql.py:118: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_metric_catalog.py::test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[sqlite]
+FAILED tests/test_metric_catalog.py::test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[duckdb]
+2 failed, 84 passed in 1.63s

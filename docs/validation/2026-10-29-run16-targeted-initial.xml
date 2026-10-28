@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="86" time="1.633" timestamp="2026-10-28T14:16:46.873672-07:00" hostname="0140c7ffc96e"><testcase classname="tests.test_metric_catalog" name="test_catalog_is_versioned_immutable_and_json_snapshot_has_no_aliases" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[net_deposits]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[net_deposits.v2]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[conversion_rate.v1]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[None]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[metric_id5]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_unknown_or_unversioned_metric_is_not_silently_substituted[1]" time="0.000" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[metric_id-profit.v1]" time="0.002" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[version-2]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[numerator-sum(deposits.amount) + sum(withdrawals.amount)]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[denominator-customer_count]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[components-value4]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[source_keys-value5]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[deduplication_policy-deduplicate all rows]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[time_fields-value7]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[window_semantics-end day exclusive]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[timezone_policy-UTC converted]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[status_filter-value10]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[region_attribution-historical snapshot]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[unit-percent]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[currency-EUR]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_replaced_definition_fails_both_cashflow_checks[limitations-value14]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_catalog_snapshot_cannot_be_removed_or_duplicated[delete]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_catalog_snapshot_cannot_be_removed_or_duplicated[empty]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_catalog_snapshot_cannot_be_removed_or_duplicated[duplicate]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_catalog_snapshot_cannot_be_removed_or_duplicated[missing_change]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_catalog_snapshot_cannot_be_removed_or_duplicated[missing_decomposition]" time="0.001" /><testcase classname="tests.test_metric_catalog" name="test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[sqlite]" time="0.019"><failure message="RuntimeError: SQL execution failed [E0017]: no such column: affected_team">self = &lt;fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a92072f0&gt;
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -&gt; ToolResult:
+        if evidence_preview_rows &lt; 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) &lt;= value &lt; 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+&gt;           columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/fitzsight/tools/sql.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;fitzsight.data.store.AnalyticsStore object at 0x7f12a91c4920&gt;
+sql = "SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date) AS __fitzsight_safe_query LIMIT 5001"
+parameters = None
+
+    def execute(
+        self, sql: str, parameters: tuple[Any, ...] | None = None,
+    ) -&gt; tuple[list[str], list[tuple[Any, ...]]]:
+&gt;       cursor = self._conn.execute(sql) if parameters is None else self._conn.execute(sql, parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such column: affected_team
+
+src/fitzsight/data/store.py:161: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_engine_records_def0')
+backend = 'sqlite'
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    def test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic(tmp_path, backend):
+        pd.DataFrame([
+            {'customer_id': 'A', 'region': 'Europe', 'assigned_team': 'Team A'},
+            {'customer_id': 'B', 'region': 'Asia', 'assigned_team': 'Team B'},
+        ]).to_csv(tmp_path / 'customers.csv', index=False)
+        for table, amounts in [('deposits', [100, 75]), ('withdrawals', [20, 15])]:
+            rows = []
+            for i, (timestamp, amount) in enumerate(zip(['2026-07-27', '2026-08-03'], amounts)):
+                rows.append({table[:-1] + '_id': str(i), 'customer_id': 'A', 'timestamp': timestamp,
+                             'amount': amount, 'currency': 'USD', 'status': 'completed'})
+            rows.append({table[:-1] + '_id': 'excluded', 'customer_id': 'A', 'timestamp': '2026-08-03',
+                         'amount': 1000, 'currency': 'USD', 'status': 'pending'})
+            pd.DataFrame(rows).to_csv(tmp_path / (table + '.csv'), index=False)
+        pd.DataFrame(columns=['event_id', 'date', 'event_type', 'region', 'description']).to_csv(tmp_path / 'business_events.csv', index=False)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry), registry=registry)
+&gt;           result = engine.investigate('Why did European net deposits decline this week?')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_metric_catalog.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/fitzsight/investigation/net_deposit.py:302: in investigate
+    events = self.sql_tool.run(event_sql)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a92072f0&gt;
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -&gt; ToolResult:
+        if evidence_preview_rows &lt; 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) &lt;= value &lt; 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+            columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+        except Exception as exc:  # backend errors become explicit failed evidence
+            payload = {"error": type(exc).__name__, "message": str(exc)}
+            record = self.registry.register(
+                "read_only_sql",
+                context,
+                payload,
+                status="error",
+            )
+&gt;           raise RuntimeError(f"SQL execution failed [{record.evidence_id}]: {exc}") from exc
+E           RuntimeError: SQL execution failed [E0017]: no such column: affected_team
+
+src/fitzsight/tools/sql.py:118: RuntimeError</failure></testcase><testcase classname="tests.test_metric_catalog" name="test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic[duckdb]" time="0.184"><failure message="RuntimeError: SQL execution failed [E0017]: Binder Error: Referenced column &quot;affected_team&quot; not found in FROM clause!&#10;Candidate bindings: &quot;event_type&quot;, &quot;date&quot;, &quot;event_id&quot;, &quot;description&quot;&#10;&#10;LINE 1: SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region...&#10;                                                                  ^">self = &lt;fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a9dd6270&gt;
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -&gt; ToolResult:
+        if evidence_preview_rows &lt; 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) &lt;= value &lt; 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+&gt;           columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/fitzsight/tools/sql.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;fitzsight.data.store.AnalyticsStore object at 0x7f12a8687950&gt;
+sql = "SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date) AS __fitzsight_safe_query LIMIT 5001"
+parameters = None
+
+    def execute(
+        self, sql: str, parameters: tuple[Any, ...] | None = None,
+    ) -&gt; tuple[list[str], list[tuple[Any, ...]]]:
+&gt;       cursor = self._conn.execute(sql) if parameters is None else self._conn.execute(sql, parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       _duckdb.BinderException: Binder Error: Referenced column "affected_team" not found in FROM clause!
+E       Candidate bindings: "event_type", "date", "event_id", "description"
+E       
+E       LINE 1: SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region...
+E                                                                         ^
+
+src/fitzsight/data/store.py:161: BinderException
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_engine_records_def1')
+backend = 'duckdb'
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    def test_actual_engine_records_definitions_and_matches_independent_cashflow_arithmetic(tmp_path, backend):
+        pd.DataFrame([
+            {'customer_id': 'A', 'region': 'Europe', 'assigned_team': 'Team A'},
+            {'customer_id': 'B', 'region': 'Asia', 'assigned_team': 'Team B'},
+        ]).to_csv(tmp_path / 'customers.csv', index=False)
+        for table, amounts in [('deposits', [100, 75]), ('withdrawals', [20, 15])]:
+            rows = []
+            for i, (timestamp, amount) in enumerate(zip(['2026-07-27', '2026-08-03'], amounts)):
+                rows.append({table[:-1] + '_id': str(i), 'customer_id': 'A', 'timestamp': timestamp,
+                             'amount': amount, 'currency': 'USD', 'status': 'completed'})
+            rows.append({table[:-1] + '_id': 'excluded', 'customer_id': 'A', 'timestamp': '2026-08-03',
+                         'amount': 1000, 'currency': 'USD', 'status': 'pending'})
+            pd.DataFrame(rows).to_csv(tmp_path / (table + '.csv'), index=False)
+        pd.DataFrame(columns=['event_id', 'date', 'event_type', 'region', 'description']).to_csv(tmp_path / 'business_events.csv', index=False)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry), registry=registry)
+&gt;           result = engine.investigate('Why did European net deposits decline this week?')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_metric_catalog.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/fitzsight/investigation/net_deposit.py:302: in investigate
+    events = self.sql_tool.run(event_sql)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;fitzsight.tools.sql.ReadOnlySQLTool object at 0x7f12a9dd6270&gt;
+sql = "SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region = 'Europe' AND date &gt;= '2026-08-03' AND date &lt; '2026-08-08' ORDER BY date"
+parameters = None, compact_evidence = False, evidence_preview_rows = 20
+
+    def run(
+        self,
+        sql: str,
+        *,
+        parameters: tuple[Any, ...] | list[Any] | None = None,
+        compact_evidence: bool = False,
+        evidence_preview_rows: int = 20,
+    ) -&gt; ToolResult:
+        if evidence_preview_rows &lt; 0:
+            raise ValueError("evidence_preview_rows must be non-negative")
+        safe_sql = validate_read_only_sql(sql)
+        # Snapshot primitive values before execution; never interpolate values into SQL.
+        # Dates are supplied as explicit ISO strings by the caller, avoiding implicit
+        # backend-specific datetime adapters. Identifiers cannot be bound as values.
+        if parameters is not None and type(parameters) not in (tuple, list):
+            raise ValueError("SQL parameters must be a tuple or list of primitive values")
+        bound = None if parameters is None else tuple(parameters)
+        for value in bound or ():
+            if value is not None and type(value) not in (str, int, float, bool):
+                raise ValueError("Unsupported SQL parameter type")
+            if type(value) is float and not math.isfinite(value):
+                raise ValueError("SQL parameters must be finite")
+            if type(value) is int and not -(2**63) &lt;= value &lt; 2**63:
+                raise ValueError("Integer SQL parameters must fit signed 64 bits")
+        context = {"sql": safe_sql, "backend": self.store.backend, "max_rows": self.max_rows}
+        if bound is not None:
+            context["bound_parameters"] = list(bound)
+        wrapped = (
+            "SELECT * FROM (" + safe_sql + ") AS __fitzsight_safe_query "
+            f"LIMIT {self.max_rows + 1}"
+        )
+        try:
+            columns, rows = self.store.execute(wrapped) if bound is None else self.store.execute(wrapped, bound)
+        except Exception as exc:  # backend errors become explicit failed evidence
+            payload = {"error": type(exc).__name__, "message": str(exc)}
+            record = self.registry.register(
+                "read_only_sql",
+                context,
+                payload,
+                status="error",
+            )
+&gt;           raise RuntimeError(f"SQL execution failed [{record.evidence_id}]: {exc}") from exc
+E           RuntimeError: SQL execution failed [E0017]: Binder Error: Referenced column "affected_team" not found in FROM clause!
+E           Candidate bindings: "event_type", "date", "event_id", "description"
+E           
+E           LINE 1: SELECT * FROM (SELECT event_id, date, event_type, region, affected_team, description FROM business_events WHERE region...
+E                                                                             ^
+
+src/fitzsight/tools/sql.py:118: RuntimeError</failure></testcase><testcase classname="tests.test_numeric_claims" name="test_hand_calculated_net_change_accepts_and_serializes_binding" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-99.0]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-nan]" time="0.003" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-inf]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-True]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-99]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[value-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[unit-percent]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[currency-EUR]" time="0.002" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[metric_id-conversion_rate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_field-deposit_change]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[region-Asia]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[baseline_start-2026-07-28]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[baseline_end-2026-08-01]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[current_start-2026-08-04]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[current_end-2026-08-10]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_id-E0001]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_binding_tampering_rejected_even_with_original_valid_evidence[evidence_id-E9999]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[Net deposits changed by $99.00.]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[\u51c0\u5165\u91d1\u53d8\u5316\u4e3a99%\u3002]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_free_text_number_or_unit_tampering_rejected[Net deposits changed by \u20ac20.00.]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_consistently_wrong_value_and_rendering_still_rejected" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[binding]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[claim]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_contract_cannot_be_removed_or_duplicated[source_reference]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_internally_consistent_but_wrong_driver_rejected_by_source_recalculation" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars" time="0.000" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-99.0]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-99.0]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-nan]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-inf]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-True]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[withdrawal_change-99]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[deposit_change-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[value-0]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[unit-percent]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[currency-EUR]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[region-Asia]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[baseline_start-2026-07-28]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[current_end-2026-08-10]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[metric_id-net_deposit_change.v1]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[evidence_field-deposit_change]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_binding_tampering_fails_specific_check[evidence_id-E9999]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_compensating_wrong_components_with_matching_text_and_driver_rejected" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[binding]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[claim]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[source_reference]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[text]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_contract_cannot_be_bypassed[wrong_type]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_decomposition_hand_calculation_and_serialization" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_required_concentration_claim[remove]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_required_concentration_claim[duplicate]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_required_regional_claim[remove]" time="0.001" /><testcase classname="tests.test_numeric_claims" name="test_required_regional_claim[duplicate]" time="0.001" /></testsuite></testsuites>

@@ -1,11 +1,13 @@
 """Bounded numeric contracts: the legacy synthetic USD net-change claim.
 
-This is deliberately not a generic metric catalog. Other claims still need
-migration; matching these fields does not validate upstream business semantics.
+N-C1/N-C2 require the approved metric-definition snapshot. Other claims still
+need catalog migration; matching metadata does not validate upstream semantics.
 """
 from dataclasses import dataclass
 import math
 from numbers import Real
+
+from fitzsight.metrics import get_metric, net_deposit_definitions
 
 
 @dataclass(frozen=True)
@@ -67,9 +69,9 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
     expected_type = NetDecompositionBinding if decomposition else NetChangeBinding
     if type(b) is not expected_type:
         return False
+    metric = get_metric('net_deposit_decomposition.v1' if decomposition else 'net_deposit_change.v1')
     if (b.metric_id, b.evidence_field, b.unit, b.currency, b.region) != (
-        ('net_deposit_decomposition.v1' if decomposition else 'net_deposit_change.v1'),
-        'net_change', 'currency_amount', 'USD', 'Europe'
+        metric.metric_id, 'net_change', metric.unit, metric.currency, 'Europe'
     ) or not finite_number(b.value):
         return False
     try:
@@ -81,6 +83,8 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
         for field in ('baseline_start', 'baseline_end', 'current_start', 'current_end', 'region', 'currency'):
             if getattr(b, field) != record.parameters[field]:
                 return False
+        if record.parameters['metric_definitions'] != net_deposit_definitions():
+            return False
         expected = record.result[b.evidence_field]
         if not finite_number(expected) or not math.isclose(b.value, expected, rel_tol=0, abs_tol=1e-8):
             return False
