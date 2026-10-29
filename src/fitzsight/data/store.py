@@ -84,7 +84,14 @@ class AnalyticsStore:
     def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         self.close()
 
-    def load_csv_directory(self, include: Iterable[str] | None = None) -> StoreInfo:
+    def load_csv_directory(
+        self, include: Iterable[str] | None = None, *, materialize: bool = False,
+    ) -> StoreInfo:
+        """Load CSVs; materialize=True detaches DuckDB tables from file changes.
+
+        SQLite always materializes. This option alone does not verify or freeze
+        source bytes during loading; use the request-bound input session for that.
+        """
         allowed = set(include) if include is not None else None
         csv_paths = sorted(self.data_dir.glob("*.csv"))
         if not csv_paths:
@@ -94,7 +101,7 @@ class AnalyticsStore:
             table = _safe_identifier(path.stem)
             if allowed is not None and table not in allowed:
                 continue
-            self._load_csv(table, path)
+            self._load_csv(table, path, materialize=materialize)
             if table not in self._loaded_tables:
                 self._loaded_tables.append(table)
 
@@ -102,7 +109,7 @@ class AnalyticsStore:
             raise StoreError("No requested CSV tables were loaded")
         return self.info()
 
-    def _load_csv(self, table: str, path: Path) -> None:
+    def _load_csv(self, table: str, path: Path, *, materialize: bool = False) -> None:
         # The path is discovered from the configured local data directory, not from
         # user SQL. Resolve it again and ensure it remains within that directory.
         resolved = path.resolve()
@@ -112,7 +119,7 @@ class AnalyticsStore:
         if self.backend == "duckdb":
             escaped_path = str(resolved).replace("'", "''")
             self._conn.execute(
-                f"CREATE OR REPLACE VIEW {_quote_identifier(table)} AS "
+                f"CREATE OR REPLACE {'TABLE' if materialize else 'VIEW'} {_quote_identifier(table)} AS "
                 f"SELECT * FROM read_csv_auto('{escaped_path}', HEADER=TRUE)"
             )
             return
