@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="10" time="1.876" timestamp="2026-10-29T14:16:29.176453-07:00" hostname="46cfc6cbd67e"><testcase classname="tests.test_event_completeness" name="test_preview_marked_rows_never_certify_event_facts[evidence_mode-False]" time="0.002"><failure message="AssertionError: assert not True&#10; +  where True = verify_event(Claim(claim_id='N-C5', text='No matching high-value withdrawal-cluster event was found in the nearby European operatio...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bfa2000&gt;)">present = False, marker = 'evidence_mode'
+
+    @pytest.mark.parametrize('present', [False, True])
+    @pytest.mark.parametrize('marker', ['evidence_mode', 'rows_preview'])
+    def test_preview_marked_rows_never_certify_event_facts(present, marker):
+        registry, result = fixture()
+        claim = make_event(registry, [row()] if present else [])
+        assert verify_event(claim, registry)
+        original = registry.get(claim.event_binding.evidence_id)
+        payload = deepcopy(original.result)
+        payload[marker] = 'compact_preview' if marker == 'evidence_mode' else payload['rows']
+        source = registry.register(original.tool_name, original.parameters, payload)
+        # New ID and correct digest; only the preview marker differs.
+        binding = replace(claim.event_binding, evidence_id=source.evidence_id)
+        claim = replace(claim, event_binding=binding, evidence_ids=(source.evidence_id,))
+&gt;       assert not verify_event(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = verify_event(Claim(claim_id='N-C5', text='No matching high-value withdrawal-cluster event was found in the nearby European operatio...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bfa2000&gt;)
+
+tests/test_event_completeness.py:32: AssertionError</failure></testcase><testcase classname="tests.test_event_completeness" name="test_preview_marked_rows_never_certify_event_facts[evidence_mode-True]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = verify_event(Claim(claim_id='N-C5', text='A high-value withdrawal-cluster event is present in the nearby operational event log. The...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd7f0e0&gt;)">present = True, marker = 'evidence_mode'
+
+    @pytest.mark.parametrize('present', [False, True])
+    @pytest.mark.parametrize('marker', ['evidence_mode', 'rows_preview'])
+    def test_preview_marked_rows_never_certify_event_facts(present, marker):
+        registry, result = fixture()
+        claim = make_event(registry, [row()] if present else [])
+        assert verify_event(claim, registry)
+        original = registry.get(claim.event_binding.evidence_id)
+        payload = deepcopy(original.result)
+        payload[marker] = 'compact_preview' if marker == 'evidence_mode' else payload['rows']
+        source = registry.register(original.tool_name, original.parameters, payload)
+        # New ID and correct digest; only the preview marker differs.
+        binding = replace(claim.event_binding, evidence_id=source.evidence_id)
+        claim = replace(claim, event_binding=binding, evidence_ids=(source.evidence_id,))
+&gt;       assert not verify_event(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = verify_event(Claim(claim_id='N-C5', text='A high-value withdrawal-cluster event is present in the nearby operational event log. The...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd7f0e0&gt;)
+
+tests/test_event_completeness.py:32: AssertionError</failure></testcase><testcase classname="tests.test_event_completeness" name="test_preview_marked_rows_never_certify_event_facts[rows_preview-False]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = verify_event(Claim(claim_id='N-C5', text='No matching high-value withdrawal-cluster event was found in the nearby European operatio...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd90500&gt;)">present = False, marker = 'rows_preview'
+
+    @pytest.mark.parametrize('present', [False, True])
+    @pytest.mark.parametrize('marker', ['evidence_mode', 'rows_preview'])
+    def test_preview_marked_rows_never_certify_event_facts(present, marker):
+        registry, result = fixture()
+        claim = make_event(registry, [row()] if present else [])
+        assert verify_event(claim, registry)
+        original = registry.get(claim.event_binding.evidence_id)
+        payload = deepcopy(original.result)
+        payload[marker] = 'compact_preview' if marker == 'evidence_mode' else payload['rows']
+        source = registry.register(original.tool_name, original.parameters, payload)
+        # New ID and correct digest; only the preview marker differs.
+        binding = replace(claim.event_binding, evidence_id=source.evidence_id)
+        claim = replace(claim, event_binding=binding, evidence_ids=(source.evidence_id,))
+&gt;       assert not verify_event(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = verify_event(Claim(claim_id='N-C5', text='No matching high-value withdrawal-cluster event was found in the nearby European operatio...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd90500&gt;)
+
+tests/test_event_completeness.py:32: AssertionError</failure></testcase><testcase classname="tests.test_event_completeness" name="test_preview_marked_rows_never_certify_event_facts[rows_preview-True]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = verify_event(Claim(claim_id='N-C5', text='A high-value withdrawal-cluster event is present in the nearby operational event log. The...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd92c90&gt;)">present = True, marker = 'rows_preview'
+
+    @pytest.mark.parametrize('present', [False, True])
+    @pytest.mark.parametrize('marker', ['evidence_mode', 'rows_preview'])
+    def test_preview_marked_rows_never_certify_event_facts(present, marker):
+        registry, result = fixture()
+        claim = make_event(registry, [row()] if present else [])
+        assert verify_event(claim, registry)
+        original = registry.get(claim.event_binding.evidence_id)
+        payload = deepcopy(original.result)
+        payload[marker] = 'compact_preview' if marker == 'evidence_mode' else payload['rows']
+        source = registry.register(original.tool_name, original.parameters, payload)
+        # New ID and correct digest; only the preview marker differs.
+        binding = replace(claim.event_binding, evidence_id=source.evidence_id)
+        claim = replace(claim, event_binding=binding, evidence_ids=(source.evidence_id,))
+&gt;       assert not verify_event(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = verify_event(Claim(claim_id='N-C5', text='A high-value withdrawal-cluster event is present in the nearby operational event log. The...RAWAL_CLUSTER', period_start='2026-08-03', period_end_exclusive='2026-08-08', metric_id='nearby_operational_event.v1')), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7f0f3bd92c90&gt;)
+
+tests/test_event_completeness.py:32: AssertionError</failure></testcase><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[0-sqlite]" time="0.018" /><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[0-duckdb]" time="0.162" /><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[2-sqlite]" time="0.012" /><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[2-duckdb]" time="0.069" /><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[3-sqlite]" time="0.014"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_event_limit_empty_4')
+backend = 'sqlite', count = 3
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('count', [0, 2, 3])
+    def test_actual_event_limit_empty_and_complete_results(tmp_path, backend, count):
+        write_bundle(tmp_path, None)
+        (tmp_path / 'business_events.csv').write_text(
+            'event_id,date,event_type,region,affected_team,description\n' + ''.join(
+                f'event-{i},2026-08-05,HIGH_VALUE_WITHDRAWAL_CLUSTER,Europe,Team A,context\n'
+                for i in range(count)))
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=2), registry=registry)
+            if count &gt; 2:
+&gt;               with pytest.raises(ValueError, match='Event facts require complete SQL rows'):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE ValueError
+
+tests/test_event_completeness.py:52: Failed</failure></testcase><testcase classname="tests.test_event_completeness" name="test_actual_event_limit_empty_and_complete_results[3-duckdb]" time="0.086"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_event_limit_empty_5')
+backend = 'duckdb', count = 3
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('count', [0, 2, 3])
+    def test_actual_event_limit_empty_and_complete_results(tmp_path, backend, count):
+        write_bundle(tmp_path, None)
+        (tmp_path / 'business_events.csv').write_text(
+            'event_id,date,event_type,region,affected_team,description\n' + ''.join(
+                f'event-{i},2026-08-05,HIGH_VALUE_WITHDRAWAL_CLUSTER,Europe,Team A,context\n'
+                for i in range(count)))
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=SchemaInspectorTool(store, registry),
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=2), registry=registry)
+            if count &gt; 2:
+&gt;               with pytest.raises(ValueError, match='Event facts require complete SQL rows'):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE ValueError
+
+tests/test_event_completeness.py:52: Failed</failure></testcase></testsuite></testsuites>

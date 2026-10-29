@@ -6,6 +6,8 @@ real-world causality or a tamper-proof audit store.
 from dataclasses import dataclass
 from datetime import date, datetime
 
+from .numeric_claims import complete_sql_rows
+
 
 @dataclass(frozen=True)
 class EventBinding:
@@ -49,10 +51,9 @@ def verify_event(claim, registry) -> bool:
                 or source.parameters["sql"] != event_query(b.period_start, b.period_end_exclusive)):
             return False
         payload = source.result
-        rows = payload["rows"]
-        if (type(rows) is not list or payload["truncated"] is not False
-                or type(payload["row_count"]) is not int or payload["row_count"] != len(rows)):
+        if not complete_sql_rows(payload):
             return False
+        rows = payload["rows"]
         matched, seen = [], set()
         for row in rows:
             event_id = row["event_id"]

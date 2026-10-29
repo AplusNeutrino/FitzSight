@@ -285,6 +285,8 @@ class NetDepositInvestigationEngine:
         event_end = (scenario.event_date + timedelta(days=2) + timedelta(days=1)).isoformat()
         event_sql = event_query(event_start, event_end)
         events = self.sql_tool.run(event_sql)
+        if not complete_sql_rows(events.data):
+            raise ValueError("Event facts require complete SQL rows")
         matching_events = [
             row
             for row in events.data["rows"]
