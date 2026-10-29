@@ -72,3 +72,24 @@ print(result.metrics)
 独立核验`verify_regional(claim, registry, expected_request=request)`必须使用原始可信请求；比对声明/证据的地区、四日期、快照等上下文，再核对四来源批准SQL及绑定参数，沿用完整性和金额/人数/中位数重算。带请求证据不能省略外部请求核验。
 
 实测覆盖三地区三时期双后端、无流水客户、日期/pending过滤、重复执行、缺地区、零变化和来源参数篡改。N-C5、完整调查、demo与CLI/UI仍待办。聚合重算不是独立源系统审计；客户主键重复导致的JOIN放大、历史归属、源数据真实性、定点金额和持久化仍待M2/M4。地区对照仅为描述性比较，不代表因果。
+
+
+## 显式事件查询配置（RUN-20261030-27）
+
+`EventSelection` 是 N-C5 参数化的查询基础，尚未接入 `execute_net_cashflows` 或 Claim 核验。示例仅构造批准 SQL 和绑定值，不返回已核验调查：
+
+```python
+from fitzsight.investigation.event_selection import EventSelection, event_lookup_query
+
+selection = EventSelection.from_dict({
+    "event_type": "HIGH_VALUE_WITHDRAWAL_CLUSTER",
+    "period": {"start": "2026-02-03", "end": "2026-02-05"},
+})
+sql, parameters = event_lookup_query(request, selection)
+# 未来执行接线应在已核对的同一输入会话内调用 SQL 工具，
+# 并把原 request 与原 selection 交给独立声明核验器。
+```
+
+配置不可变，JSON字段严格匹配，只批准现有高价值提款聚集事件类型；不从日志猜事件类型或日期。地区来自原请求，不能另传地区覆盖。事件窗口独立于现金流基线/本期，采用 `source_naive` 日历日期，包含结束日全日（SQL转换为次日零点排他边界），不隐式选“事件前后两天”。同日按event_id排序；不在查询层去重或推断因果。
+
+查询函数不读文件、不校验快照内容、不执行SQL、不生成声明。实际执行、schema检查、完整性/事件事实核验、原请求与原配置绑定及CLI/UI/demo迁移属于后续任务；本轮三地区/三窗口查询通过不等于整链验收。未来重放须保存原事件配置，不从可变证据反推期望值。
