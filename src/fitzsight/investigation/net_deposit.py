@@ -14,6 +14,7 @@ from .numeric_claims import complete_sql_rows, NetChangeBinding, NetDecompositio
 from .concentration_claims import ConcentrationBinding, render_concentration
 from .regional_claims import RegionAmounts, RegionalBinding, render_regional
 from .event_claims import EventBinding, event_query, render_event
+from .cashflow_queries import cashflow_sql
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -78,17 +79,9 @@ class NetDepositInvestigationEngine:
             raise ValueError("Unsupported cash-flow table")
         start_s, end_exclusive = self._period_bounds(start, end)
         parameters = [start_s, end_exclusive]
-        region_clause = ""
         if region is not None:
-            region_clause = " AND c.region = ?"
             parameters.append(region)
-        sql = (
-            f"SELECT t.customer_id, t.timestamp, t.amount, t.currency, c.region, c.assigned_team "
-            f"FROM {table} AS t JOIN customers AS c ON c.customer_id = t.customer_id "
-            f"WHERE t.status = 'completed' "
-            "AND t.timestamp >= ? AND t.timestamp < ?"
-            f"{region_clause} ORDER BY t.timestamp, t.customer_id"
-        )
+        sql = cashflow_sql(table, region_filter=region is not None)
         result = self.sql_tool.run(sql, parameters=parameters)
         if not complete_sql_rows(result.data):
             raise ValueError("Net-deposit amounts require complete SQL rows; truncated or incomplete result")

@@ -4,6 +4,10 @@ N-C1/N-C2 require the approved metric-definition snapshot. Other claims still
 need catalog migration; matching metadata does not validate upstream semantics.
 """
 from dataclasses import dataclass
+from datetime import date, timedelta
+
+from .cashflow_queries import cashflow_sql
+from .request import InvestigationRequest
 import math
 from numbers import Real
 
@@ -42,7 +46,7 @@ def render_net_decomposition(binding: NetDecompositionBinding) -> str:
 
 def render_net_change(binding: NetChangeBinding) -> str:
     return (
-        f"European net deposits changed by ${binding.value:,.2f} week over week "
+        f"{binding.region} net deposits changed by ${binding.value:,.2f} between periods "
         f"({binding.baseline_start}–{binding.baseline_end} versus "
         f"{binding.current_start}–{binding.current_end})."
     )
@@ -69,23 +73,26 @@ def complete_sql_rows(payload) -> bool:
     )
 
 
-def verify_net_change(claim, registry) -> bool:
-    return _verify_cashflow(claim, registry, decomposition=False)
+def verify_net_change(claim, registry, *, expected_request=None) -> bool:
+    return _verify_cashflow(claim, registry, decomposition=False, expected_request=expected_request)
 
 
-def verify_net_decomposition(claim, registry) -> bool:
-    return _verify_cashflow(claim, registry, decomposition=True)
+def verify_net_decomposition(claim, registry, *, expected_request=None) -> bool:
+    return _verify_cashflow(claim, registry, decomposition=True, expected_request=expected_request)
 
 
-def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
+def _verify_cashflow(claim, registry, *, decomposition: bool, expected_request=None) -> bool:
     """Fail closed; both components must match sources, not merely cancel out."""
+    if expected_request is not None and type(expected_request) is not InvestigationRequest:
+        return False
+    region = expected_request.region if expected_request is not None else "Europe"
     b = claim.numeric_binding
     expected_type = NetDecompositionBinding if decomposition else NetChangeBinding
     if type(b) is not expected_type:
         return False
     metric = get_metric('net_deposit_decomposition.v1' if decomposition else 'net_deposit_change.v1')
     if (b.metric_id, b.evidence_field, b.unit, b.currency, b.region) != (
-        metric.metric_id, 'net_change', metric.unit, metric.currency, 'Europe'
+        metric.metric_id, 'net_change', metric.unit, metric.currency, region
     ) or not finite_number(b.value):
         return False
     try:
@@ -99,6 +106,18 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
                 return False
         if record.parameters['metric_definitions'] != net_deposit_definitions():
             return False
+        if 'request' in record.parameters and expected_request is None:
+            return False
+        if expected_request is not None:
+            if record.parameters.get('request') != expected_request.to_dict():
+                return False
+            if (b.baseline_start, b.baseline_end, b.current_start, b.current_end) != (
+                expected_request.baseline.start, expected_request.baseline.end,
+                expected_request.current.start, expected_request.current.end,
+            ):
+                return False
+            if claim.status != 'supported' or claim.confidence != 'high':
+                return False
         expected = record.result[b.evidence_field]
         if not finite_number(expected) or not math.isclose(b.value, expected, rel_tol=0, abs_tol=1e-8):
             return False
@@ -107,7 +126,7 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
         if len(source_ids) != 4 or len(set(source_ids)) != 4:
             return False
         sums = []
-        for eid in source_ids:
+        for index, eid in enumerate(source_ids):
             source = registry.get(eid)
             if eid not in claim.evidence_ids or source.tool_name != 'read_only_sql' or source.status != 'success':
                 return False
@@ -115,6 +134,12 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
                 return False
             if not complete_sql_rows(source.result):
                 return False
+            if expected_request is not None:
+                period = expected_request.baseline if index < 2 else expected_request.current
+                bounds = [period.start, (date.fromisoformat(period.end) + timedelta(days=1)).isoformat(), region]
+                if (source.parameters.get('sql') != cashflow_sql('deposits' if index % 2 == 0 else 'withdrawals')
+                        or source.parameters.get('bound_parameters') != bounds):
+                    return False
             rows = source.result['rows']
             if any(not finite_number(r['amount']) or r['currency'] != 'USD' for r in rows):
                 return False

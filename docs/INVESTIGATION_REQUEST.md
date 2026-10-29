@@ -28,3 +28,25 @@ with open_net_input_store(request, data_dir, backend="duckdb") as session:
 这是输入会话接口，**尚未接入旧runtime、调查引擎或CLI/UI**。它不执行请求中的指标/地区/窗口过滤，后续必须协调全部查询与Claim核验，不可将本例计作参数化调查完成。`AnalyticsStore.load_csv_directory(materialize=True)`是底层物化选项，单独调用不提供指纹核对；默认行为保持兼容。
 
 边界：字节指纹不证明CSV业务口径、跨表事务一致性、历史客户归属或来源真实性；复制时如果发生改动，只有最终副本仍匹配预先指定标识才会接受，不提供上游原子快照。数据库仍可被持有store的可信程序代码写入，不是防篡改/权限隔离系统；不防同进程或同OS身份恶意修改临时文件。本入口不持久化重放数据，退出后内存数据丢失。物化增加临时磁盘与内存成本，尚未做规模性能验收。
+
+## 请求驱动金额执行（RUN-23）
+
+```python
+from fitzsight.investigation.request import InvestigationRequest
+from fitzsight.investigation.net_cashflows import execute_net_cashflows
+
+request = InvestigationRequest.from_dict(request_json)
+result = execute_net_cashflows(request, data_dir, backend="duckdb")  # 或 sqlite
+assert result.scope == "net_cashflow_amounts.v1"
+print(result.metrics)
+```
+
+`request_json`使用本文既有严格契约和预先指定的四文件指纹。入口不生成数据：私有副本核对 → 双后端物化 → 三张金额源表字段预检 → 请求地区/两期绑定查询 → 金额及分解 → N-C1/N-C2独立重算。返回原请求、已核对清单、六项金额/恒等检查、两条声明及证据；退出时关闭数据库。保持source_naive/USD语义，不做汇率、时区转换或每日归一化。文字使用实际地区及“两个期间”，不把不等长窗口写成周环比。
+
+这是**金额阶段接口**，结果类型为`NetCashflowResult`，不提供完整五声明调查、诊断、自然语言参数抽取、事件归因或CLI/UI入口。N-C3—N-C5、demo配置及其他核心调查链仍待迁移。旧runtime仍使用固定场景，不会自动调用本入口。此前RUN-18—20“尚未接入”的描述保留为对应批次历史。
+
+独立复核金额声明时，必须将原始、可信的`InvestigationRequest`通过`expected_request=`传入`verify_net_change`/`verify_net_decomposition`，不可从待核验的证据重新推定请求。新路径比对完整请求（含snapshot/timezone/metric）、声明地区/窗口、四来源的批准SQL与日期/地区绑定参数，并沿用来源完整性、有限数值、币种和定义快照校验。带request的证据若省略expected_request将被拒绝；旧场景核验规则保留。
+
+测试覆盖三地区×三组时期×双后端18组合，每组重复执行；关键数字、声明、请求、清单及SQL参数/摘要一致，证据执行时间戳允许变化。手工数据独立算式为基线(100−20)×k=80k，本期(75−15)×k=60k，净变−20k，入金变−25k，出金变−5k；pending和结束次日零点排除、结束日23:59:59包含。这仅是金额阶段跨场景验收，不能代替M1三条整链要求。
+
+边界：完整SQL与参数核对不证明原始数据真实、客户主键唯一、JOIN无重复、历史地区归属正确或外部/内部划转分类正确；注册器仍不签名、不持久化。四文件指纹包括本阶段暂不使用的business_events，事件表业务校验在后续完整调查迁移。每份SQL最多5000行，超限明确拒绝。金额仍沿用现有数值表示，定点金额和统一数据质量由M2推进。返回对象的嵌套字典可变，导出不是防篡改存储，也不是持久化重放验收。
