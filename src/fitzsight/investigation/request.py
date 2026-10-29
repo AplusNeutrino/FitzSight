@@ -63,6 +63,14 @@ class InvestigationRequest:
         return cls(value['metric'], filters['region'], Period.from_dict(value['baseline']),
                    Period.from_dict(value['current']), value['timezone'], value['currency'], value['data_snapshot'])
 
+    def verify_snapshot(self, data_dir):
+        """Explicit content check only; does not run or freeze an investigation."""
+        from fitzsight.data.snapshot import fingerprint_net_inputs
+        snapshot = fingerprint_net_inputs(data_dir)
+        if snapshot.snapshot_id != self.data_snapshot:
+            raise ValueError('Request data_snapshot does not match input file contents')
+        return snapshot
+
     def to_dict(self):
         return dict(metric=self.metric, filters={'region': self.region},
                     baseline={'start': self.baseline.start, 'end': self.baseline.end},
