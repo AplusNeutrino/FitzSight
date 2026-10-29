@@ -15,6 +15,7 @@ from .concentration_claims import ConcentrationBinding, render_concentration
 from .regional_claims import RegionAmounts, RegionalBinding, render_regional
 from .event_claims import EventBinding, event_query, render_event
 from .cashflow_queries import cashflow_sql
+from .regional_queries import regional_sql
 from .models import Claim, InvestigationPlan, InvestigationResult, PlanStep
 
 
@@ -91,21 +92,8 @@ class NetDepositInvestigationEngine:
 
     def _regional_net_per_customer(self, start: date, end: date):
         start_s, end_exclusive = self._period_bounds(start, end)
-        deposit_sql = (
-            "SELECT c.region, COUNT(DISTINCT c.customer_id) AS customer_count, "
-            "COALESCE(SUM(CAST(d.amount AS DOUBLE)), 0) AS deposits, "
-            "SUM(CASE WHEN d.customer_id IS NOT NULL AND (d.currency IS NULL OR d.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
-            "FROM customers c LEFT JOIN deposits d ON d.customer_id = c.customer_id "
-            "AND d.status = 'completed' AND d.timestamp >= ? AND d.timestamp < ? "
-            "GROUP BY c.region ORDER BY c.region"
-        )
-        withdrawal_sql = (
-            "SELECT c.region, COALESCE(SUM(CAST(w.amount AS DOUBLE)), 0) AS withdrawals, "
-            "SUM(CASE WHEN w.customer_id IS NOT NULL AND (w.currency IS NULL OR w.currency <> 'USD') THEN 1 ELSE 0 END) AS invalid_currency_count "
-            "FROM customers c LEFT JOIN withdrawals w ON w.customer_id = c.customer_id "
-            "AND w.status = 'completed' AND w.timestamp >= ? AND w.timestamp < ? "
-            "GROUP BY c.region ORDER BY c.region"
-        )
+        deposit_sql = regional_sql("deposits")
+        withdrawal_sql = regional_sql("withdrawals")
         deposits = self.sql_tool.run(deposit_sql, parameters=(start_s, end_exclusive))
         withdrawals = self.sql_tool.run(withdrawal_sql, parameters=(start_s, end_exclusive))
         if not all(complete_sql_rows(result.data) for result in (deposits, withdrawals)):

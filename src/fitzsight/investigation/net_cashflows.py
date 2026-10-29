@@ -3,6 +3,7 @@ from dataclasses import asdict, dataclass
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
+from statistics import median
 
 from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.metrics import net_deposit_definitions
@@ -11,6 +12,7 @@ from fitzsight.tools.sql import ReadOnlySQLTool
 from .inputs import open_net_input_store
 from .concentration_claims import ConcentrationBinding, render_concentration, verify_concentration
 from .models import Claim
+from .regional_claims import RegionAmounts, RegionalBinding, render_regional, verify_regional
 from .net_deposit import NetDepositInvestigationEngine
 from .numeric_claims import (
     NetChangeBinding, NetDecompositionBinding, finite_number,
@@ -36,13 +38,15 @@ class NetCashflowResult:
 
 def execute_net_cashflows(
     request: InvestigationRequest, data_dir: str | Path, *, backend: str,
-    top_customers: int | None = None,
+    top_customers: int | None = None, include_regional: bool = False,
 ) -> NetCashflowResult:
     """Materialize verified inputs, measure approved periods, verify N-C1/N-C2.
 
     No natural-language routing, model calls, demo generation or root-cause claim.
     Request context is checked separately from mutable evidence metadata.
     """
+    if type(include_regional) is not bool:
+        raise ValueError('include_regional must be a bool')
     if top_customers is not None and (type(top_customers) is not int or top_customers <= 0):
         raise ValueError('top_customers must be a positive integer or None')
     with open_net_input_store(request, data_dir, backend=backend) as session:
@@ -100,6 +104,11 @@ def execute_net_cashflows(
             metrics = {**metrics, 'customer_concentration': concentration}
             claims += (claim,)
             scope = 'net_cashflow_concentration.v1'
+        if include_regional:
+            regional, claim = _regional(request, registry, engine)
+            metrics = {**metrics, 'regional_control': regional}
+            claims += (claim,)
+            scope = 'net_cashflow_regional.v1'
         return NetCashflowResult(request.to_dict(), session.snapshot.to_dict(), metrics,
                                  claims, tuple(registry.to_dicts()), scope=scope)
 
@@ -134,4 +143,42 @@ def _concentration(request, registry, source, top_customers):
                   (source.evidence_id, record.evidence_id), numeric_binding=binding)
     if not verify_concentration(claim, registry, expected_request=request, expected_customer_count=top_customers):
         raise ValueError('Request-bound concentration claim verification failed')
+    return payload, claim
+
+
+def _regional(request, registry, engine):
+    periods = [engine._regional_net_per_customer(date.fromisoformat(p.start), date.fromisoformat(p.end))
+               for p in (request.baseline, request.current)]
+    baseline, current = (p[0] for p in periods)
+    changes = {}
+    for region in sorted(baseline.keys() | current.keys()):
+        before = baseline.get(region, {}).get('net_deposits_per_customer')
+        after = current.get(region, {}).get('net_deposits_per_customer')
+        changes[region] = after-before if before is not None and after is not None else None
+    if any(v is not None and not finite_number(v) for v in changes.values()):
+        raise ValueError('Regional changes must be finite')
+    target = changes.get(request.region)
+    controls = [v for r,v in changes.items() if r != request.region and v is not None]
+    control = median(controls) if controls else None
+    available = target is not None and control is not None
+    payload = dict(net_deposit_per_customer_change=changes, target_change=target,
+                   other_region_median_change=control, control_region_count=len(controls),
+                   calculation_status='computed' if available else 'unavailable',
+                   unavailable_reason='missing_target_region' if target is None else
+                       'missing_control_regions' if control is None else None)
+    context = dict(region=request.region, currency=request.currency,
+                   baseline_start=request.baseline.start, baseline_end=request.baseline.end,
+                   current_start=request.current.start, current_end=request.current.end)
+    ids = tuple(eid for _, pair in periods for eid in pair)
+    record = registry.register('regional_net_deposit_control',
+        {**context, 'request': request.to_dict(), 'source_evidence_ids': list(ids)}, payload)
+    def amounts(values):
+        return tuple(RegionAmounts(r,v['customer_count'],v['deposits'],v['withdrawals'])
+                     for r,v in sorted(values.items()))
+    binding = RegionalBinding(value=target, control_value=control, baseline=amounts(baseline),
+        current=amounts(current), evidence_id=record.evidence_id, source_evidence_ids=ids, **context)
+    claim = Claim('N-C4',render_regional(binding),'supported' if available else 'insufficient_evidence',
+                  'medium', ids+(record.evidence_id,), numeric_binding=binding)
+    if not verify_regional(claim,registry,expected_request=request):
+        raise ValueError('Request-bound regional claim verification failed')
     return payload, claim

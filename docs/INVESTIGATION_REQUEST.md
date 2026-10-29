@@ -60,3 +60,15 @@ print(result.metrics)
 独立核验N-C3时必须同时传`expected_request=request, expected_customer_count=11`，并沿用来源完整性/摘要/金额重算。原请求、原配置与证据分别核对，不能用证据自报的N代替原配置；还核对当前期间、地区及批准提款SQL和绑定参数。新证据缺少外部请求时拒绝；旧固定场景核验兼容。规范文字使用实际地区和明确起止日期（末端不含），不再固定European/current-week。
 
 18个地区/期间/后端组合均实测并重复运行，客户A=30k+20k、B=10k，前1占50k/60k；空表、全零、N大于实际客户数及负金额双后端验证。N-C4/N-C5、完整调查、demo配置和CLI/UI仍未迁移。此比例描述提款集中度，不代表余额集中度、客户风险或因果；数据质量、去重、定点金额及持久化边界沿用上文。
+
+## 请求驱动地区对照（RUN-25）
+
+`execute_net_cashflows(request, data_dir, backend="duckdb", include_regional=True)`增加N-C4，scope为`net_cashflow_regional.v1`。同时传`top_customers=11`返回N-C1—N-C4；不传时返回N-C1/N-C2/N-C4。include_regional只接受bool，默认False兼容原入口；它是执行配置，不是请求JSON字段。
+
+同一个已核对输入会话复用区域SQL：基线、本期分别查询全地区入金/出金，增加四份完整行证据。每地区分母为输入customers表的COUNT(DISTINCT customer_id)，包括没有流水的客户；计算两期人均净额之差，再取其他可计算地区变化的中位数。不等长窗口不按天归一化，不自动构造实验对照组。
+
+新结果使用metrics.regional_control.target_change，避免把Asia/Americas结果存为europe_change；旧固定引擎字段保留兼容。报告使用实际地区和两期日期，明确输入客户表分母，不声称历史期末注册数。缺目标/对照时null和insufficient_evidence，真实零值是computed。非目标地区的非USD流水同样拒绝。
+
+独立核验`verify_regional(claim, registry, expected_request=request)`必须使用原始可信请求；比对声明/证据的地区、四日期、快照等上下文，再核对四来源批准SQL及绑定参数，沿用完整性和金额/人数/中位数重算。带请求证据不能省略外部请求核验。
+
+实测覆盖三地区三时期双后端、无流水客户、日期/pending过滤、重复执行、缺地区、零变化和来源参数篡改。N-C5、完整调查、demo与CLI/UI仍待办。聚合重算不是独立源系统审计；客户主键重复导致的JOIN放大、历史归属、源数据真实性、定点金额和持久化仍待M2/M4。地区对照仅为描述性比较，不代表因果。

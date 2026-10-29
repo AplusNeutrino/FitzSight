@@ -1,6 +1,9 @@
 """N-C4 recomputation from SQL aggregates, not independent source-system audit."""
 from dataclasses import dataclass
 import math
+from datetime import date, timedelta
+from .request import InvestigationRequest
+from .regional_queries import regional_sql
 from statistics import median
 from .numeric_claims import complete_sql_rows, finite_number
 
@@ -35,9 +38,10 @@ def render_regional(b: RegionalBinding) -> str:
     if b.value is None or b.control_value is None:
         return ("Regional net-deposit comparison is unavailable because the target region "
                 "or comparable control regions have no calculable per-customer change.")
-    return (f"Europe's weekly net-deposit movement per registered customer was "
+    return (f"{b.region}'s net-deposit change per customer in the supplied customer table was "
             f"${b.value:,.2f}, versus a median of "
-            f"${b.control_value:,.2f} across the other regions.")
+            f"${b.control_value:,.2f} across the other regions "
+            f"({b.baseline_start}–{b.baseline_end} versus {b.current_start}–{b.current_end}).")
 
 
 def _close(a, b):
@@ -66,10 +70,13 @@ def _period(deposits, withdrawals):
     return tuple(output)
 
 
-def verify_regional(claim, registry) -> bool:
+def verify_regional(claim, registry, *, expected_request=None) -> bool:
+    if expected_request is not None and type(expected_request) is not InvestigationRequest:
+        return False
+    region = expected_request.region if expected_request is not None else 'Europe'
     b = claim.numeric_binding
     if type(b) is not RegionalBinding or (b.metric_id, b.unit, b.currency, b.region) != (
-        "regional_net_per_customer_change.v1", "currency_amount_per_customer", "USD", "Europe"
+        "regional_net_per_customer_change.v1", "currency_amount_per_customer", "USD", region
     ):
         return False
     try:
@@ -78,6 +85,14 @@ def verify_regional(claim, registry) -> bool:
             return False
         for field in ("baseline_start", "baseline_end", "current_start", "current_end", "currency", "region"):
             if record.parameters[field] != getattr(b, field):
+                return False
+        if 'request' in record.parameters and expected_request is None:
+            return False
+        if expected_request is not None:
+            if (record.parameters.get('request') != expected_request.to_dict()
+                    or (b.baseline_start, b.baseline_end, b.current_start, b.current_end) != (
+                        expected_request.baseline.start, expected_request.baseline.end,
+                        expected_request.current.start, expected_request.current.end)):
                 return False
         ids = b.source_evidence_ids
         if len(ids) != 4 or len(set(ids)) != 4 or tuple(record.parameters["source_evidence_ids"]) != ids:
@@ -91,6 +106,13 @@ def verify_regional(claim, registry) -> bool:
             return False
         if not all(complete_sql_rows(item.result) for item in sources):
             return False
+        if expected_request is not None:
+            for index, source in enumerate(sources):
+                period = expected_request.baseline if index < 2 else expected_request.current
+                bounds = [period.start, (date.fromisoformat(period.end)+timedelta(days=1)).isoformat()]
+                if (source.parameters.get('sql') != regional_sql('deposits' if index % 2 == 0 else 'withdrawals')
+                        or source.parameters.get('bound_parameters') != bounds):
+                    return False
         baseline = _period(sources[0].result["rows"], sources[1].result["rows"])
         current = _period(sources[2].result["rows"], sources[3].result["rows"])
         for bound, computed in ((b.baseline, baseline), (b.current, current)):
@@ -113,7 +135,7 @@ def verify_regional(claim, registry) -> bool:
         if recorded_changes.keys() != changes.keys() or any(not _close(v, recorded_changes[r]) for r, v in changes.items()):
             return False
         if not all((_close(b.value, target), _close(b.control_value, control),
-                    _close(result["europe_change"], target), _close(result["other_region_median_change"], control))):
+                    _close(result["target_change" if expected_request is not None else "europe_change"], target), _close(result["other_region_median_change"], control))):
             return False
         available = target is not None and control is not None
         reason = "missing_target_region" if target is None else "missing_control_regions" if control is None else None
