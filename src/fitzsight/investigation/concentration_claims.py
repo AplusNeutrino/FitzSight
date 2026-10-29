@@ -1,6 +1,10 @@
 """Bounded USD withdrawal concentration contract; source SQL remains trusted."""
 from dataclasses import dataclass
 import math
+from datetime import date, timedelta
+
+from .request import InvestigationRequest
+from .cashflow_queries import cashflow_sql
 
 from .numeric_claims import complete_sql_rows, finite_number
 
@@ -24,17 +28,22 @@ class ConcentrationBinding:
 
 def render_concentration(b: ConcentrationBinding) -> str:
     if b.value is None:
-        return "Withdrawal concentration is unavailable because current-week European total withdrawals are not positive."
-    return (f"The largest {b.customer_count} European customer withdrawals account for "
-            f"{b.value:.1%} of current-week European withdrawals.")
+        return f"Withdrawal concentration is unavailable because {b.region} total withdrawals in the selected period are not positive."
+    return (f"The largest {b.customer_count} customer withdrawal totals in {b.region} account for "
+            f"{b.value:.1%} of withdrawals in the selected period ({b.period_start} to {b.period_end_exclusive}, end exclusive).")
 
 
-def verify_concentration(claim, registry) -> bool:
+def verify_concentration(claim, registry, *, expected_request=None, expected_customer_count=None) -> bool:
+    if expected_request is not None:
+        if (type(expected_request) is not InvestigationRequest
+                or type(expected_customer_count) is not int or expected_customer_count <= 0):
+            return False
+    region = expected_request.region if expected_request is not None else 'Europe'
     b = claim.numeric_binding
     if type(b) is not ConcentrationBinding:
         return False
     if (b.metric_id, b.evidence_field, b.unit, b.currency, b.region) != (
-        "withdrawal_concentration.v1", "share_of_current_withdrawals", "ratio", "USD", "Europe"
+        "withdrawal_concentration.v1", "share_of_current_withdrawals", "ratio", "USD", region
     ) or type(b.customer_count) is not int or b.customer_count <= 0:
         return False
     try:
@@ -47,6 +56,17 @@ def verify_concentration(claim, registry) -> bool:
         for field in ("period_start", "period_end_exclusive", "currency", "region",
                       "customer_count", "source_evidence_id"):
             if record.parameters[field] != getattr(b, field):
+                return False
+        if 'request' in record.parameters and expected_request is None:
+            return False
+        if expected_request is not None:
+            start = expected_request.current.start
+            end = (date.fromisoformat(expected_request.current.end) + timedelta(days=1)).isoformat()
+            if (record.parameters.get('request') != expected_request.to_dict()
+                    or b.customer_count != expected_customer_count
+                    or (b.period_start, b.period_end_exclusive) != (start, end)
+                    or source.parameters.get('sql') != cashflow_sql('withdrawals')
+                    or source.parameters.get('bound_parameters') != [start, end, region]):
                 return False
         if not complete_sql_rows(source.result):
             return False
