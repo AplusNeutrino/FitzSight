@@ -14,7 +14,7 @@ from fitzsight.investigation.numeric_claims import NetChangeBinding, NetDecompos
 
 def fixture():
     registry = EvidenceRegistry()
-    sources = [registry.register('read_only_sql', {}, {'rows': [{'amount': amount, 'currency': 'USD'}]})
+    sources = [registry.register('read_only_sql', {}, {'rows': [{'amount': amount, 'currency': 'USD'}], 'row_count': 1, 'truncated': False})
                for amount in (100.0, 20.0, 75.0, 15.0)]
     context = dict(baseline_start='2026-07-27', baseline_end='2026-08-02',
                    current_start='2026-08-03', current_end='2026-08-09')
@@ -97,7 +97,7 @@ def test_net_engine_refuses_non_usd_source_instead_of_labeling_it_dollars():
         def run(self, sql, *, parameters):
             assert parameters == ['2026-07-27', '2026-08-03', 'Europe']
             assert 'c.region = ?' in sql
-            return SimpleNamespace(data={'rows': [{'amount': 100, 'currency': 'EUR'}]})
+            return SimpleNamespace(data={'rows': [{'amount': 100, 'currency': 'EUR'}], 'row_count': 1, 'truncated': False})
     engine = NetDepositInvestigationEngine(schema_tool=None, sql_tool=SQL(), registry=EvidenceRegistry())
     with pytest.raises(ValueError, match='requires USD'):
         engine._money_rows('deposits', region='Europe', start=date(2026, 7, 27), end=date(2026, 8, 2))

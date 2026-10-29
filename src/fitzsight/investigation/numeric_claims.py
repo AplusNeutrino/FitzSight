@@ -55,6 +55,20 @@ def finite_number(value):
         return False
 
 
+def complete_sql_rows(payload) -> bool:
+    """Require explicit full-result metadata; absent flags are not proof of completeness."""
+    return (
+        type(payload) is dict
+        and payload.get('truncated') is False
+        and 'evidence_mode' not in payload
+        and 'rows_preview' not in payload
+        and type(payload.get('rows')) is list
+        and type(payload.get('row_count')) is int
+        and payload['row_count'] == len(payload['rows'])
+        and all(type(row) is dict for row in payload['rows'])
+    )
+
+
 def verify_net_change(claim, registry) -> bool:
     return _verify_cashflow(claim, registry, decomposition=False)
 
@@ -98,6 +112,8 @@ def _verify_cashflow(claim, registry, *, decomposition: bool) -> bool:
             if eid not in claim.evidence_ids or source.tool_name != 'read_only_sql' or source.status != 'success':
                 return False
             if registry.digest(source.result) != source.result_digest:
+                return False
+            if not complete_sql_rows(source.result):
                 return False
             rows = source.result['rows']
             if any(not finite_number(r['amount']) or r['currency'] != 'USD' for r in rows):

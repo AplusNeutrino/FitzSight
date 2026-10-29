@@ -10,7 +10,7 @@ from fitzsight.evidence.registry import EvidenceRegistry
 from fitzsight.metrics import get_metric, net_deposit_definitions
 from fitzsight.tools.schema import SchemaInspectorTool
 from fitzsight.tools.sql import ReadOnlySQLTool
-from .numeric_claims import NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
+from .numeric_claims import complete_sql_rows, NetChangeBinding, NetDecompositionBinding, render_net_change, render_net_decomposition
 from .concentration_claims import ConcentrationBinding, render_concentration
 from .regional_claims import RegionAmounts, RegionalBinding, render_regional
 from .event_claims import EventBinding, event_query, render_event
@@ -90,6 +90,8 @@ class NetDepositInvestigationEngine:
             f"{region_clause} ORDER BY t.timestamp, t.customer_id"
         )
         result = self.sql_tool.run(sql, parameters=parameters)
+        if not complete_sql_rows(result.data):
+            raise ValueError("Net-deposit amounts require complete SQL rows; truncated or incomplete result")
         if any(row["currency"] != "USD" for row in result.data["rows"]):
             raise ValueError("Net-deposit demo requires USD cash flows; currency conversion is not implemented")
         return result
