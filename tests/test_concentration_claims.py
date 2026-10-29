@@ -13,7 +13,7 @@ def make_claim(registry, amounts=(30, 20, 10)):
     source = registry.register("read_only_sql", {}, {"rows": [
         {"customer_id": customer, "amount": amount, "currency": "USD"}
         for customer, amount in zip(("A", "A", "B"), amounts)
-    ]})
+    ], "truncated": False, "row_count": len(amounts)})
     total = sum(amounts)
     top = sum(amounts[:2])
     value = top / total if total else None

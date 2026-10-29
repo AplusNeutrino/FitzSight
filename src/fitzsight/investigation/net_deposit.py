@@ -115,6 +115,8 @@ class NetDepositInvestigationEngine:
         )
         deposits = self.sql_tool.run(deposit_sql, parameters=(start_s, end_exclusive))
         withdrawals = self.sql_tool.run(withdrawal_sql, parameters=(start_s, end_exclusive))
+        if not all(complete_sql_rows(result.data) for result in (deposits, withdrawals)):
+            raise ValueError("Regional comparison requires complete SQL rows; truncated or incomplete result")
         if any(row["invalid_currency_count"] for result in (deposits, withdrawals) for row in result.data["rows"]):
             raise ValueError("Regional net-deposit comparison requires USD cash flows")
         withdrawal_by_region = {

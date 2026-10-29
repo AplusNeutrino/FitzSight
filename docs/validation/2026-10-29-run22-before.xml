@@ -1,0 +1,1713 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="44" skipped="0" tests="44" time="1.612" timestamp="2026-10-29T02:17:52.202972-07:00" hostname="e5ee82246f9f"><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[truncated-0]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b54d6a0&gt;)">source_index = 0, defect = 'truncated'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b54d6a0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[truncated-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae652e0&gt;)">source_index = 1, defect = 'truncated'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae652e0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[truncated-2]" time="0.003"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae64c20&gt;)">source_index = 2, defect = 'truncated'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae64c20&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[truncated-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae65c10&gt;)">source_index = 3, defect = 'truncated'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae65c10&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[truncated-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae66120&gt;)">source_index = 4, defect = 'truncated'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae66120&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_flag-0]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae66d20&gt;)">source_index = 0, defect = 'missing_flag'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae66d20&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_flag-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea95b0&gt;)">source_index = 1, defect = 'missing_flag'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea95b0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_flag-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea8a40&gt;)">source_index = 2, defect = 'missing_flag'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea8a40&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_flag-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea9df0&gt;)">source_index = 3, defect = 'missing_flag'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea9df0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_flag-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e7e0&gt;)">source_index = 4, defect = 'missing_flag'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e7e0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_string-0]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e090&gt;)">source_index = 0, defect = 'false_string'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e090&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_string-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07ef00&gt;)">source_index = 1, defect = 'false_string'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07ef00&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_string-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07ffe0&gt;)">source_index = 2, defect = 'false_string'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07ffe0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_string-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50830&gt;)">source_index = 3, defect = 'false_string'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50830&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_string-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad51580&gt;)">source_index = 4, defect = 'false_string'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad51580&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_integer-0]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07f7d0&gt;)">source_index = 0, defect = 'false_integer'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07f7d0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_integer-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e4b0&gt;)">source_index = 1, defect = 'false_integer'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e4b0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_integer-2]" time="0.003"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e660&gt;)">source_index = 2, defect = 'false_integer'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e660&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_integer-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea9b20&gt;)">source_index = 3, defect = 'false_integer'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea9b20&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[false_integer-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea85f0&gt;)">source_index = 4, defect = 'false_integer'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea85f0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_count-0]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae666f0&gt;)">source_index = 0, defect = 'missing_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae666f0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_count-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae659a0&gt;)">source_index = 1, defect = 'missing_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae659a0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_count-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae67800&gt;)">source_index = 2, defect = 'missing_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae67800&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_count-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50680&gt;)">source_index = 3, defect = 'missing_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50680&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[missing_count-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad52060&gt;)">source_index = 4, defect = 'missing_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad52060&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[wrong_count-0]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad53350&gt;)">source_index = 0, defect = 'wrong_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad53350&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[wrong_count-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae14260&gt;)">source_index = 1, defect = 'wrong_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae14260&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[wrong_count-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad53170&gt;)">source_index = 2, defect = 'wrong_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad53170&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[wrong_count-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad51100&gt;)">source_index = 3, defect = 'wrong_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad51100&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[wrong_count-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50e60&gt;)">source_index = 4, defect = 'wrong_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ad50e60&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[boolean_count-0]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae65160&gt;)">source_index = 0, defect = 'boolean_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae65160&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[boolean_count-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae63590&gt;)">source_index = 1, defect = 'boolean_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae63590&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[boolean_count-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea8bc0&gt;)">source_index = 2, defect = 'boolean_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57aea8bc0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[boolean_count-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07fb60&gt;)">source_index = 3, defect = 'boolean_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07fb60&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[boolean_count-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07df70&gt;)">source_index = 4, defect = 'boolean_count'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07df70&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[preview-0]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae17770&gt;)">source_index = 0, defect = 'preview'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       AssertionError: assert not True
+E        +  where True = &lt;function verify_concentration at 0x7ff57b074220&gt;(Claim(claim_id='N-C3', text='The largest 1 European customer withdrawals account for 83.3% of current-week European wi...v1', evidence_field='share_of_current_withdrawals', unit='ratio', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae17770&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[preview-1]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae14ec0&gt;)">source_index = 1, defect = 'preview'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae14ec0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[preview-2]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae15f10&gt;)">source_index = 2, defect = 'preview'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae15f10&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[preview-3]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae16f30&gt;)">source_index = 3, defect = 'preview'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57ae16f30&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_incomplete_comparison_source_rejected[preview-4]" time="0.001"><failure message="assert not True&#10; +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text=&quot;Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e3c0&gt;)">source_index = 4, defect = 'preview'
+
+    @pytest.mark.parametrize('source_index', range(5))
+    @pytest.mark.parametrize('defect', ['truncated', 'missing_flag', 'false_string', 'false_integer',
+                                      'missing_count', 'wrong_count', 'boolean_count', 'preview'])
+    def test_incomplete_comparison_source_rejected(source_index, defect):
+        registry = EvidenceRegistry()
+        concentration = source_index == 0
+        claim = make_claim(registry) if concentration else make_regional(registry)
+        binding = claim.numeric_binding
+        ids = [binding.source_evidence_id] if concentration else list(binding.source_evidence_ids)
+        index = 0 if concentration else source_index - 1
+        original = registry.get(ids[index])
+        payload = deepcopy(original.result)
+        # Explicit valid metadata first, so only the selected defect causes rejection.
+        payload.update(truncated=False, row_count=len(payload['rows']))
+        if defect == 'truncated': payload['truncated'] = True
+        elif defect == 'missing_flag': del payload['truncated']
+        elif defect == 'false_string': payload['truncated'] = 'false'
+        elif defect == 'false_integer': payload['truncated'] = 0
+        elif defect == 'missing_count': del payload['row_count']
+        elif defect == 'wrong_count': payload['row_count'] += 1
+        elif defect == 'boolean_count': payload['row_count'] = True
+        else:
+            payload['evidence_mode'] = 'compact_preview'
+            payload['rows_preview'] = payload['rows']
+        changed = registry.register(original.tool_name, original.parameters, payload)
+        ids[index] = changed.evidence_id
+        derived = registry.get(binding.evidence_id)
+        if concentration:
+            derived.parameters['source_evidence_id'] = ids[0]
+            binding = replace(binding, source_evidence_id=ids[0])
+        else:
+            derived.parameters['source_evidence_ids'] = tuple(ids)
+            binding = replace(binding, source_evidence_ids=tuple(ids))
+        claim = replace(claim, numeric_binding=binding, evidence_ids=claim.evidence_ids+(changed.evidence_id,))
+        verify = verify_concentration if concentration else verify_regional
+&gt;       assert not verify(claim, registry)
+E       assert not True
+E        +  where True = &lt;function verify_regional at 0x7ff57b09a980&gt;(Claim(claim_id='N-C4', text="Europe's weekly net-deposit movement per registered customer was $-20.00, versus a median...net_per_customer_change.v1', unit='currency_amount_per_customer', currency='USD', region='Europe'), event_binding=None), &lt;fitzsight.evidence.registry.EvidenceRegistry object at 0x7ff57b07e3c0&gt;)
+
+tests/test_comparison_completeness.py:53: AssertionError</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_actual_regional_truncation_and_exact_limit[start0-end0-sqlite]" time="0.013"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_regional_truncatio0')
+backend = 'sqlite', start = datetime.date(2026, 7, 27)
+end = datetime.date(2026, 8, 2)
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('start,end', [(date(2026,7,27),date(2026,8,2)),
+                                         (date(2026,8,3),date(2026,8,9))])
+    def test_actual_regional_truncation_and_exact_limit(tmp_path, backend, start, end):
+        write_bundle(tmp_path, None)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=None,
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=1), registry=registry)
+&gt;           with pytest.raises(ValueError, match='Regional comparison requires complete SQL rows'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_comparison_completeness.py:66: Failed</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_actual_regional_truncation_and_exact_limit[start0-end0-duckdb]" time="0.115"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_regional_truncatio1')
+backend = 'duckdb', start = datetime.date(2026, 7, 27)
+end = datetime.date(2026, 8, 2)
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('start,end', [(date(2026,7,27),date(2026,8,2)),
+                                         (date(2026,8,3),date(2026,8,9))])
+    def test_actual_regional_truncation_and_exact_limit(tmp_path, backend, start, end):
+        write_bundle(tmp_path, None)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=None,
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=1), registry=registry)
+&gt;           with pytest.raises(ValueError, match='Regional comparison requires complete SQL rows'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_comparison_completeness.py:66: Failed</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_actual_regional_truncation_and_exact_limit[start1-end1-sqlite]" time="0.009"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_regional_truncatio2')
+backend = 'sqlite', start = datetime.date(2026, 8, 3)
+end = datetime.date(2026, 8, 9)
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('start,end', [(date(2026,7,27),date(2026,8,2)),
+                                         (date(2026,8,3),date(2026,8,9))])
+    def test_actual_regional_truncation_and_exact_limit(tmp_path, backend, start, end):
+        write_bundle(tmp_path, None)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=None,
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=1), registry=registry)
+&gt;           with pytest.raises(ValueError, match='Regional comparison requires complete SQL rows'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_comparison_completeness.py:66: Failed</failure></testcase><testcase classname="tests.test_comparison_completeness" name="test_actual_regional_truncation_and_exact_limit[start1-end1-duckdb]" time="0.033"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_regional_truncatio3')
+backend = 'duckdb', start = datetime.date(2026, 8, 3)
+end = datetime.date(2026, 8, 9)
+
+    @pytest.mark.parametrize('backend', ['sqlite', 'duckdb'])
+    @pytest.mark.parametrize('start,end', [(date(2026,7,27),date(2026,8,2)),
+                                         (date(2026,8,3),date(2026,8,9))])
+    def test_actual_regional_truncation_and_exact_limit(tmp_path, backend, start, end):
+        write_bundle(tmp_path, None)
+        with AnalyticsStore(tmp_path, backend=backend) as store:
+            store.load_csv_directory()
+            registry = EvidenceRegistry()
+            engine = NetDepositInvestigationEngine(schema_tool=None,
+                sql_tool=ReadOnlySQLTool(store, registry, max_rows=1), registry=registry)
+&gt;           with pytest.raises(ValueError, match='Regional comparison requires complete SQL rows'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_comparison_completeness.py:66: Failed</failure></testcase></testsuite></testsuites>

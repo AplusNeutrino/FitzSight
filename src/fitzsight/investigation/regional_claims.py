@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 import math
 from statistics import median
-from .numeric_claims import finite_number
+from .numeric_claims import complete_sql_rows, finite_number
 
 
 @dataclass(frozen=True)
@@ -88,6 +88,8 @@ def verify_regional(claim, registry) -> bool:
                     or registry.digest(item.result) != item.result_digest):
                 return False
         if any(item.tool_name != "read_only_sql" for item in sources):
+            return False
+        if not all(complete_sql_rows(item.result) for item in sources):
             return False
         baseline = _period(sources[0].result["rows"], sources[1].result["rows"])
         current = _period(sources[2].result["rows"], sources[3].result["rows"])

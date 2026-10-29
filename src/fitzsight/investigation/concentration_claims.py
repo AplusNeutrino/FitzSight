@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 import math
 
-from .numeric_claims import finite_number
+from .numeric_claims import complete_sql_rows, finite_number
 
 
 @dataclass(frozen=True)
@@ -48,6 +48,8 @@ def verify_concentration(claim, registry) -> bool:
                       "customer_count", "source_evidence_id"):
             if record.parameters[field] != getattr(b, field):
                 return False
+        if not complete_sql_rows(source.result):
+            return False
         # Aggregate the same current-period raw rows independently of ranking SQL.
         totals = {}
         for row in source.result["rows"]:

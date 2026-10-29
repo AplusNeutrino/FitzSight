@@ -18,9 +18,9 @@ def make_regional(registry, missing=None):
     for period in (before, after):
         sources.append(registry.register("read_only_sql", {}, {"rows": [
             dict(region=r.region, customer_count=r.customer_count, deposits=r.deposits, invalid_currency_count=0)
-            for r in period]}))
+            for r in period], "truncated": False, "row_count": len(period)}))
         sources.append(registry.register("read_only_sql", {}, {"rows": [
-            dict(region=r.region, withdrawals=r.withdrawals, invalid_currency_count=0) for r in period]}))
+            dict(region=r.region, withdrawals=r.withdrawals, invalid_currency_count=0) for r in period], "truncated": False, "row_count": len(period)}))
     ids = tuple(s.evidence_id for s in sources)
     changes = {r.region: change for r, change in zip(before, (30, 10, -20))}
     if missing == "controls":
